@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HERA tool</title>
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" href="v5.3.0-dist/ol.css">
+  <link rel="stylesheet" href="https://rawgit.com/Turbo87/sidebar-v2/master/css/ol3-sidebar.css" />
+
+  <link rel="stylesheet" href="../ol-layerswitcher/src/ol-layerswitcher.css" />
+  <link rel="stylesheet" type="text/css" href="mapStyle.css">
+  <script src="v5.3.0-dist/ol.js" type="text/javascript"></script>
+
+  <!-- JQuery and DataTable -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" type="text/javascript"></script>
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+  <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js" type="text/javascript"></script>
+
+  <!-- JQeury UI -->
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+  <!-- Activate DataTable File Exporting function -->
+  <script src="https://cdn.datatables.net/buttons/1.6.0/js/dataTables.buttons.min.js" type="text/javascript"></script>
+  <script src="https://cdn.datatables.net/buttons/1.6.0/js/buttons.flash.min.js" type="text/javascript"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js" type="text/javascript"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js" type="text/javascript"></script>
+  <script src="https://cdn.datatables.net/buttons/1.6.0/js/buttons.html5.min.js" type="text/javascript"></script>
+  <!-- DataTale Multiple tabs function -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" type="text/javascript"></script>
+  <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap.min.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap.min.css">
+
+  <script src="https://d3js.org/d3.v6.min.js"></script>
+  <!-- <script src="SSRT_highwinds.geojson.js"></script> -->
+
+
+</head>
+
+<body>
+  <div class="map-header">
+    <h1 id="header">Hazardous Extremes for Risk Assessment (HERA) Tool</h1>
+    <!-- <p id="header">Hazardous Extremes for Risk Assessment (HERA) Tool</p> -->
+  </div>
+
+  <!-- START OF SIDEBAR DIV -->
+  <div id="sidebar" class="sidebar collapsed">
+
+    <!-- Nav tabs -->
+    <div class="sidebar-tabs">
+      <ul role="tablist">
+        <li><a href="#home" role="tab"><i class="fa fa-bars"></i></a></li>
+        <li><a href="#table" role="tab"><i class="fa fa-table"></i></a></li>
+        <li><a href="#filter" role="tab"><i class="fa fa-filter"></i></a></li>
+        <li><a href="#chart" role="tab"><i class="fa fa-bar-chart"></i></a></li>
+        <li><a href="#about" role="tab"><i class="fa fa-info-circle"></i></a></li>
+      </ul>
+
+      <ul role="tablist">
+        <li><a href="#settings" role="tab"><i class="fa fa-gear"></i></a></li>
+      </ul>
+    </div>
+
+    <!-- Tab panes -->
+    <div class="sidebar-content">
+      <div class="sidebar-pane" id="home">
+        <h1 class="sidebar-header">Layers<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
+        <!-- !!! HERE WILL GO THE CONTENT OF LAYERSWITCHER !!! -->
+        <div id="layers" class="layer-switcher"></div>
+        <!-- <i class="fa fa-info-circle" aria-hidden="true" id="info"></i> -->
+      </div>
+
+      <div class="sidebar-pane" id="table">
+        <h1 class="sidebar-header">Table<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+          <li role="presentation" class="active"><a id="tab-1" href="#tabpanel-1" aria-controls="tabpanel-1" role="tab"
+              data-toggle="tab"></a></li>
+          <li role="presentation"><a id="tab-2" href="#tabpanel-2" aria-controls="tabpanel-2" role="tab"
+              data-toggle="tab"></a></li>
+          <li role="presentation"><a id="tab-3" href="#tabpanel-3" aria-controls="tabpanel-3" role="tab"
+              data-toggle="tab"></a></li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+          <div role="tabpanel" class="tab-pane fade in active" id="tabpanel-1">
+            <!-- attribute table creation-->
+            <table id="attributeTb" class="table table-striped table-bordered table-condensed" cellspacing="0"
+              width="100%"></table>
+          </div>
+          <div role="tabpanel" class="tab-pane fade" id="tabpanel-2">
+            <table id="attributeTb2" class="table table-striped table-bordered table-condensed" cellspacing="0"
+              width="100%"></table>
+          </div>
+          <div role="tabpanel" class="tab-pane fade" id="tabpanel-3">
+            <table id="attributeTb3" class="table table-striped table-bordered table-condensed" cellspacing="0"
+              width="100%"></table>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-pane" id="filter">
+        <h1 class="sidebar-header">Filter<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
+        <select id='status-table'>
+          <option value='default' selected>target layer </option>
+          <!-- <option value='accept'></option> -->
+        </select></br>
+        <select id='status-table'>
+          <option value='default' selected>sub category </option>
+          <!-- <option value='accept'></option> -->
+        </select></br>
+        <button>update map</button>
+      </div>
+
+      <div class="sidebar-pane" id="chart">
+        <h1 class="sidebar-header">Chart<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
+      </div>
+
+      <div class="sidebar-pane" id="about">
+        <h1 class="sidebar-header">About HERA<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
+        <p>HERA is an experimental decision-support tool designed to assist local and regional organizations in planning
+          and preparedness for hazardous and extreme meteorological and climatological events. The tool provides
+          decision support through:
+
+          Hazard data visualization in county maps and annual tables
+          County-level counts and probabilities of hazardous and extreme events
+          Comparisons across counties
+          Currently, the tool uses historical data to provide information by county in North Carolina and South
+          Carolina, and may soon be expanded to other southeastern states.</p>
+      </div>
+
+      <div class="sidebar-pane" id="settings">
+        <h1 class="sidebar-header">Settings<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
+      </div>
+    </div>
+  </div>
+  <!-- END OF SIDEBAR DIV -->
+
+  <div id="map">
+    <div id="dialog" title="Legend">
+      <button id='updateLegend'>Update legend</button>
+      <p>To navigate through HERA, click on the Hazard tabs or move the navigation slider that appears under tabs when
+        hovering over them. On each page, you may select State, Years, and Subcategories depending on the hazard of
+        interest. To view a Count of the number of hazard events that have occurred and the Probability that at least
+        one event of that hazard will happen in a year, ....</p>
+      <div>
+        <img id="legend"
+          src="http://152.7.99.155:8080/geoserver/hera/wms?&REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=hera:ncsc_isa_lyr">
+        <!-- <img
+          src="http://152.7.99.155:8080/geoserver/hera/wms?&REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=hera:ncsc_population_lyr"> -->
+
+      </div>
+    </div>
+  </div>
+  <div id="popup" class="ol-popup">
+    <a href="#" id="popup-closer" class="ol-popup-closer"></a>
+    <div id="popup-content" class="ol-popup-content"></div>
+  </div>
+  <script src="https://rawgit.com/Turbo87/sidebar-v2/master/js/ol3-sidebar.js"></script>
+  <script src="ol-layerswitcher/dist/ol-layerswitcher.js"></script>
+  <script src="HERA.js" style="text/javascript"></script>
+
+</body>
+
+</html>

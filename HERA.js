@@ -92,21 +92,6 @@ var boundarySource = new ol.source.TileWMS({
   transition: 0,
 });
 
-// new ol.source.Vector({
-//   renderMode: 'image', // Vector layers are rendered as images. Better performance. Default is 'vector'.
-//   format: new ol.format.GeoJSON(),
-//   url: function(extent) {
-//     return  'http://152.7.99.155:8080/geoserver/hera/wfs?service=WFS' +
-//             '&version=1.0.0&request=GetFeature'+
-//             '&typeName=hera:ncsc_county' +
-//            '&outputFormat=application/json&srsname=EPSG:4326' +
-//           //  '&bbox=-124.73142200000001, 24.955967, -66.969849, 49.371735'
-//            '&bbox=-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641'
-//           // + '&bbox=' + extent.join(',') + ',EPSG:3857'; // CQL filter and bbox are mutually exclusive. comment this to enable cql filter
-//   },
-//   strategy: ol.loadingstrategy.bbox,
-// }),
-
 var view = new ol.View({
   // projection: 'EPSG:3857',
   center: ol.proj.fromLonLat([-79.5, 34.1]),
@@ -176,7 +161,6 @@ var map = new ol.Map({
 
             new ol.layer.Vector({
               // title: "NC SC population - Vector",
-              // title: featurestatus,
               source: new ol.source.Vector({
                 renderMode: 'image', // Vector layers are rendered as images. Better performance. Default is 'vector'.
                 format: new ol.format.GeoJSON(),
@@ -194,7 +178,6 @@ var map = new ol.Map({
               style: new ol.style.Style({
                 fill: new ol.style.Fill({
                   color: [255, 255, 255, 0],
-                  // opacity: 1
                 }),
                 stroke: new ol.style.Stroke({
                   color: '#867E77',
@@ -204,105 +187,46 @@ var map = new ol.Map({
             }),
           ]
         }),
-        // new ol.layer.Tile({
-        //   title:"US County",
-        //   source: new ol.source.TileArcGISRest({
-        //       url: "https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/State_County/MapServer",
-        //   }),
-        //   style: new ol.style.Style({
-        //   })
-        // }),
 
+        new ol.layer.Group({
+          title: "2015 Impervious Surface Area - group",
+          combine: true,
+          visible: true,
+          layers: [
+            new ol.layer.Tile({
+              // title: "2015 Impervious Surface Area",
+              source: wmsSource2
+            }),
 
-        // new ol.layer.Vector({
-        //     title: "NC SC County- Vector",
-        //     // title: featurestatus,
-        //     source: new ol.source.Vector({
-        //       renderMode: 'image', // Vector layers are rendered as images. Better performance. Default is 'vector'.
-        //       format: new ol.format.GeoJSON(),
-        //       url: function(extent) {
-        //         return  'http://152.7.99.155:8080/geoserver/hera/wfs?service=WFS' +
-        //                 '&version=1.0.0&request=GetFeature'+
-        //                 '&typeName=hera:ncsc_county' +
-        //                '&outputFormat=application/json&srsname=EPSG:4326' +
-        //               //  '&bbox=-124.73142200000001, 24.955967, -66.969849, 49.371735'
-        //                '&bbox=-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641'
-        //               // + '&bbox=' + extent.join(',') + ',EPSG:3857'; // CQL filter and bbox are mutually exclusive. comment this to enable cql filter
-        //       },
-        //       strategy: ol.loadingstrategy.bbox,
-        //     }),
-        //     // style: styleFunction, // Setting style in GeoServer SLD files 
-        //   }),
-
-        // new ol.layer.Vector({
-        //   title: "NC SC population - Vector",
-        //   // title: featurestatus,
-        //   source: new ol.source.Vector({
-        //     renderMode: 'image', // Vector layers are rendered as images. Better performance. Default is 'vector'.
-        //     format: new ol.format.GeoJSON(),
-        //     url: function (extent) {
-        //       return 'http://152.7.99.155:8080/geoserver/hera/wfs?service=WFS' +
-        //         '&version=1.0.0&request=GetFeature' +
-        //         '&typeName=hera:ncsc_population_lyr' +
-        //         '&outputFormat=application/json&srsname=EPSG:4326' +
-        //         //  '&bbox=-124.73142200000001, 24.955967, -66.969849, 49.371735'
-        //         '&bbox=-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641'
-        //       // + '&bbox=' + extent.join(',') + ',EPSG:3857'; // CQL filter and bbox are mutually exclusive. comment this to enable cql filter
-        //     },
-        //     strategy: ol.loadingstrategy.bbox,
-        //   }),
-        //   // style: styleFunction, // Setting style in GeoServer SLD files 
-        // }),
-
-        new ol.layer.Vector({
-          title: "NC SC ISA - Vector",
-          // title: featurestatus,
-          source: new ol.source.Vector({
-            renderMode: 'image', // Vector layers are rendered as images. Better performance. Default is 'vector'.
-            format: new ol.format.GeoJSON(),
-            url: function (extent) {
-              return 'http://152.7.99.155:8080/geoserver/hera/wfs?service=WFS' +
-                '&version=1.0.0&request=GetFeature' +
-                '&typeName=hera:ncsc_isa_lyr' +
-                '&outputFormat=application/json&srsname=EPSG:4326' +
-                //  '&bbox=-124.73142200000001, 24.955967, -66.969849, 49.371735'
-                '&bbox=-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641'
-              // + '&bbox=' + extent.join(',') + ',EPSG:3857'; // CQL filter and bbox are mutually exclusive. comment this to enable cql filter
-            },
-            strategy: ol.loadingstrategy.bbox,
-          }),
-          // style: styleFunction, // Setting style in GeoServer SLD files 
+            new ol.layer.Vector({
+              // title: "NC SC ISA - Vector",
+              source: new ol.source.Vector({
+                renderMode: 'image', // Vector layers are rendered as images. Better performance. Default is 'vector'.
+                format: new ol.format.GeoJSON(),
+                url: function (extent) {
+                  return 'http://152.7.99.155:8080/geoserver/hera/wfs?service=WFS' +
+                    '&version=1.0.0&request=GetFeature' +
+                    '&typeName=hera:ncsc_isa_lyr' +
+                    '&outputFormat=application/json&srsname=EPSG:4326' +
+                    //  '&bbox=-124.73142200000001, 24.955967, -66.969849, 49.371735'
+                    '&bbox=-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641'
+                  // + '&bbox=' + extent.join(',') + ',EPSG:3857'; // CQL filter and bbox are mutually exclusive. comment this to enable cql filter
+                },
+                strategy: ol.loadingstrategy.bbox,
+              }),
+              style: new ol.style.Style({
+                fill: new ol.style.Fill({
+                  color: [255, 255, 255, 0],
+                }),
+                stroke: new ol.style.Stroke({
+                  color: '#867E77',
+                  width: 0.1
+                })
+              }),
+            }),
+          ]
         }),
 
-
-        // new ol.layer.Tile({
-        //   title: "2017 population",
-        //   source: wmsSource
-        //   // source: new ol.source.TileWMS({
-        //   //   url: 'http://152.7.99.155:8080/geoserver/hera/wms',
-        //   //   projection: 'EPSG:4269',
-        //   //   params: {"VERSION": "1.3.0",
-        //   //           'LAYERS': 'hera:ncsc_population_lyr',
-        //   //           // 'bbox': [-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641],
-        //   //           'TILED': true,
-        //   //           'FORMAT': 'image/png'},
-        //   //   serverType: 'geoserver',
-        //   //   // Countries have transparency, so do not fade tiles:
-        //   //   transition: 0,
-        //   // }),
-        // }),
-
-        new ol.layer.Tile({
-          title: "2015 Impervious Surface Area",
-          source: wmsSource2
-        }),
-
-        // new ol.layer.Tile({
-        //   title:"Test ESRI MapServer",
-        //   source: new ol.source.TileArcGISRest({
-        //     url: 'https://idpgis.ncep.noaa.gov/arcgis/rest/services/NWS_Observations/radar_base_reflectivity/MapServer',
-        //   }),
-        // }),
 
       ]
     })
@@ -405,6 +329,9 @@ map.addControl(sidebar);
 
 document.getElementById("tab-1").innerHTML = "2017 population";
 document.getElementById("tab-2").innerHTML = "2015 Impervious Surface Area";
+
+document.getElementById("about-tab-1").innerHTML = "HERA Data Source";
+document.getElementById("about-tab-2").innerHTML = "Contact Us";
 
 
 // Create attribute table using Jquery library DataTable
@@ -593,6 +520,31 @@ var cells = rows.selectAll("td")
     return d;
   });
 
+var sourcedata = [
+  [
+    "Tiger Nixon",
+    "System Architect",
+    "Edinburgh",
+    "5421",
+    "2011/04/25",
+    "$3,120"
+  ],
+  [
+    "Garrett Winters",
+    "Director",
+    "Edinburgh",
+    "8422",
+    "2011/07/25",
+    "$5,300"
+  ]
+]
+
+
+$('#datasourceTb').DataTable({
+  data: sourcedata,
+});
+
+
 $(function () {
   $("#dialog").dialog({
     autoOpen: true,
@@ -600,6 +552,7 @@ $(function () {
     minHeight: 400
   });
 });
+
 
 let legendBtn = document.getElementById("updateLegend");
 let legendImg = document.getElementById("legend");

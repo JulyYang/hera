@@ -106,6 +106,14 @@ body {
   z-index: 100000;
 }
 
+#cisa-logo {
+  width: 200px;
+}
+
+#sercc-logo {
+  width: 120px;
+}
+
 /* .layer-switcher.shown.layer-switcher-activation-mode-click {
   padding-right: 34px;
 }

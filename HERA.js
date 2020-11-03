@@ -92,6 +92,21 @@ var boundarySource = new ol.source.TileWMS({
   transition: 0,
 });
 
+var testVm = new ol.source.TileWMS({
+  url: 'http://hera1.oasis.unc.edu:8080/geoserver/topp/wms',
+  projection: 'EPSG:4326',
+  params: {
+    "VERSION": "1.3.0",
+    'LAYERS': 'topp:states',
+    // 'bbox': [-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641],
+    'TILED': true,
+    'FORMAT': 'image/png'
+  },
+  serverType: 'geoserver',
+  // Countries have transparency, so do not fade tiles:
+  transition: 0,
+});
+
 var view = new ol.View({
   // projection: 'EPSG:3857',
   center: ol.proj.fromLonLat([-79.5, 34.1]),
@@ -229,7 +244,12 @@ var map = new ol.Map({
 
 
       ]
-    })
+    }),
+
+    // new ol.layer.Tile({
+    //   title: "test layer from VM",
+    //   source: testVm
+    // }),
 
   ],
   overlays: [overlay],
@@ -540,9 +560,9 @@ var sourcedata = [
 ]
 
 
-$('#datasourceTb').DataTable({
-  data: sourcedata,
-});
+// $('#datasourceTb').DataTable({
+//   data: sourcedata,
+// });
 
 
 $(function () {
@@ -557,20 +577,32 @@ $(function () {
 let legendBtn = document.getElementById("updateLegend");
 let legendImg = document.getElementById("legend");
 let legendSrc = "http://152.7.99.155:8080/geoserver/hera/wms?&REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER="
-legendImg.src = legendSrc + "hera:ncsc_isa_lyr";
+let firstLyr = 'hera:ncsc_isa_lyr';
+legendImg.src = legendSrc + firstLyr;
+// legendImg.src = legendSrc + 'hera:ncsc_isa_lyr';
 
 legendBtn.onclick = function () {
-  let currentLyrList = map.getLayerGroup().getLayersArray();
-  let firstLyr = currentLyrList[currentLyrList.length - 1].getSource().params_.LAYERS;
-  let lyrVis = map.getLayerGroup().getLayers().item(1).getLayers().item(3).state_['visible'];
-  if (!lyrVis) {
-    firstLyr = currentLyrList[currentLyrList.length - 1 - 1].getSource().params_.LAYERS;
-    legendImg.src = legendSrc + firstLyr;
-  } else {
-    legendImg.src = legendSrc + firstLyr;
+  let currentLyrs = map.getLayerGroup().getLayers().array_;
+  let lyrsGroup = currentLyrs.filter(e => {
+    return e.values_.title == 'Layers'
+  })[0];
+  let tilelyrs = lyrsGroup.getLayersArray().filter(e => {
+    return e.type == 'TILE'
+  });
+  // console.log(tilelyrs);
+
+  for (l of tilelyrs) {
+    if (l.state_.visible) {
+      firstLyr = l.getSource().params_.LAYERS;
+      legendImg.src = legendSrc + firstLyr;
+    }
   }
-  console.log("legend");
+
   // console.log(firstLyr);
+
+  // let visiblelyr = tilelyrs.find(e => {e.state_.visible == true});
+  // console.log(visiblelyr);
+
 };
 
 

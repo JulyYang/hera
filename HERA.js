@@ -386,13 +386,6 @@ function createTabTable(attributeTableID, layerID, properties) {
   return table;
 };
 
-$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-  $.fn.dataTable.tables({
-    visible: true,
-    api: true
-  }).columns.adjust();
-});
-
 createTabTable('#attributeTb', 'ncsc_population_lyr', [{
     "title": "FIPS",
     data: "properties.fips",
@@ -427,9 +420,14 @@ createTabTable('#attributeTb2', 'ncsc_isa_lyr', [{
   },
 ], );
 
+$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+  $.fn.dataTable.tables({
+    visible: true,
+    api: true
+  }).columns.adjust();
+});
 
 // Create mock-up highlight table as tableau
-
 var dummy = [
 
   ['2006', 10, 30, 40, 40, 55, 36, 74, 39, 29],
@@ -540,29 +538,53 @@ var cells = rows.selectAll("td")
     return d;
   });
 
-var sourcedata = [
-  [
-    "Tiger Nixon",
-    "System Architect",
-    "Edinburgh",
-    "5421",
-    "2011/04/25",
-    "$3,120"
-  ],
-  [
-    "Garrett Winters",
-    "Director",
-    "Edinburgh",
-    "8422",
-    "2011/07/25",
-    "$5,300"
+var sourcedata = [{
+    "Dataset": "Local Storm Reports (LSR)",
+    "Years": "1989-2018",
+    "Hazards": "Hail, High Winds, Tornadoes",
+    "Description": "Local Storm Reports originate from National Weather Service (NWS) offices and are verified by the NWS Storm Prediction Center each spring. HERA displays LSR data for hail, high winds and tornadoes from 1989-2018. LSRs are generated from reports of severe weather in an area or county made by storm spotters (storm chasers, law enforcement officials, emergency management personnel, firefighters, EMTs, or public citizens). LSRs may also be issued by NWS Weather Forecast Offices (WFO) after a weather event has ended to inform media outlets and the public.",
+  },
+  {
+    "Dataset": "National Hurricane Center (NHC) Best Track Data (HURDAT2)",
+    "Years": "1950-2019",
+    "Hazards": "Hurricanes, Tropical Storms",
+    "Description": "The Atlantic hurricane database known as Atlantic HURDAT2 (1851-2019), has six-hourly information on the location, maximum winds, central pressure, and (beginning in 2004) size of all known tropical cyclones and subtropical cyclones. HERA displays hurricanes and tropical storms data from 1950-2019. The location of hurricane and tropical storm tracks every six hours was used to ascertain the proximity to county centroids. If hurricanes or tropical storms were found to be within 75 miles of a county centroid, they were counted for that county.",
+  },
+  {
+    "Dataset": "National Weather Service (NWS) Watches, Warnings and Advisories (WWA or WaWA)",
+    "Years": "2006-2019",
+    "Hazards": "Floods, Heat, Winter Weather",
+    "Description": `NWS WaWA data is used as a best-available proxy for occurrence of hazards in HERA related to floods, heat, and winter weather. The WaWA data is downloaded from the Iowa Environmental Mesonet (IEM) at <a href="https://mesonet.agron.iastate.edu/pickup/wwa/" target="_blank">WWA</a> for years 2006-2019. Only Warnings and Advisories are used as a proxy for the occurrence of hazards, because Advisories and Warnings are issued only when an event is imminent or occurring. However, users should be aware that the issuance of Advisories and Warnings may vary geographically, because they are issued by different Weather Forecast Offices (WFO) based on local criteria. The count of flood, heat, and winter weather Advisories and Warnings in HERA is made on a daily basis. So, multi-day events may be counted for each day an Advisory or Warning is in effect, if that Advisory or Warning is updated on a daily basis.`,
+  },
+];
+
+
+$('#datasourceTb').DataTable({
+  responsive: 'true',
+  data: sourcedata,
+  // "dom": 'Brt<"bottom"l>',
+  "dom": 't',
+  columns: [{
+      data: 'Dataset'
+    },
+    {
+      data: 'Years'
+    },
+    {
+      data: 'Hazards'
+    },
+    {
+      data: 'Description'
+    }
   ]
-]
+});
 
 
-// $('#datasourceTb').DataTable({
-//   data: sourcedata,
-// });
+$('a[href="#about-tabpanel-2"]').click(function (e) {
+  e.preventDefault();
+  $(this).tab('show');
+  console.log('here');
+});
 
 
 $(function () {

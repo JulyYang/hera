@@ -620,52 +620,18 @@ legendBtn.onclick = function () {
     }
   }
 
-  // console.log(firstLyr);
-
-  // let visiblelyr = tilelyrs.find(e => {e.state_.visible == true});
-  // console.log(visiblelyr);
-
 };
 
-
-var listItems = document.querySelectorAll('li.layer');
-for (let i = 0; i < listItems.length - 1; i++) {
-  var info = document.createElement('i');
-  info.className = "fa fa-info-circle";
-  info.setAttribute('aria-hidden', "true");
-  info.setAttribute('id', 'info-' + i.toString());
-  listItems[i].appendChild(info);
-  // alert(listItems[i].textContent);
-}
-
-
-// var infoBox = document.getElementById('info');
-
-// infoBox.onclick = function () {
+// var clickInfo = function () {
 //   console.log('info clicked')
 // };
 
-// ol.control.LayerSwitcher.prototype.renderLayer_ = function () {
-//   // var lyrLogos = ['hi', 'test', 'label', 'hi', 'test', 'label', 'hi', 'test', 'label'];
-
-//   // var lyrTitle = lyrLogos[idx] + '&nbsp' + lyr.get('title');
-//   // var getT = lyr.get('title')
-//   // console.log(getT);
-
-//   var listItems = document.querySelectorAll('li.layer');
-//   for (let i = 0; i < listItems.length - 1; i++) {
-//     var info = document.createElement('i');
-//     info.className = "fa fa-info-circle";
-//     info.setAttribute('aria-hidden', "true");
-//     info.setAttribute('id', 'info-' + i.toString());
-//     listItems[i].appendChild(info);
-//     // alert(listItems[i].textContent);
-//   }
-
-//   // ListeningStateChangedEvent.appendChild(info);
-
+// var listItems = document.querySelectorAll('li.layer');
+// for (let i = 0; i < listItems.length - 1; i++) {
+//   var info = document.createElement('i');
+//   info.className = "fa fa-info-circle";
+//   info.setAttribute('aria-hidden', "true");
+//   info.setAttribute('id', 'info-' + i.toString());
+//   listItems[i].appendChild(info);
+//   info.onclick = clickInfo;
 // }
-
-/* <i class="fa fa-info-circle" aria-hidden="true" id="info"></i> */
-
-// ol.control.LayerSwitcher.renderPanel(map, toc);

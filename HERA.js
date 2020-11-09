@@ -275,68 +275,40 @@ map.on('pointermove', function (e) {
   e.map.getTargetElement().style.cursor = hit ? 'pointer' : '';
 });
 
+let createContent = function (lyr, f) {
+  switch (lyr) {
+    case 'ncsc_population_lyr':
+      var countyname = f.get('county');
+      var geoid = f.get('fips');
+      var population = f.get('population');
+      content.innerHTML = '<h5>County: ' + countyname + '</h5><br><p>Zipcode: ' + geoid + '</p>' + '<p>Population (2017): ' + population + '</p>';
+      break;
+    case 'ncsc_isa_lyr':
+      var countyname = f.get('county');
+      var geoid = f.get('fips');
+      var percentIsa = (100 * f.get('percent_isa')).toFixed(2);
+      content.innerHTML = '<h5>County: ' + countyname + '</h5><br><p>Zipcode: ' + geoid + '</p>' + '<p>Impervious Surface Area (2015): ' + percentIsa + '</p>';
+      break;
+  }
+
+
+
+}
+
 map.on('singleclick', function (evt) {
   var coord = evt.coordinate;
   var features = map.getFeaturesAtPixel(evt.pixel);
-  // let resolution = map.getView().getResolution();
-  // let projection = map.getView().getProjection();
-  // // var url = '';
-  // // var vistaResolution = /** @type {number} */ (vista.getResolution());
-  // var url = wmsSource.getGetFeatureInfoUrl(
-  //     coord, resolution, projection,
-  //     {'INFO_FORMAT': 'application/json',}
-  //       // 'propertyName': 'fips, county, population'}
-  // );
-
   if (features) {
-    // if (features.length > 1){
+    console.log(features[0]);
+    var layerid = features[0].getId().split('.')[0];
+    console.log(layerid);
 
-    //   } else {
-    var countyname = features[0].get('county');
-    var geoid = features[0].get('fips');
-    var population = features[0].get('population');
-
-    //   }
-    content.innerHTML = '<h3>' + countyname + '</h3><br><p>geoid: ' + geoid + '</p>' + '<p>population: ' + population + '</p>';
-    //   // overlay.setPosition(ol.proj.fromLonLat([lon,lat]));
+    createContent(layerid, features[0]);
     overlay.setPosition(coord);
   } else {
-    // else if (url) {
-    let resolution = map.getView().getResolution();
-    let projection = map.getView().getProjection();
-    // var url = '';
-    // var vistaResolution = /** @type {number} */ (vista.getResolution());
-    var url = wmsSource.getGetFeatureInfoUrl(
-      coord, resolution, projection, {
-        'INFO_FORMAT': 'application/json',
-      }
-      // 'propertyName': 'fips, county, population'}
-    );
-
-    if (url) {
-      fetch(url)
-        .then(function (response) {
-          return response.json();
-        })
-        .then(function (json) {
-          var lyrId = json['features'][0]['id'].split('.')[0];
-          if (lyrId = 'ncsc_population_lyr') {
-            content.innerHTML = '<h3>population:' + json["features"][0]["properties"]["population"] + '</h3>' + 'county name:' + json["features"][0]["properties"]["county"];
-            console.log(json);
-          } else if (lyrId = 'ncsc_isa_lyr') {
-            content.innerHTML = '<h3>population:' + json["features"][0]["properties"]["percent_isa"] + '</h3>' + 'county name:' + json["features"][0]["properties"]["county"];
-            console.log(json);
-          }
-        });
-      // }
-      overlay.setPosition(coord);
-    }
+    overlay.setPosition(undefined);
   }
-  // else {
-  //   overlay.setPosition(undefined);
-  // }
 });
-
 
 
 var sidebar = new ol.control.Sidebar({
@@ -446,60 +418,58 @@ var rowLabel = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'S
 
 // Using RBG
 var colors = [{
-    r: 255,
-    g: 255,
-    b: 255
-  },
-  {
-    r: 59,
-    g: 115,
-    b: 143
-  }, {
-    r: 59,
-    g: 115,
-    b: 143
-  }, {
-    r: 59,
-    g: 115,
-    b: 143
-  }, {
-    r: 59,
-    g: 115,
-    b: 143
-  }, {
-    r: 59,
-    g: 115,
-    b: 143
-  }, {
-    r: 59,
-    g: 115,
-    b: 143
-  }, {
-    r: 59,
-    g: 115,
-    b: 143
-  }, {
-    r: 59,
-    g: 115,
-    b: 143
-  }, {
-    r: 59,
-    g: 115,
-    b: 143
-  }, {
-    r: 59,
-    g: 115,
-    b: 143
-  }, {
-    r: 59,
-    g: 115,
-    b: 143
-  }, {
-    r: 59,
-    g: 115,
-    b: 143
-  }
-];
+  r: 255,
+  g: 255,
+  b: 255
+}, {
+  r: 59,
+  g: 115,
+  b: 143
+}, {
+  r: 59,
+  g: 115,
+  b: 143
+}, {
+  r: 59,
+  g: 115,
+  b: 143
+}, {
+  r: 59,
+  g: 115,
+  b: 143
+}, {
+  r: 59,
+  g: 115,
+  b: 143
+}, {
+  r: 59,
+  g: 115,
+  b: 143
+}, {
+  r: 59,
+  g: 115,
+  b: 143
+}, {
+  r: 59,
+  g: 115,
+  b: 143
+}, {
+  r: 59,
+  g: 115,
+  b: 143
+}, {
+  r: 59,
+  g: 115,
+  b: 143
+}, {
+  r: 59,
+  g: 115,
+  b: 143
+}, {
+  r: 59,
+  g: 115,
+  b: 143
+}];
 
 var alpha = d3.scaleLinear().domain([0, 100]).range([0, 1]);
 
@@ -621,17 +591,3 @@ legendBtn.onclick = function () {
   }
 
 };
-
-// var clickInfo = function () {
-//   console.log('info clicked')
-// };
-
-// var listItems = document.querySelectorAll('li.layer');
-// for (let i = 0; i < listItems.length - 1; i++) {
-//   var info = document.createElement('i');
-//   info.className = "fa fa-info-circle";
-//   info.setAttribute('aria-hidden', "true");
-//   info.setAttribute('id', 'info-' + i.toString());
-//   listItems[i].appendChild(info);
-//   info.onclick = clickInfo;
-// }

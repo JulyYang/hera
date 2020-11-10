@@ -122,3 +122,26 @@ body {
   right: 0;
   border-left: 0;
 } */
+
+.ui-icon-arrowrefresh-1-s {
+  background-position: -176px -64px;
+}
+
+.ui-icon, .ui-widget-content .ui-icon {
+  background-image: url(images/ui-icons_222222_256x240.png);
+}
+
+.ui-icon {
+  width: 50px;
+  height: 50px;
+}
+
+/* .ui-icon {
+  display: inline-block;
+  vertical-align: middle;
+  margin-top: -.25em;
+  position: relative;
+  text-indent: -99999px;
+  overflow: hidden;
+  background-repeat: no-repeat;
+} */

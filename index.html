@@ -109,6 +109,10 @@
       <div class="sidebar-pane" id="filter">
         <h1 class="sidebar-header">Filter<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
         <select id='status-table'>
+          <option value='default' selected>State </option>
+          <!-- <option value='accept'></option> -->
+        </select></br>
+        <select id='status-table'>
           <option value='default' selected>target layer </option>
           <!-- <option value='accept'></option> -->
         </select></br>
@@ -181,7 +185,26 @@
   <div id="map">
     <!-- Floating legend box -->
     <div id="dialog" title="Legend">
-      <button id='updateLegend'>Update legend</button>
+
+      <!-- <div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix"
+        style="background-color: transparent; background-image: none; border: 0px;"><span id="ui-id-2"
+          class="ui-dialog-title">dialog@1605026268294</span>
+        <div class="ui-dialog-titlebar-buttonpane"
+          style="position: absolute; top: 50%; right: 0.3em; margin-top: -10px; height: 18px;"><button
+            class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only ui-dialog-titlebar-close"
+            role="button" aria-disabled="false" title="close"
+            style="position: relative; float: right; top: auto; right: auto; margin: 0px;"><span
+              class="ui-button-icon-primary ui-icon ui-icon-closethick"></span><span
+              class="ui-button-text">close</span></button><a
+            class="ui-dialog-titlebar-restore ui-corner-all ui-state-default" href="#" role="button"
+            style="display: none;"><span class="ui-icon ui-icon-newwin">restore</span></a><a
+            class="ui-dialog-titlebar-collapse ui-corner-all ui-state-default" href="#" role="button"><span
+              class="ui-icon ui-icon-triangle-1-s">collapse</span></a></div>
+      </div> -->
+
+      <!-- <button id='updateLegend'>Update legend</button> -->
+      <a role="button">
+        <span id='updateLegend' class="ui-icon ui-icon-arrowrefresh-1-s" title="Refresh Legend"></span></a>
       <p>To navigate through HERA, click on the Hazard tabs or move the navigation slider that appears under tabs when
         hovering over them. On each page, you may select State, Years, and Subcategories depending on the hazard of
         interest. To view a Count of the number of hazard events that have occurred and the Probability that at least

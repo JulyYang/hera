@@ -2,7 +2,56 @@ var interactionSelectPointerMove = new ol.interaction.Select({
   condition: ol.events.condition.pointerMove
 });
 
-var interactionSelect = new ol.interaction.Select({});
+var interactionSelect = new ol.interaction.Select({
+  multi: false,
+  // condition: ol.events.condition.shiftKeyOnly,
+  // toggleCondition: ol.events.condition.never,
+  // removeCondition: ol.events.condition.altKeyOnly,
+  // style: new ol.style.Style({
+  //   // image: new ol.style.Circle({
+  //   // radius: 5,
+  //   fill: new ol.style.Fill({
+  //     color: 'grey'
+  //   }),
+  //   stroke: new ol.style.Stroke({
+  //     color: "yellow",
+  //     width: 2
+  //   })
+  //   // })
+  // })
+});
+
+var multiSelect = new ol.interaction.Select({
+  condition: function (mapBrowserEvent) {
+    return ol.events.condition.click(mapBrowserEvent) && ol.events.condition.shiftKeyOnly(mapBrowserEvent);
+  },
+  // ol.events.condition.shiftKeyOnly,
+  // toggleCondition: ol.events.condition.never,
+  // removeCondition: function (mapBrowserEvent) {
+  //   return ol.events.condition.altKeyOnly(mapBrowserEvent);
+  // },
+  style: new ol.style.Style({
+    // image: new ol.style.Circle({
+    // radius: 5,
+    fill: new ol.style.Fill({
+      color: 'grey'
+    }),
+    stroke: new ol.style.Stroke({
+      color: "yellow",
+      width: 2
+    })
+    // })
+  })
+});
+
+// function highlightFeature(feat){
+//   interactionSelect.getFeatures().push(feat);
+//   interactionSelect.dispatchEvent({
+//      type: 'select',
+//      selected: [feat],
+//      deselected: []
+//   });
+// };
 
 var container = document.getElementById('popup');
 var content = document.getElementById('popup-content');
@@ -16,29 +65,6 @@ var overlay = new ol.Overlay({
     duration: 250
   }
 });
-
-// function styleFunction(scheme){
-//   let color;
-//   switch (scheme) {
-//     case 'darkmint':
-//       // if (){};
-
-//   }
-
-//   let reStyle = new ol.style.Style({
-//     // image: new ol.style.Circle({
-//     //      radius: 5,
-//          fill: new ol.style.Fill({
-//              color: color
-//          }),
-//          stroke: new ol.style.Stroke({
-//            color:'#867E77',
-//            width: 0.1
-//          })
-//     // })
-//  });
-//  return reStyle;
-// }
 
 // click close button to close the popup window
 closer.onclick = function () {
@@ -129,6 +155,7 @@ var map = new ol.Map({
     new ol.interaction.MouseWheelZoom(),
     new ol.interaction.DragPan(),
     interactionSelect,
+    multiSelect
   ],
   layers: [
     new ol.layer.Group({
@@ -275,6 +302,7 @@ map.on('pointermove', function (e) {
   e.map.getTargetElement().style.cursor = hit ? 'pointer' : '';
 });
 
+
 let createContent = function (lyr, f) {
   switch (lyr) {
     case 'ncsc_population_lyr':
@@ -290,18 +318,19 @@ let createContent = function (lyr, f) {
       content.innerHTML = '<h5>County: ' + countyname + '</h5><br><p>Zipcode: ' + geoid + '</p>' + '<p>Impervious Surface Area (2015): ' + percentIsa + '</p>';
       break;
   }
-
-
-
 }
 
-map.on('singleclick', function (evt) {
+// var selectedFeatures = interactionSelect.getFeatures();
+// var selected = [];
+
+
+map.on('click', function (evt) {
   var coord = evt.coordinate;
   var features = map.getFeaturesAtPixel(evt.pixel);
   if (features) {
     console.log(features[0]);
     var layerid = features[0].getId().split('.')[0];
-    console.log(layerid);
+    // console.log(layerid);
 
     createContent(layerid, features[0]);
     overlay.setPosition(coord);
@@ -309,6 +338,32 @@ map.on('singleclick', function (evt) {
     overlay.setPosition(undefined);
   }
 });
+
+
+// map.on('click', function (evt) {
+//   var coord = evt.coordinate;
+//   var features = map.getFeaturesAtPixel(evt.pixel);
+//   if (features) {
+//     var selIndex = selected.indexOf(features[0]);
+//     if (selIndex < 0) {
+//       selected.push(features[0]);
+//     } else {
+//       selected.splice(selIndex, 1);
+//       features[0].setStyle(undefined);
+//     }
+//     if (selected.length > 1) {
+//       console.log(selected.length)
+//     } else if (selected.length == 1) {
+//       var layerid = features[0].getId().split('.')[0];
+
+//       createContent(layerid, features[0]);
+//       overlay.setPosition(coord);
+//       // console.log(features[0]);
+//     }
+//   } else {
+//     overlay.setPosition(undefined);
+//   }
+// });
 
 
 var sidebar = new ol.control.Sidebar({
@@ -561,7 +616,9 @@ $(function () {
   $("#dialog").dialog({
     autoOpen: true,
     modal: false,
-    minHeight: 400
+    minHeight: 400,
+    minWidth: 300,
+    // resizable: true
   });
 });
 

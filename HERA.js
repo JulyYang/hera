@@ -192,7 +192,7 @@ var map = new ol.Map({
       layers: [
 
         new ol.layer.Group({
-          title: "2017 population - group",
+          title: "2017 population ",
           combine: true,
           visible: true,
           layers: [
@@ -231,7 +231,7 @@ var map = new ol.Map({
         }),
 
         new ol.layer.Group({
-          title: "2015 Impervious Surface Area - group",
+          title: "2015 Impervious Surface Area ",
           combine: true,
           visible: true,
           layers: [

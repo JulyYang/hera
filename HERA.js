@@ -1,9 +1,18 @@
 var interactionSelectPointerMove = new ol.interaction.Select({
-  condition: ol.events.condition.pointerMove
+  condition: ol.events.condition.pointerMove,
+  style: new ol.style.Style({
+    // fill: new ol.style.Fill({
+    //   color: 'grey'
+    // }),
+    stroke: new ol.style.Stroke({
+      color: "grey",
+      width: 2
+    })
+  })
 });
 
 var interactionSelect = new ol.interaction.Select({
-  multi: false,
+  // multi: false,
   // condition: ol.events.condition.shiftKeyOnly,
   // toggleCondition: ol.events.condition.never,
   // removeCondition: ol.events.condition.altKeyOnly,
@@ -27,12 +36,10 @@ var multiSelect = new ol.interaction.Select({
   },
   // ol.events.condition.shiftKeyOnly,
   // toggleCondition: ol.events.condition.never,
-  // removeCondition: function (mapBrowserEvent) {
-  //   return ol.events.condition.altKeyOnly(mapBrowserEvent);
-  // },
+  removeCondition: function (mapBrowserEvent) {
+    return ol.events.condition.click(mapBrowserEvent);
+  },
   style: new ol.style.Style({
-    // image: new ol.style.Circle({
-    // radius: 5,
     fill: new ol.style.Fill({
       color: 'grey'
     }),
@@ -40,7 +47,6 @@ var multiSelect = new ol.interaction.Select({
       color: "yellow",
       width: 2
     })
-    // })
   })
 });
 
@@ -155,7 +161,7 @@ var map = new ol.Map({
     new ol.interaction.MouseWheelZoom(),
     new ol.interaction.DragPan(),
     interactionSelect,
-    multiSelect
+    // multiSelect
   ],
   layers: [
     new ol.layer.Group({
@@ -324,21 +330,58 @@ let createContent = function (lyr, f) {
 // var selected = [];
 
 
-map.on('click', function (evt) {
-  var coord = evt.coordinate;
-  var features = map.getFeaturesAtPixel(evt.pixel);
-  if (features) {
-    console.log(features[0]);
-    var layerid = features[0].getId().split('.')[0];
-    // console.log(layerid);
+// map.on('click', function (evt) {
+//   var coord = evt.coordinate;
+//   var features = map.getFeaturesAtPixel(evt.pixel);
+//   if (features) {
+//     console.log(features[0]);
+//     var layerid = features[0].getId().split('.')[0];
+//     // console.log(layerid);
 
+//     createContent(layerid, features[0]);
+//     overlay.setPosition(coord);
+//   } else {
+//     overlay.setPosition(undefined);
+//   }
+// });
+// var testf;
+
+interactionSelect.on('select', function (e) {
+  // console.log(e.target.getFeatures().getLength());
+  // console.log(e.selected.length);
+  // console.log(e.deselected.length);
+
+
+  var coord = e.mapBrowserEvent.coordinate;
+  // console.log(coord);
+  // var features = map.getFeaturesAtPixel(e.pixel);
+  var features = e.target.getFeatures().getArray();
+  // testf = e.target.getFeatures();
+  if (features.length > 1) {
+    var popcontent = '';
+    for (f of features) {
+      console.log(f.getId());
+      console.log(f.get('county'));
+      console.log(f.get('percent_isa'));
+      popcontent += f.get('county');
+      content.innerHTML = `<p>`+ popcontent +`</p>`;
+      overlay.setPosition(coord);
+    }
+  } else if (features.length == 1) {
+    var layerid = features[0].getId().split('.')[0];
     createContent(layerid, features[0]);
     overlay.setPosition(coord);
+    console.log(features);
+    // console.log(layerid);
   } else {
     overlay.setPosition(undefined);
   }
 });
 
+// multiSelect.on('select', function(e){
+//   var selectedf = e.selected;
+//   console.log(selectedf);
+// })
 
 // map.on('click', function (evt) {
 //   var coord = evt.coordinate;

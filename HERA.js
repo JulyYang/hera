@@ -30,26 +30,6 @@ var interactionSelect = new ol.interaction.Select({
   // })
 });
 
-var multiSelect = new ol.interaction.Select({
-  condition: function (mapBrowserEvent) {
-    return ol.events.condition.click(mapBrowserEvent) && ol.events.condition.shiftKeyOnly(mapBrowserEvent);
-  },
-  // ol.events.condition.shiftKeyOnly,
-  // toggleCondition: ol.events.condition.never,
-  removeCondition: function (mapBrowserEvent) {
-    return ol.events.condition.click(mapBrowserEvent);
-  },
-  style: new ol.style.Style({
-    fill: new ol.style.Fill({
-      color: 'grey'
-    }),
-    stroke: new ol.style.Stroke({
-      color: "yellow",
-      width: 2
-    })
-  })
-});
-
 // function highlightFeature(feat){
 //   interactionSelect.getFeatures().push(feat);
 //   interactionSelect.dispatchEvent({
@@ -161,7 +141,6 @@ var map = new ol.Map({
     new ol.interaction.MouseWheelZoom(),
     new ol.interaction.DragPan(),
     interactionSelect,
-    // multiSelect
   ],
   layers: [
     new ol.layer.Group({
@@ -309,104 +288,41 @@ map.on('pointermove', function (e) {
 });
 
 
-let createContent = function (lyr, f) {
+let createContent = function (lyr, features) {
+  var counties = '';
+  var total = 0;
   switch (lyr) {
     case 'ncsc_population_lyr':
-      var countyname = f.get('county');
-      var geoid = f.get('fips');
-      var population = f.get('population');
-      content.innerHTML = '<h5>County: ' + countyname + '</h5><br><p>Zipcode: ' + geoid + '</p>' + '<p>Population (2017): ' + population + '</p>';
+      for (f of features) {
+        counties += f.get('county') + ', ';
+        total += f.get('population');
+      }
+      averagePopulation = (total / features.length).toFixed(2);
+      content.innerHTML = '<h5>County: ' + counties + '</h5><br><p>2017 Population: ' + averagePopulation + '</p>';
       break;
     case 'ncsc_isa_lyr':
-      var countyname = f.get('county');
-      var geoid = f.get('fips');
-      var percentIsa = (100 * f.get('percent_isa')).toFixed(2);
-      content.innerHTML = '<h5>County: ' + countyname + '</h5><br><p>Zipcode: ' + geoid + '</p>' + '<p>Impervious Surface Area (2015): ' + percentIsa + '</p>';
+      for (f of features) {
+        counties += f.get('county') + ', ';
+        total += f.get('percent_isa');
+      }
+      averageIsa = (total / features.length * 100).toFixed(2);
+      content.innerHTML = '<h5>County: ' + counties + '</h5><br><p>2015 ISA: ' + averageIsa + '</p>';
       break;
   }
 }
 
-// var selectedFeatures = interactionSelect.getFeatures();
-// var selected = [];
-
-
-// map.on('click', function (evt) {
-//   var coord = evt.coordinate;
-//   var features = map.getFeaturesAtPixel(evt.pixel);
-//   if (features) {
-//     console.log(features[0]);
-//     var layerid = features[0].getId().split('.')[0];
-//     // console.log(layerid);
-
-//     createContent(layerid, features[0]);
-//     overlay.setPosition(coord);
-//   } else {
-//     overlay.setPosition(undefined);
-//   }
-// });
-// var testf;
-
 interactionSelect.on('select', function (e) {
-  // console.log(e.target.getFeatures().getLength());
-  // console.log(e.selected.length);
-  // console.log(e.deselected.length);
-
-
   var coord = e.mapBrowserEvent.coordinate;
-  // console.log(coord);
-  // var features = map.getFeaturesAtPixel(e.pixel);
   var features = e.target.getFeatures().getArray();
-  // testf = e.target.getFeatures();
-  if (features.length > 1) {
-    var popcontent = '';
-    for (f of features) {
-      console.log(f.getId());
-      console.log(f.get('county'));
-      console.log(f.get('percent_isa'));
-      popcontent += f.get('county');
-      content.innerHTML = `<p>`+ popcontent +`</p>`;
-      overlay.setPosition(coord);
-    }
-  } else if (features.length == 1) {
+
+  if (features.length >= 1) {
     var layerid = features[0].getId().split('.')[0];
-    createContent(layerid, features[0]);
+    createContent(layerid, features);
     overlay.setPosition(coord);
-    console.log(features);
-    // console.log(layerid);
   } else {
     overlay.setPosition(undefined);
   }
 });
-
-// multiSelect.on('select', function(e){
-//   var selectedf = e.selected;
-//   console.log(selectedf);
-// })
-
-// map.on('click', function (evt) {
-//   var coord = evt.coordinate;
-//   var features = map.getFeaturesAtPixel(evt.pixel);
-//   if (features) {
-//     var selIndex = selected.indexOf(features[0]);
-//     if (selIndex < 0) {
-//       selected.push(features[0]);
-//     } else {
-//       selected.splice(selIndex, 1);
-//       features[0].setStyle(undefined);
-//     }
-//     if (selected.length > 1) {
-//       console.log(selected.length)
-//     } else if (selected.length == 1) {
-//       var layerid = features[0].getId().split('.')[0];
-
-//       createContent(layerid, features[0]);
-//       overlay.setPosition(coord);
-//       // console.log(features[0]);
-//     }
-//   } else {
-//     overlay.setPosition(undefined);
-//   }
-// });
 
 
 var sidebar = new ol.control.Sidebar({

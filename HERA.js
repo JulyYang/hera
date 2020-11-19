@@ -67,9 +67,12 @@ var wmsSource = new ol.source.TileWMS({
     'LAYERS': 'hera:ncsc_population_lyr',
     // 'bbox': [-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641],
     'TILED': true,
-    'FORMAT': 'image/png'
+    'FORMAT': 'image/png',
+    // 'CQL_FILTER': "stusps = 'NC'",
+    'CQL_FILTER': "stusps = 'NC'",
   },
   serverType: 'geoserver',
+  crossOrigin: 'anonymous',
   // Countries have transparency, so do not fade tiles:
   transition: 0,
 });
@@ -196,8 +199,8 @@ var map = new ol.Map({
                     '&version=1.0.0&request=GetFeature' +
                     '&typeName=hera:ncsc_population_lyr' +
                     '&outputFormat=application/json&srsname=EPSG:4326' +
-                    //  '&bbox=-124.73142200000001, 24.955967, -66.969849, 49.371735'
-                    '&bbox=-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641'
+                    '&CQL_FILTER=stusps=%27NC%27' 
+                    // '&bbox=-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641'
                   // + '&bbox=' + extent.join(',') + ',EPSG:3857'; // CQL filter and bbox are mutually exclusive. comment this to enable cql filter
                 },
                 strategy: ol.loadingstrategy.bbox,
@@ -297,7 +300,7 @@ let createContent = function (lyr, features) {
         counties += f.get('county') + ', ';
         total += f.get('population');
       }
-      averagePopulation = (total / features.length).toFixed(2);
+      averagePopulation = Math.round((total / features.length));
       content.innerHTML = '<h5>County: ' + counties + '</h5><br><p>2017 Population: ' + averagePopulation + '</p>';
       break;
     case 'ncsc_isa_lyr':
@@ -383,8 +386,8 @@ createTabTable('#attributeTb', 'ncsc_population_lyr', [{
     "class": "center"
   },
   {
-    "title": "State",
-    data: "properties.stusps",
+    "title": "County",
+    data: "properties.county",
     "class": "center"
   },
 ], );

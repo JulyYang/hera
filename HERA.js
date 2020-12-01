@@ -199,8 +199,8 @@ var map = new ol.Map({
                     '&version=1.0.0&request=GetFeature' +
                     '&typeName=hera:ncsc_population_lyr' +
                     '&outputFormat=application/json&srsname=EPSG:4326' +
-                    '&CQL_FILTER=stusps=%27NC%27' 
-                    // '&bbox=-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641'
+                    '&CQL_FILTER=stusps=%27NC%27'
+                  // '&bbox=-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641'
                   // + '&bbox=' + extent.join(',') + ',EPSG:3857'; // CQL filter and bbox are mutually exclusive. comment this to enable cql filter
                 },
                 strategy: ol.loadingstrategy.bbox,
@@ -257,6 +257,56 @@ var map = new ol.Map({
           ]
         }),
 
+        // new ol.layer.Tile({
+        //   title: "NC floods - raster",
+        //   source: new ol.source.TileWMS({
+        //     url: 'http://152.7.99.155:8080/geoserver/hera/wms',
+        //     projection: 'EPSG:4269',
+        //     params: {
+        //       "VERSION": "1.3.0",
+        //       'LAYERS': 'hera:nc_allfloods_lyr',
+        //       // 'bbox': [-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641],
+        //       'TILED': true,
+        //       'FORMAT': 'image/png',
+        //       'CQL_FILTER': "year = '2019'",
+        //     },
+        //     serverType: 'geoserver',
+        //     crossOrigin: 'anonymous',
+        //     // Countries have transparency, so do not fade tiles:
+        //     transition: 0,
+        //   })
+        // }),
+
+        new ol.layer.Vector({
+          title: "NC floods - Vector",
+          source: new ol.source.Vector({
+            renderMode: 'image', // Vector layers are rendered as images. Better performance. Default is 'vector'.
+            format: new ol.format.GeoJSON(),
+            url: function (extent) {
+              return 'http://152.7.99.155:8080/geoserver/hera/wfs?service=WFS' +
+                '&version=1.1.0&request=GetFeature' +
+                '&typeName=hera:nc_allfloods_lyr' +
+                '&outputFormat=application/json&srsname=EPSG:4326' +
+                // '&resultType=hits' + 
+                '&CQL_FILTER=year_issued=%27' + 2019 + '%27'
+
+              //  '&bbox=-124.73142200000001, 24.955967, -66.969849, 49.371735'
+              // '&bbox=-84.321821,31.995954,-75.400119,36.588137'
+              // + '&bbox=' + extent.join(',') + ',EPSG:3857'; // CQL filter and bbox are mutually exclusive. comment this to enable cql filter
+            },
+            strategy: ol.loadingstrategy.bbox,
+          }),
+          // style: new ol.style.Style({
+          //   fill: new ol.style.Fill({
+          //     color: [255, 255, 255, 0],
+          //   }),
+          //   stroke: new ol.style.Stroke({
+          //     color: '#867E77',
+          //     width: 0.1
+          //   })
+          // }),
+        }),
+
 
       ]
     }),
@@ -311,12 +361,27 @@ let createContent = function (lyr, features) {
       averageIsa = (total / features.length * 100).toFixed(2);
       content.innerHTML = '<h5>County: ' + counties + '</h5><br><p>2015 ISA: ' + averageIsa + '</p>';
       break;
+    case 'nc_allfloods_lyr':
+      for (f of features) {
+        // counties += f.get('county') + ', ';
+        // total += f.get('percent_isa');
+        console.log(f.get('record_id'));
+      }
+      // averageIsa = (total / features.length * 100).toFixed(2);
+      // content.innerHTML = '<h5>County: ' + counties + '</h5><br><p>2015 ISA: ' + averageIsa + '</p>';
+      content.innerHTML = 'Number of records: ' + features.length;
+      break;
   }
 }
 
 interactionSelect.on('select', function (e) {
   var coord = e.mapBrowserEvent.coordinate;
   var features = e.target.getFeatures().getArray();
+  console.log(e.target.getFeatures());
+  // console.log(e.target.getLength());
+  // console.log(map.getFeaturesAtPixel(e.pixel));
+  console.log(features);
+  console.log(features.length);
 
   if (features.length >= 1) {
     var layerid = features[0].getId().split('.')[0];
@@ -576,10 +641,14 @@ $('a[href="#about-tabpanel-2"]').click(function (e) {
 
 $(function () {
   $("#dialog").dialog({
-    autoOpen: true,
+    autoOpen: false,
     modal: false,
     minHeight: 400,
     minWidth: 300,
+    close: function (e, ui) {
+      $('#toggle').bootstrapToggle('off');
+      $(this).dialog("close");
+    }
     // resizable: true
   });
 });
@@ -610,3 +679,22 @@ legendBtn.onclick = function () {
   }
 
 };
+
+function testtoggle() {
+  let toggleon = document.getElementById('toggle').checked;
+  if (toggleon){
+    $("#dialog").dialog("open");
+    console.log("toggle on")
+  } else {
+    $("#dialog").dialog("close");
+    console.log("toggle off")
+  }
+  // if (!$("#dialog").dialog("isOpen")) {
+  //   // $('#toggle').bootstrapToggle('on');
+  //   $("#dialog").dialog("open");
+  //   console.log("toggle on")
+  // } else {
+  //   $("#dialog").dialog("close");
+  //   console.log("toggle off")
+  // }
+}

@@ -72,7 +72,7 @@ var wmsSource = new ol.source.TileWMS({
     'CQL_FILTER': "stusps = 'NC'",
   },
   serverType: 'geoserver',
-  crossOrigin: 'anonymous',
+  crossOrigin: 'anonymous', // Add to enable CQL filter on WMS
   // Countries have transparency, so do not fade tiles:
   transition: 0,
 });
@@ -83,6 +83,23 @@ var wmsSource2 = new ol.source.TileWMS({
   params: {
     "VERSION": "1.3.0",
     'LAYERS': 'hera:ncsc_isa_lyr',
+    // 'bbox': [-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641],
+    'TILED': true,
+    'FORMAT': 'image/png',
+    'CQL_FILTER': "stusps = 'NC'",
+  },
+  serverType: 'geoserver',
+  crossOrigin: 'anonymous',
+  // Countries have transparency, so do not fade tiles:
+  transition: 0,
+});
+
+var wmsSource3 = new ol.source.TileWMS({
+  url: 'http://152.7.99.155:8080/geoserver/hera/wms',
+  projection: 'EPSG:4269',
+  params: {
+    "VERSION": "1.3.0",
+    'LAYERS': 'hera:test_nc_allfloods_lyr',
     // 'bbox': [-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641],
     'TILED': true,
     'FORMAT': 'image/png'
@@ -124,8 +141,8 @@ var testVm = new ol.source.TileWMS({
 
 var view = new ol.View({
   // projection: 'EPSG:3857',
-  center: ol.proj.fromLonLat([-79.5, 34.1]),
-  zoom: 7
+  center: ol.proj.fromLonLat([-79.5, 34.9]),
+  zoom: 7.5
 
 })
 
@@ -238,8 +255,48 @@ var map = new ol.Map({
                     '&version=1.0.0&request=GetFeature' +
                     '&typeName=hera:ncsc_isa_lyr' +
                     '&outputFormat=application/json&srsname=EPSG:4326' +
+                    '&CQL_FILTER=stusps=%27NC%27'
+                  // '&bbox=-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641'
+                  // + '&bbox=' + extent.join(',') + ',EPSG:3857'; // CQL filter and bbox are mutually exclusive. comment this to enable cql filter
+                },
+                strategy: ol.loadingstrategy.bbox,
+              }),
+              style: new ol.style.Style({
+                fill: new ol.style.Fill({
+                  color: [255, 255, 255, 0],
+                }),
+                stroke: new ol.style.Stroke({
+                  color: '#867E77',
+                  width: 0.1
+                })
+              }),
+            }),
+          ]
+        }),
+
+
+        new ol.layer.Group({
+          title: "NC Floods ",
+          combine: true,
+          visible: false,
+          layers: [
+            new ol.layer.Tile({
+              // title: "2015 Impervious Surface Area",
+              source: wmsSource3
+            }),
+
+            new ol.layer.Vector({
+              // title: "NC SC ISA - Vector",
+              source: new ol.source.Vector({
+                renderMode: 'image', // Vector layers are rendered as images. Better performance. Default is 'vector'.
+                format: new ol.format.GeoJSON(),
+                url: function (extent) {
+                  return 'http://152.7.99.155:8080/geoserver/hera/wfs?service=WFS' +
+                    '&version=1.0.0&request=GetFeature' +
+                    '&typeName=hera:test_nc_allfloods_lyr' +
+                    '&outputFormat=application/json&srsname=EPSG:4326' +
                     //  '&bbox=-124.73142200000001, 24.955967, -66.969849, 49.371735'
-                    '&bbox=-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641'
+                    '&bbox=-84.321821,31.995954,-75.400119,36.588137'
                   // + '&bbox=' + extent.join(',') + ',EPSG:3857'; // CQL filter and bbox are mutually exclusive. comment this to enable cql filter
                 },
                 strategy: ol.loadingstrategy.bbox,
@@ -276,36 +333,6 @@ var map = new ol.Map({
         //     transition: 0,
         //   })
         // }),
-
-        new ol.layer.Vector({
-          title: "NC floods - Vector",
-          source: new ol.source.Vector({
-            renderMode: 'image', // Vector layers are rendered as images. Better performance. Default is 'vector'.
-            format: new ol.format.GeoJSON(),
-            url: function (extent) {
-              return 'http://152.7.99.155:8080/geoserver/hera/wfs?service=WFS' +
-                '&version=1.1.0&request=GetFeature' +
-                '&typeName=hera:nc_allfloods_lyr' +
-                '&outputFormat=application/json&srsname=EPSG:4326' +
-                // '&resultType=hits' + 
-                '&CQL_FILTER=year_issued=%27' + 2019 + '%27'
-
-              //  '&bbox=-124.73142200000001, 24.955967, -66.969849, 49.371735'
-              // '&bbox=-84.321821,31.995954,-75.400119,36.588137'
-              // + '&bbox=' + extent.join(',') + ',EPSG:3857'; // CQL filter and bbox are mutually exclusive. comment this to enable cql filter
-            },
-            strategy: ol.loadingstrategy.bbox,
-          }),
-          // style: new ol.style.Style({
-          //   fill: new ol.style.Fill({
-          //     color: [255, 255, 255, 0],
-          //   }),
-          //   stroke: new ol.style.Stroke({
-          //     color: '#867E77',
-          //     width: 0.1
-          //   })
-          // }),
-        }),
 
 
       ]
@@ -361,15 +388,15 @@ let createContent = function (lyr, features) {
       averageIsa = (total / features.length * 100).toFixed(2);
       content.innerHTML = '<h5>County: ' + counties + '</h5><br><p>2015 ISA: ' + averageIsa + '</p>';
       break;
-    case 'nc_allfloods_lyr':
+    case 'test_nc_allfloods_lyr':
       for (f of features) {
-        // counties += f.get('county') + ', ';
-        // total += f.get('percent_isa');
-        console.log(f.get('record_id'));
+        counties += f.get('county') + ', ';
+        total += f.get('count');
+        // console.log(f.get('record_id'));
       }
-      // averageIsa = (total / features.length * 100).toFixed(2);
-      // content.innerHTML = '<h5>County: ' + counties + '</h5><br><p>2015 ISA: ' + averageIsa + '</p>';
-      content.innerHTML = 'Number of records: ' + features.length;
+      average = (total / features.length).toFixed(2);
+      content.innerHTML = '<h5>County: ' + counties + '</h5><br><p>Count: ' + total + '</p><br><p>Average count: ' + average + '</p>';
+      // content.innerHTML = 'Number of records: ' + total;
       break;
   }
 }
@@ -380,11 +407,12 @@ interactionSelect.on('select', function (e) {
   console.log(e.target.getFeatures());
   // console.log(e.target.getLength());
   // console.log(map.getFeaturesAtPixel(e.pixel));
-  console.log(features);
-  console.log(features.length);
+  // console.log(features);
+  // console.log(features.length);
 
   if (features.length >= 1) {
     var layerid = features[0].getId().split('.')[0];
+    // console.log(layerid);
     createContent(layerid, features);
     overlay.setPosition(coord);
   } else {
@@ -403,6 +431,7 @@ map.addControl(sidebar);
 
 document.getElementById("tab-1").innerHTML = "2017 population";
 document.getElementById("tab-2").innerHTML = "2015 Impervious Surface Area";
+document.getElementById("tab-3").innerHTML = "NC floods";
 
 document.getElementById("about-tab-1").innerHTML = "HERA Data Source";
 document.getElementById("about-tab-2").innerHTML = "Contact Us";
@@ -472,6 +501,38 @@ createTabTable('#attributeTb2', 'ncsc_isa_lyr', [{
     data: "properties.percent_isa",
     "class": "center"
   },
+], );
+
+createTabTable('#attributeTb3', 'test_nc_allfloods_lyr', [{
+    "title": "FIPS",
+    data: "properties.fips",
+    "class": "center"
+  },
+  {
+    "title": "County",
+    data: "properties.county",
+    "class": "center"
+  },
+  {
+    "title": "Count",
+    data: "properties.count",
+    "class": "center"
+  },
+  // {
+  //   "title": "Year",
+  //   data: "properties.year_issued",
+  //   "class": "center"
+  // },
+  // {
+  //   "title": "Month",
+  //   data: "properties.month_issued",
+  //   "class": "center"
+  // },
+  // {
+  //   "title": "Subgroup",
+  //   data: "properties.description",
+  //   "class": "center"
+  // },
 ], );
 
 $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
@@ -682,7 +743,7 @@ legendBtn.onclick = function () {
 
 function testtoggle() {
   let toggleon = document.getElementById('toggle').checked;
-  if (toggleon){
+  if (toggleon) {
     $("#dialog").dialog("open");
     console.log("toggle on")
   } else {

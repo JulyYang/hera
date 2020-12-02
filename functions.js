@@ -6,6 +6,9 @@ var generateInfo = function (t) {
     case "2017 population ":
       return "Data for Freezing Rain are obtained from the NWS WaWA Advisories. A Freezing Rain Advisory is issued for freezing rain, freezing drizzle, and/or light ice accumulation."
       break;
+    case "NC Floods ":
+      return "Data from the National Weather Service (NWS) Advisories and Warnings are used as the best-available proxy for occurence of Areal, Coastal, Flash and River Floods."
+      break;
   }
 };
 

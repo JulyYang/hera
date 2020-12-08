@@ -35,8 +35,9 @@ body {
   /* display: inline-block; */
 }
 
-.toggle.ios, .toggle-on.ios, .toggle-off.ios { border-radius: 20px; }
-.toggle.ios .toggle-handle { border-radius: 20px; }
+#toggleLabel {display:block; text-align:right;}
+.toggle.ios, .toggle-on.ios, .toggle-off.ios { border-radius: 50px; float: right}
+.toggle.ios .toggle-handle {  border-radius: 50px; }
 
 .ol-popup {
   position: absolute;
@@ -97,6 +98,28 @@ body {
 	padding: 10px;
 	position: relative;
 } */
+
+.loader {
+  border: 10px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 10px solid #A9A9A9	;
+  width: 50px;
+  height: 50px;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+  z-index: 80000;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 
 .tab-content {
   padding: 10px;

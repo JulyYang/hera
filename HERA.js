@@ -99,7 +99,22 @@ var wmsSource3 = new ol.source.TileWMS({
   projection: 'EPSG:4269',
   params: {
     "VERSION": "1.3.0",
-    'LAYERS': 'hera:test_nc_allfloods_lyr',
+    'LAYERS': 'hera:v_nc_yearlyfloods_lyr',
+    // 'bbox': [-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641],
+    'TILED': true,
+    'FORMAT': 'image/png'
+  },
+  serverType: 'geoserver',
+  // Countries have transparency, so do not fade tiles:
+  transition: 0,
+});
+
+var wmsSource4 = new ol.source.TileWMS({
+  url: 'http://152.7.99.155:8080/geoserver/hera/wms',
+  projection: 'EPSG:4269',
+  params: {
+    "VERSION": "1.3.0",
+    'LAYERS': 'hera:v_nc_yearlyheats_lyr',
     // 'bbox': [-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641],
     'TILED': true,
     'FORMAT': 'image/png'
@@ -293,7 +308,7 @@ var map = new ol.Map({
                 url: function (extent) {
                   return 'http://152.7.99.155:8080/geoserver/hera/wfs?service=WFS' +
                     '&version=1.0.0&request=GetFeature' +
-                    '&typeName=hera:test_nc_allfloods_lyr' +
+                    '&typeName=hera:v_nc_yearlyfloods_lyr' +
                     '&outputFormat=application/json&srsname=EPSG:4326' +
                     //  '&bbox=-124.73142200000001, 24.955967, -66.969849, 49.371735'
                     '&bbox=-84.321821,31.995954,-75.400119,36.588137'
@@ -314,24 +329,62 @@ var map = new ol.Map({
           ]
         }),
 
-        // new ol.layer.Tile({
-        //   title: "NC floods - raster",
-        //   source: new ol.source.TileWMS({
-        //     url: 'http://152.7.99.155:8080/geoserver/hera/wms',
-        //     projection: 'EPSG:4269',
-        //     params: {
-        //       "VERSION": "1.3.0",
-        //       'LAYERS': 'hera:nc_allfloods_lyr',
-        //       // 'bbox': [-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641],
-        //       'TILED': true,
-        //       'FORMAT': 'image/png',
-        //       'CQL_FILTER': "year = '2019'",
+        new ol.layer.Group({
+          title: "NC Heat ",
+          combine: true,
+          visible: false,
+          layers: [
+            new ol.layer.Tile({
+              // title: "2015 Impervious Surface Area",
+              source: wmsSource4
+            }),
+
+            new ol.layer.Vector({
+              // title: "NC SC ISA - Vector",
+              source: new ol.source.Vector({
+                renderMode: 'image', // Vector layers are rendered as images. Better performance. Default is 'vector'.
+                format: new ol.format.GeoJSON(),
+                url: function (extent) {
+                  return 'http://152.7.99.155:8080/geoserver/hera/wfs?service=WFS' +
+                    '&version=1.0.0&request=GetFeature' +
+                    '&typeName=hera:v_nc_yearlyheats_lyr' +
+                    '&outputFormat=application/json&srsname=EPSG:4326' +
+                    //  '&bbox=-124.73142200000001, 24.955967, -66.969849, 49.371735'
+                    '&bbox=-84.321821,31.995954,-75.400119,36.588137'
+                  // + '&bbox=' + extent.join(',') + ',EPSG:3857'; // CQL filter and bbox are mutually exclusive. comment this to enable cql filter
+                },
+                strategy: ol.loadingstrategy.bbox,
+              }),
+              style: new ol.style.Style({
+                fill: new ol.style.Fill({
+                  color: [255, 255, 255, 0],
+                }),
+                stroke: new ol.style.Stroke({
+                  color: '#867E77',
+                  width: 0.1
+                })
+              }),
+            }),
+          ]
+        }),
+
+        // new ol.layer.Vector({
+        //   title: "test floods",
+        //   source: new ol.source.Vector({
+        //     renderMode: 'image', // Vector layers are rendered as images. Better performance. Default is 'vector'.
+        //     format: new ol.format.GeoJSON(),
+        //     url: function (extent) {
+        //       return 'http://152.7.99.155:8080/geoserver/hera/wfs?service=WFS' +
+        //         '&version=1.0.0&request=GetFeature' +
+        //         '&typeName=hera:v_test_floodsgrouping_lyr' +
+        //         '&outputFormat=application/json&srsname=EPSG:4326' +
+        //         // '&CQL_FILTER=stusps=%27NC%27'
+        //         '&bbox=-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641'
+        //       // + '&bbox=' + extent.join(',') + ',EPSG:3857'; // CQL filter and bbox are mutually exclusive. comment this to enable cql filter
         //     },
-        //     serverType: 'geoserver',
-        //     crossOrigin: 'anonymous',
-        //     // Countries have transparency, so do not fade tiles:
-        //     transition: 0,
-        //   })
+        //     strategy: ol.loadingstrategy.bbox,
+        //   }),
+        //   style: styleFunction,
         // }),
 
 
@@ -355,6 +408,35 @@ var map = new ol.Map({
   // })
 });
 
+function styleFunction(feature) {
+  var color;
+  var fAllYear = feature.get("y2006") + feature.get("y2007") + feature.get("y2008") + feature.get("y2009") + feature.get("y2010") + feature.get("y2011") + feature.get("y2012") + feature.get("y2013") + feature.get("y2014") + feature.get("y2015") + feature.get("y2016") + feature.get("y2017") + feature.get("y2018") + feature.get("y2019");
+  if ( fAllYear <= 50) {
+    color = '#d1eeea';
+  } else if (fAllYear <= 100) {
+    color = '#a8dbd9';
+  } else if (fAllYear <= 200) {
+    color = '#85c4c9';
+  } else if (fAllYear <= 300) {
+    color = '#68abb8';
+  } else if (fAllYear <= 450) {
+    color = '#4f90a6';
+  } else if (fAllYear <= 600) {
+    color = '#3b738f';
+  } else {
+    color = '#2a5674';
+  };
+  var reStyle = new ol.style.Style({
+    fill: new ol.style.Fill({
+      color: color
+    }),
+    stroke: new ol.style.Stroke({
+      color: "dark grey",
+      width: 0.5
+    })
+  });
+  return reStyle;
+};
 
 // If there is any feature at the event pixel (where the mouse points at), the pointer will change to the 'hand' symbol
 map.on('pointermove', function (e) {
@@ -378,7 +460,7 @@ let createContent = function (lyr, features) {
         total += f.get('population');
       }
       averagePopulation = Math.round((total / features.length));
-      content.innerHTML = '<h5>County: ' + counties + '</h5><br><p>2017 Population: ' + averagePopulation + '</p>';
+      content.innerHTML = '<h5>Selected County: ' + counties + '</h5><br><p>2017 Population: ' + averagePopulation + '</p>';
       break;
     case 'ncsc_isa_lyr':
       for (f of features) {
@@ -386,18 +468,29 @@ let createContent = function (lyr, features) {
         total += f.get('percent_isa');
       }
       averageIsa = (total / features.length * 100).toFixed(2);
-      content.innerHTML = '<h5>County: ' + counties + '</h5><br><p>2015 ISA: ' + averageIsa + '</p>';
+      content.innerHTML = '<h5>Selected County: ' + counties + '</h5><br><p>2015 ISA: ' + averageIsa + '</p>';
       break;
-    case 'test_nc_allfloods_lyr':
+    case 'v_nc_yearlyfloods_lyr':
       for (f of features) {
         counties += f.get('county') + ', ';
         total += f.get('count');
         // console.log(f.get('record_id'));
       }
       average = (total / features.length).toFixed(2);
-      content.innerHTML = '<h5>County: ' + counties + '</h5><br><p>Count: ' + total + '</p><br><p>Average count: ' + average + '</p>';
+      content.innerHTML = '<b>Layer: </b>Floods<br>' + '<h5>Selected County: ' + counties + '</h5><br><p>Year: 2006-2019</p><br><p>Total count: ' + total + '</p><br><p>Average count: ' + average + '</p>';
       // content.innerHTML = 'Number of records: ' + total;
       break;
+    case 'v_nc_yearlyheats_lyr':
+      for (f of features) {
+        counties += f.get('county') + ', ';
+        total += f.get('count');
+        // console.log(f.get('record_id'));
+      }
+      average = (total / features.length).toFixed(2);
+      content.innerHTML = '<b>Layer: </b>Heat<br>' + '<h5>Selected County: ' + counties + '</h5><br><p>Year: 2006-2019</p><br><p>Total count: ' + total + '</p><br><p>Average count: ' + average + '</p>';
+      // content.innerHTML = 'Number of records: ' + total;
+      break;
+
   }
 }
 
@@ -503,7 +596,7 @@ createTabTable('#attributeTb2', 'ncsc_isa_lyr', [{
   },
 ], );
 
-createTabTable('#attributeTb3', 'test_nc_allfloods_lyr', [{
+createTabTable('#attributeTb3', 'v_nc_yearlyfloods_lyr', [{
     "title": "FIPS",
     data: "properties.fips",
     "class": "center"

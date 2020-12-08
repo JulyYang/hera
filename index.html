@@ -74,8 +74,9 @@
     <div class="sidebar-content">
       <div class="sidebar-pane" id="home">
         <h1 class="sidebar-header">Layers
-          <!-- <label></label> -->
-          <input type="checkbox" id="toggle" data-toggle="toggle" data-size="mini" data-onstyle="warning" data-style="ios" data-on="on" data-off="off" onchange="testtoggle()">
+          <input type="checkbox" id="toggle" data-toggle="toggle" data-size="mini" data-onstyle="warning"
+            data-style="ios" data-on="on" data-off="off" onchange="testtoggle()">
+          <label id="toggleLabel" for="toggle">Legend</label>
           <span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
         <!-- !!! HERE WILL GO THE CONTENT OF LAYERSWITCHER !!! -->
         <div id="layers" class="layer-switcher"></div>
@@ -116,14 +117,17 @@
 
       <div class="sidebar-pane" id="filter">
         <h1 class="sidebar-header">Filter<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
+        <label>Target Layer: </label>
         <select id='status-table'>
           <option value='default' selected>target layer </option>
           <!-- <option value='accept'></option> -->
         </select></br>
+        <label>State: </label>
         <select id='status-table'>
           <option value='default' selected>State </option>
           <!-- <option value='accept'></option> -->
         </select></br>
+        <label>Subcategory: </label>
         <select id='status-table'>
           <option value='default' selected>sub category </option>
           <!-- <option value='accept'></option> -->
@@ -191,6 +195,10 @@
   <!-- END OF SIDEBAR DIV -->
 
   <div id="map">
+
+    <!-- Spinner -->
+    <!-- <div class="loader"></div> -->
+
     <!-- Floating legend box -->
     <div id="dialog" title="Legend">
 

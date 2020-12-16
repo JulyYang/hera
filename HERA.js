@@ -512,7 +512,7 @@ let createContent = function (lyr, features) {
       averageIsa = (total / features.length * 100).toFixed(2);
       content.innerHTML = '<h5>Selected County: ' + counties + '</h5><br><p>2015 ISA: ' + averageIsa + '</p>';
       break;
-    case 'v_nc_yearlyfloods_lyr':
+    case 'nc_floods_sql':
       for (f of features) {
         counties += f.get('county') + ', ';
         total += f.get('count');
@@ -522,14 +522,14 @@ let createContent = function (lyr, features) {
       content.innerHTML = '<b>Layer: </b>Floods<br>' + '<h5>Selected County: ' + counties + '</h5><br><p>Year: 2006-2019</p><br><p>Total count: ' + total + '</p><br><p>Average count: ' + average + '</p>';
       // content.innerHTML = 'Number of records: ' + total;
       break;
-    case 'v_nc_yearlyheats_lyr':
+    case 'nc_ww_sql':
       for (f of features) {
         counties += f.get('county') + ', ';
         total += f.get('count');
         // console.log(f.get('record_id'));
       }
       average = (total / features.length).toFixed(2);
-      content.innerHTML = '<b>Layer: </b>Heat<br>' + '<h5>Selected County: ' + counties + '</h5><br><p>Year: 2006-2019</p><br><p>Total count: ' + total + '</p><br><p>Average count: ' + average + '</p>';
+      content.innerHTML = '<b>Layer: </b>Winter Weather<br>' + '<h5>Selected County: ' + counties + '</h5><br><p>Year: 2006-2019</p><br><p>Total count: ' + total + '</p><br><p>Average count: ' + average + '</p>';
       // content.innerHTML = 'Number of records: ' + total;
       break;
 
@@ -894,3 +894,40 @@ function testtoggle() {
   //   console.log("toggle off")
   // }
 }
+
+
+var dt_from = "2006-01-01";
+var dt_to = "2020-01-01";
+
+$('.slider-time').html(dt_from);
+$('.slider-time2').html(dt_to);
+var min_val = Date.parse(dt_from)/1000;
+var max_val = Date.parse(dt_to)/1000;
+
+function zeroPad(num, places) {
+  var zero = places - num.toString().length + 1;
+  return Array(+(zero > 0 && zero)).join("0") + num;
+}
+function formatDT(__dt) {
+    var year = __dt.getFullYear();
+    // var month = zeroPad(__dt.getMonth()+1, 2);
+    var month = zeroPad(__dt.getMonth()+1, 2);
+    var date = zeroPad(__dt.getDate(), 2);
+    return year + '-' + month + '-' + date;
+};
+
+
+$("#slider-range").slider({
+    range: true,
+    min: min_val,
+    max: max_val,
+    step: 10,
+    values: [min_val, max_val],
+    slide: function (e, ui) {
+        var dt_cur_from = new Date(ui.values[0]*1000); //.format("yyyy-mm-dd hh:ii:ss");
+        $('.slider-time').html(formatDT(dt_cur_from));
+
+        var dt_cur_to = new Date(ui.values[1]*1000); //.format("yyyy-mm-dd hh:ii:ss");                
+        $('.slider-time2').html(formatDT(dt_cur_to));
+    }
+});

@@ -11,33 +11,7 @@ var interactionSelectPointerMove = new ol.interaction.Select({
   })
 });
 
-var interactionSelect = new ol.interaction.Select({
-  // multi: false,
-  // condition: ol.events.condition.shiftKeyOnly,
-  // toggleCondition: ol.events.condition.never,
-  // removeCondition: ol.events.condition.altKeyOnly,
-  // style: new ol.style.Style({
-  //   // image: new ol.style.Circle({
-  //   // radius: 5,
-  //   fill: new ol.style.Fill({
-  //     color: 'grey'
-  //   }),
-  //   stroke: new ol.style.Stroke({
-  //     color: "yellow",
-  //     width: 2
-  //   })
-  //   // })
-  // })
-});
-
-// function highlightFeature(feat){
-//   interactionSelect.getFeatures().push(feat);
-//   interactionSelect.dispatchEvent({
-//      type: 'select',
-//      selected: [feat],
-//      deselected: []
-//   });
-// };
+var interactionSelect = new ol.interaction.Select({});
 
 var container = document.getElementById('popup');
 var content = document.getElementById('popup-content');
@@ -57,6 +31,55 @@ closer.onclick = function () {
   overlay.setPosition(undefined);
   closer.blur();
   return false;
+};
+
+let createGroupedLyrs = function (lyr, cqlFilter = null) {
+  let wmsLayer = new ol.layer.Tile({
+    source: new ol.source.TileWMS({
+      url: 'http://152.7.99.155:8080/geoserver/hera/wms',
+      projection: 'EPSG:4269',
+      params: {
+        "VERSION": "1.3.0",
+        'LAYERS': lyr,
+        // 'bbox': [-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641],
+        'TILED': true,
+        'FORMAT': 'image/png',
+        'CQL_FILTER': cqlFilter,
+      },
+      serverType: 'geoserver',
+      crossOrigin: 'anonymous', // Add to enable CQL filter on WMS
+      // Countries have transparency, so do not fade tiles:
+      transition: 0,
+    })
+  });
+
+  let wfsLayer = new ol.layer.Vector({
+    // title: "NC SC ISA - Vector",
+    source: new ol.source.Vector({
+      renderMode: 'image', // Vector layers are rendered as images. Better performance. Default is 'vector'.
+      format: new ol.format.GeoJSON(),
+      url: function (extent) {
+        return 'http://152.7.99.155:8080/geoserver/hera/wfs?service=WFS' +
+          '&version=1.0.0&request=GetFeature' +
+          '&typeName=' + lyr +
+          '&outputFormat=application/json&srsname=EPSG:4326' +
+          '&bbox=-84.321821,31.995954,-75.400119,36.588137'
+        // + '&bbox=' + extent.join(',') + ',EPSG:3857'; // CQL filter and bbox are mutually exclusive. comment this to enable cql filter
+      },
+      strategy: ol.loadingstrategy.bbox,
+    }),
+    style: new ol.style.Style({
+      fill: new ol.style.Fill({
+        color: [255, 255, 255, 0],
+      }),
+      stroke: new ol.style.Stroke({
+        color: '#867E77',
+        width: 0.1
+      })
+    }),
+  });
+
+  return [wmsLayer, wfsLayer];
 };
 
 var wmsSource = new ol.source.TileWMS({
@@ -94,35 +117,6 @@ var wmsSource2 = new ol.source.TileWMS({
   transition: 0,
 });
 
-var wmsSource3 = new ol.source.TileWMS({
-  url: 'http://152.7.99.155:8080/geoserver/hera/wms',
-  projection: 'EPSG:4269',
-  params: {
-    "VERSION": "1.3.0",
-    'LAYERS': 'hera:v_nc_yearlyfloods_lyr',
-    // 'bbox': [-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641],
-    'TILED': true,
-    'FORMAT': 'image/png'
-  },
-  serverType: 'geoserver',
-  // Countries have transparency, so do not fade tiles:
-  transition: 0,
-});
-
-var wmsSource4 = new ol.source.TileWMS({
-  url: 'http://152.7.99.155:8080/geoserver/hera/wms',
-  projection: 'EPSG:4269',
-  params: {
-    "VERSION": "1.3.0",
-    'LAYERS': 'hera:v_nc_yearlyheats_lyr',
-    // 'bbox': [-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641],
-    'TILED': true,
-    'FORMAT': 'image/png'
-  },
-  serverType: 'geoserver',
-  // Countries have transparency, so do not fade tiles:
-  transition: 0,
-});
 
 var boundarySource = new ol.source.TileWMS({
   url: 'http://152.7.99.155:8080/geoserver/hera/wms',
@@ -288,85 +282,118 @@ var map = new ol.Map({
             }),
           ]
         }),
+        // new ol.layer.Group({
+        //   title: "2015 Impervious Surface Area ",
+        //   combine: true,
+        //   visible: true,
+        //   layers: createGroupedLyrs('hera:ncsc_isa_lyr', )
+        //   [
+        //     new ol.layer.Tile({
+        //       // title: "2015 Impervious Surface Area",
+        //       source: wmsSource2
+        //     }),
 
+        //     new ol.layer.Vector({
+        //       // title: "NC SC ISA - Vector",
+        //       source: new ol.source.Vector({
+        //         renderMode: 'image', // Vector layers are rendered as images. Better performance. Default is 'vector'.
+        //         format: new ol.format.GeoJSON(),
+        //         url: function (extent) {
+        //           return 'http://152.7.99.155:8080/geoserver/hera/wfs?service=WFS' +
+        //             '&version=1.0.0&request=GetFeature' +
+        //             '&typeName=hera:ncsc_isa_lyr' +
+        //             '&outputFormat=application/json&srsname=EPSG:4326' +
+        //             '&CQL_FILTER=stusps=%27NC%27'
+        //           // '&bbox=-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641'
+        //           // + '&bbox=' + extent.join(',') + ',EPSG:3857'; // CQL filter and bbox are mutually exclusive. comment this to enable cql filter
+        //         },
+        //         strategy: ol.loadingstrategy.bbox,
+        //       }),
+        //       style: new ol.style.Style({
+        //         fill: new ol.style.Fill({
+        //           color: [255, 255, 255, 0],
+        //         }),
+        //         stroke: new ol.style.Stroke({
+        //           color: '#867E77',
+        //           width: 0.1
+        //         })
+        //       }),
+        //     }),
+        //   ]
+        // }),
 
         new ol.layer.Group({
           title: "NC Floods ",
           combine: true,
           visible: false,
-          layers: [
-            new ol.layer.Tile({
-              // title: "2015 Impervious Surface Area",
-              source: wmsSource3
-            }),
-
-            new ol.layer.Vector({
-              // title: "NC SC ISA - Vector",
-              source: new ol.source.Vector({
-                renderMode: 'image', // Vector layers are rendered as images. Better performance. Default is 'vector'.
-                format: new ol.format.GeoJSON(),
-                url: function (extent) {
-                  return 'http://152.7.99.155:8080/geoserver/hera/wfs?service=WFS' +
-                    '&version=1.0.0&request=GetFeature' +
-                    '&typeName=hera:v_nc_yearlyfloods_lyr' +
-                    '&outputFormat=application/json&srsname=EPSG:4326' +
-                    //  '&bbox=-124.73142200000001, 24.955967, -66.969849, 49.371735'
-                    '&bbox=-84.321821,31.995954,-75.400119,36.588137'
-                  // + '&bbox=' + extent.join(',') + ',EPSG:3857'; // CQL filter and bbox are mutually exclusive. comment this to enable cql filter
-                },
-                strategy: ol.loadingstrategy.bbox,
-              }),
-              style: new ol.style.Style({
-                fill: new ol.style.Fill({
-                  color: [255, 255, 255, 0],
-                }),
-                stroke: new ol.style.Stroke({
-                  color: '#867E77',
-                  width: 0.1
-                })
-              }),
-            }),
-          ]
+          layers: createGroupedLyrs('hera:v_nc_yearlyfloods_lyr')
         }),
 
         new ol.layer.Group({
           title: "NC Heat ",
           combine: true,
           visible: false,
-          layers: [
-            new ol.layer.Tile({
-              // title: "2015 Impervious Surface Area",
-              source: wmsSource4
-            }),
-
-            new ol.layer.Vector({
-              // title: "NC SC ISA - Vector",
-              source: new ol.source.Vector({
-                renderMode: 'image', // Vector layers are rendered as images. Better performance. Default is 'vector'.
-                format: new ol.format.GeoJSON(),
-                url: function (extent) {
-                  return 'http://152.7.99.155:8080/geoserver/hera/wfs?service=WFS' +
-                    '&version=1.0.0&request=GetFeature' +
-                    '&typeName=hera:v_nc_yearlyheats_lyr' +
-                    '&outputFormat=application/json&srsname=EPSG:4326' +
-                    //  '&bbox=-124.73142200000001, 24.955967, -66.969849, 49.371735'
-                    '&bbox=-84.321821,31.995954,-75.400119,36.588137'
-                  // + '&bbox=' + extent.join(',') + ',EPSG:3857'; // CQL filter and bbox are mutually exclusive. comment this to enable cql filter
-                },
-                strategy: ol.loadingstrategy.bbox,
-              }),
-              style: new ol.style.Style({
-                fill: new ol.style.Fill({
-                  color: [255, 255, 255, 0],
-                }),
-                stroke: new ol.style.Stroke({
-                  color: '#867E77',
-                  width: 0.1
-                })
-              }),
-            }),
-          ]
+          layers: createGroupedLyrs('hera:v_nc_yearlyheats_lyr')
         }),
+
+        new ol.layer.Tile({
+          title: 'test sql query',
+          source: new ol.source.TileWMS({
+            url: 'http://152.7.99.155:8080/geoserver/hera/wms',
+            projection: 'EPSG:4269',
+            params: {
+              "VERSION": "1.3.0",
+              'LAYERS': 'hera:test_sql',
+              // 'bbox': [-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641],
+              'TILED': true,
+              'FORMAT': 'image/png',
+              // 'viewparams': "sublist:'FL'"//worked 
+              // 'viewparams': "sublist:'FL'\\,'CF'"//worked 
+              // 'viewparams': "sublist:'FL'\,'CF'"//doesn't work
+              // 'viewparams': "sublist:%27FL%27"// doesn't work
+              'viewparams': "minYear:2010-01-01;maxYear:2018-12-31;sublist:'FA'\\,'CF'"
+              // 'viewparams': "minYear:2010-01-01;maxYear:2018-12-31" //%27FL%27\,%27FA%27\,%27CF%27 doesn't work
+            },
+            serverType: 'geoserver',
+            crossOrigin: 'anonymous',
+            // Countries have transparency, so do not fade tiles:
+            transition: 0,
+          })
+        }),
+
+        new ol.layer.Vector({
+          title: "test sql- Vector",
+          source: new ol.source.Vector({
+            renderMode: 'image', // Vector layers are rendered as images. Better performance. Default is 'vector'.
+            format: new ol.format.GeoJSON(),
+            url: function (extent) {
+              return 'http://152.7.99.155:8080/geoserver/hera/wfs?service=WFS' +
+                '&version=1.0.0&request=GetFeature' +
+                '&typeName=hera:test_sql' +
+                '&outputFormat=application/json&srsname=EPSG:4326' +
+                // '&viewparams=minYear:2010-01-01' +
+                // ';maxYear:2018-12-31'+
+                '&viewparams=sublist:%27FA%27%5C,%27CF%27'+ // worked
+                // ';sublist:%27FA%27\,%27CF%27'+
+                // ";sublist:'FA'\,'CF'"+
+                // '&CQL_FILTER=stusps=%27NC%27'
+              '&bbox=-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641'
+              // + '&bbox=' + extent.join(',') + ',EPSG:3857'; // CQL filter and bbox are mutually exclusive. comment this to enable cql filter
+            },
+            strategy: ol.loadingstrategy.bbox,
+          }),
+          style: new ol.style.Style({
+            fill: new ol.style.Fill({
+              color: [255, 255, 255, 0],
+            }),
+            stroke: new ol.style.Stroke({
+              color: '#867E77',
+              width: 0.1
+            })
+          }),
+        }),
+
+        // 'http://localhost:8080/geoserver/hera/wms?service=WMS&version=1.1.0&request=GetMap&layers=hera:test_sql&styles=&bbox=-84.321821,33.752878,-75.400119,36.588137&width=768&height=330&srs=EPSG:4269&format=application/openlayers&viewparams=minYear:2018-01-01'
 
         // new ol.layer.Vector({
         //   title: "test floods",
@@ -376,7 +403,7 @@ var map = new ol.Map({
         //     url: function (extent) {
         //       return 'http://152.7.99.155:8080/geoserver/hera/wfs?service=WFS' +
         //         '&version=1.0.0&request=GetFeature' +
-        //         '&typeName=hera:v_test_floodsgrouping_lyr' +
+        //         '&typeName=hera:test_floods_ly' +
         //         '&outputFormat=application/json&srsname=EPSG:4326' +
         //         // '&CQL_FILTER=stusps=%27NC%27'
         //         '&bbox=-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641'
@@ -384,17 +411,13 @@ var map = new ol.Map({
         //     },
         //     strategy: ol.loadingstrategy.bbox,
         //   }),
-        //   style: styleFunction,
+        //   style: styleFunction_test,
         // }),
 
 
       ]
     }),
 
-    // new ol.layer.Tile({
-    //   title: "test layer from VM",
-    //   source: testVm
-    // }),
 
   ],
   overlays: [overlay],
@@ -411,7 +434,37 @@ var map = new ol.Map({
 function styleFunction(feature) {
   var color;
   var fAllYear = feature.get("y2006") + feature.get("y2007") + feature.get("y2008") + feature.get("y2009") + feature.get("y2010") + feature.get("y2011") + feature.get("y2012") + feature.get("y2013") + feature.get("y2014") + feature.get("y2015") + feature.get("y2016") + feature.get("y2017") + feature.get("y2018") + feature.get("y2019");
-  if ( fAllYear <= 50) {
+  if (fAllYear <= 50) {
+    color = '#d1eeea';
+  } else if (fAllYear <= 100) {
+    color = '#a8dbd9';
+  } else if (fAllYear <= 200) {
+    color = '#85c4c9';
+  } else if (fAllYear <= 300) {
+    color = '#68abb8';
+  } else if (fAllYear <= 450) {
+    color = '#4f90a6';
+  } else if (fAllYear <= 600) {
+    color = '#3b738f';
+  } else {
+    color = '#2a5674';
+  };
+  var reStyle = new ol.style.Style({
+    fill: new ol.style.Fill({
+      color: color
+    }),
+    stroke: new ol.style.Stroke({
+      color: "dark grey",
+      width: 0.5
+    })
+  });
+  return reStyle;
+};
+
+function styleFunction_test(feature) {
+  var color;
+  var fAllYear = feature.get("y2006") + feature.get("y2007") + feature.get("y2008") + feature.get("y2009") + feature.get("y2010") + feature.get("y2011") + feature.get("y2012") + feature.get("y2013") + feature.get("y2014") + feature.get("y2015") + feature.get("y2016") + feature.get("y2017") + feature.get("y2018") + feature.get("y2019");
+  if (fAllYear <= 50) {
     color = '#d1eeea';
   } else if (fAllYear <= 100) {
     color = '#a8dbd9';

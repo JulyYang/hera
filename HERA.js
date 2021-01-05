@@ -420,65 +420,7 @@ var map = new ol.Map({
   // })
 });
 
-function styleFunction(feature) {
-  var color;
-  var fAllYear = feature.get("y2006") + feature.get("y2007") + feature.get("y2008") + feature.get("y2009") + feature.get("y2010") + feature.get("y2011") + feature.get("y2012") + feature.get("y2013") + feature.get("y2014") + feature.get("y2015") + feature.get("y2016") + feature.get("y2017") + feature.get("y2018") + feature.get("y2019");
-  if (fAllYear <= 50) {
-    color = '#d1eeea';
-  } else if (fAllYear <= 100) {
-    color = '#a8dbd9';
-  } else if (fAllYear <= 200) {
-    color = '#85c4c9';
-  } else if (fAllYear <= 300) {
-    color = '#68abb8';
-  } else if (fAllYear <= 450) {
-    color = '#4f90a6';
-  } else if (fAllYear <= 600) {
-    color = '#3b738f';
-  } else {
-    color = '#2a5674';
-  };
-  var reStyle = new ol.style.Style({
-    fill: new ol.style.Fill({
-      color: color
-    }),
-    stroke: new ol.style.Stroke({
-      color: "dark grey",
-      width: 0.5
-    })
-  });
-  return reStyle;
-};
 
-function styleFunction_test(feature) {
-  var color;
-  var fAllYear = feature.get("y2006") + feature.get("y2007") + feature.get("y2008") + feature.get("y2009") + feature.get("y2010") + feature.get("y2011") + feature.get("y2012") + feature.get("y2013") + feature.get("y2014") + feature.get("y2015") + feature.get("y2016") + feature.get("y2017") + feature.get("y2018") + feature.get("y2019");
-  if (fAllYear <= 50) {
-    color = '#d1eeea';
-  } else if (fAllYear <= 100) {
-    color = '#a8dbd9';
-  } else if (fAllYear <= 200) {
-    color = '#85c4c9';
-  } else if (fAllYear <= 300) {
-    color = '#68abb8';
-  } else if (fAllYear <= 450) {
-    color = '#4f90a6';
-  } else if (fAllYear <= 600) {
-    color = '#3b738f';
-  } else {
-    color = '#2a5674';
-  };
-  var reStyle = new ol.style.Style({
-    fill: new ol.style.Fill({
-      color: color
-    }),
-    stroke: new ol.style.Stroke({
-      color: "dark grey",
-      width: 0.5
-    })
-  });
-  return reStyle;
-};
 
 // If there is any feature at the event pixel (where the mouse points at), the pointer will change to the 'hand' symbol
 map.on('pointermove', function (e) {

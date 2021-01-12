@@ -793,44 +793,87 @@ $("#slider-range").slider({
 let updateMapBtn = document.getElementById('updateMap');
 let targetLayer = document.getElementById('target-layer');
 let subCategory = document.getElementById('subcategory');
-updateMapBtn.onclick = function(){
+let check = document.getElementById('checkboxes');
+let form = document.getElementById('filterForm');
+
+document.addEventListener('mouseup', function(e) {
+  // var container = document.getElementById('container');
+  if (!check.contains(e.target)) {
+    check.style.display = 'none';
+  }
+});
+
+updateMapBtn.onclick = function () {
+  let params = [];
   console.log('update map');
+  console.log(form.querySelector('#target-layer').value);
+  console.log(form.querySelector('.slider-time').innerHTML);
+  console.log(form.querySelector('.slider-time2').innerHTML);
+  form.querySelectorAll('input[type="checkbox"]:checked').forEach(i => params.push(i.name));
+  // console.log(form.querySelectorAll('input[type="checkbox"]:checked'));
+  console.log(params);
+  // let checked = .map();
 }
 
-targetLayer.onchange = function(){
+targetLayer.onchange = function () {
   console.log(this.value);
-  subCategory.options.length = 0;
-  switch (this.value){
+  check.innerHTML = '';
+  // subCategory.options.length = 0;
+  switch (this.value) {
     case 'nc_floods_sql':
-      sub = ['FA','FL','FF','CF'];
-      for (s of sub){
-        // var opt = document.createElement('option');
+      sub = ['FA', 'FL', 'FF', 'CF'];
+      for (s of sub) {
+        var l = document.createElement('label');
         var input = document.createElement('input');
-        // opt.appendChild(input);
         input.value = s;
-        input.innerHTML = s;
+        input.id = s;
+        input.name = s;
         input.type = 'checkbox';
-        subCategory.appendChild(input);
+        l.setAttribute('for', s);
+        l.appendChild(input);
+        l.innerHTML = l.innerHTML + s;
+
+        // check.appendChild(input);
+        check.appendChild(l);
+        // check.appendChild(document.createElement('br'));
+        
       }
       break;
     case 'nc_ww_sql':
-      sub = ['BZ','WC','WW','HS','SN','ZR','IS','WS'];
-      for (s of sub){
-        var opt = document.createElement('option');
-        opt.value = s;
-        opt.innerHTML = s;
-        subCategory.appendChild(opt);
+      sub = ['BZ', 'WC', 'WW', 'HS', 'SN', 'ZR', 'IS', 'WS'];
+      for (s of sub) {
+        var l = document.createElement('label');
+        var input = document.createElement('input');
+        input.value = s;
+        input.id = s;
+        input.name = s;
+        input.type = 'checkbox';
+        l.setAttribute('for', s);
+        l.appendChild(input);
+        l.innerHTML = l.innerHTML + s;
+
+        // check.appendChild(input);
+        check.appendChild(l);
+        // check.appendChild(document.createElement('br'));
       }
       break;
     case 'nc_heats_sql':
-      // sub = ['FA','FL','FF','CF'];
-      // for (s of sub){
-      //   var opt = document.createElement('option');
-      //   opt.value = s;
-      //   opt.innerHTML = s;
-      //   subCategory.appendChild(opt);
-      // }
+      // check.style.visibility = 'hidden';
+
       break;
   }
 }
 
+var expanded = false;
+
+function showCheckboxes() {
+  var checkboxes = document.getElementById("checkboxes");
+  if (!expanded) {
+    checkboxes.style.display = "block";
+    expanded = true;
+  } else {
+    checkboxes.style.display = "none";
+    expanded = false;
+
+  }
+}

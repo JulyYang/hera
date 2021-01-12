@@ -271,3 +271,45 @@ body {
 .ui-slider a:focus {
     outline:none;
 }
+
+/* dropdown with checkbox */
+.multiselect {
+  width: 200px;
+}
+
+.selectBox {
+  position: relative;
+}
+
+.selectBox select {
+  width: 100%;
+  /* font-weight: bold; */
+}
+
+.overSelect {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
+#checkboxes {
+  border: 1px #dadada solid;
+}
+
+#checkboxes label {
+  /* display: inline-block; */
+  display: block;
+  font-weight: 300;
+
+}
+
+#checkboxes label:hover {
+  background-color: #1e90ff;
+  color: white;
+  /* left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0; */
+}

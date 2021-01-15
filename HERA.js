@@ -796,23 +796,128 @@ let subCategory = document.getElementById('subcategory');
 let check = document.getElementById('checkboxes');
 let form = document.getElementById('filterForm');
 
-document.addEventListener('mouseup', function(e) {
+document.addEventListener('mouseup', function (e) {
   // var container = document.getElementById('container');
   if (!check.contains(e.target)) {
     check.style.display = 'none';
   }
 });
 
+// From the stackoverflow post: 
+// function refreshSource(source, params) {
+function refreshSource(l, params) {
+  // var now = Date.now();
+  // var newsource = source;
+  // var format = new ol.format.GeoJSON();
+  var url = 'http://152.7.99.155:8080/geoserver/hera/wfs?service=WFS' +
+    '&version=1.0.0&request=GetFeature' +
+    '&typeName=' + 'hera:nc_floods_sql' +
+    '&outputFormat=application/json&srsname=EPSG:4326' +
+    '&bbox=-84.321821,31.995954,-75.400119,36.588137' +
+    '&viewparams=' + params;
+
+
+  let newsource = new ol.source.Vector({
+      renderMode: 'image', // Vector layers are rendered as images. Better performance. Default is 'vector'.
+      format: new ol.format.GeoJSON(),
+      url: function (extent) {
+        return 'http://152.7.99.155:8080/geoserver/hera/wfs?service=WFS' +
+        '&version=1.0.0&request=GetFeature' +
+        '&typeName=' + 'hera:nc_floods_sql' +
+        '&outputFormat=application/json&srsname=EPSG:4326' +
+        '&bbox=-84.321821,31.995954,-75.400119,36.588137' +
+        '&viewparams=' + params;
+        // + '&bbox=' + extent.join(',') + ',EPSG:3857'; // CQL filter and bbox are mutually exclusive. comment this to enable cql filter
+      },
+      strategy: ol.loadingstrategy.bbox,
+    });
+
+    l.setSource(newsource);
+
+    // '//your_server.net/tmp/points.json?t=' + now;
+    // var loader = ol.featureloader.xhr(url, format);
+
+  //   var features = source.getFeatures();
+  // features.forEach((feature) => {
+  //   source.removeFeature(feature);
+  // });
+
+  // source.setUrl(url);
+  // source.clear(true);
+  // loader.call(newsource, [], 1, 'EPSG:4326');
+
+  // fetch(url)
+  // .then(function(response) {
+  //   return response.json();
+  // }).then(function(json) {
+  //   // console.log('parsed json', json);
+
+  //   source.clear(); // if this is not enough try yours
+
+  //   var features = format.readFeatures(json, {
+  //     featureProjection: 'EPSG:4326'
+  //   });
+  //   source.addFeatures(features);
+
+  // }).catch(function(ex) {
+  //   console.log('parsing failed', ex);
+  // });
+
+}
+
+
 updateMapBtn.onclick = function () {
-  let params = [];
-  console.log('update map');
-  console.log(form.querySelector('#target-layer').value);
-  console.log(form.querySelector('.slider-time').innerHTML);
-  console.log(form.querySelector('.slider-time2').innerHTML);
-  form.querySelectorAll('input[type="checkbox"]:checked').forEach(i => params.push(i.name));
+  // let params = [];
+  // console.log('update map');
+  // console.log(form.querySelector('#target-layer').value);
+  let minYear = form.querySelector('.slider-time').innerHTML.replace(/\//g, "-");
+  let maxYear = form.querySelector('.slider-time2').innerHTML.replace(/\//g, "-");
+  console.log(minYear);
+  console.log(maxYear);
+  let selCategories = "";
+  // let categories = form.querySelectorAll('input[type="checkbox"]:checked').forEach(i => params.push(i.name));
+  let categories = form.querySelectorAll('input[type="checkbox"]:checked').forEach(i => selCategories += (i.name));
+  console.log(categories);
+  // form.querySelectorAll('input[type="checkbox"]:checked').forEach(i => params.push(i.name));
+  let params = "minYear:" + minYear + ";maxYear:" + maxYear + ";sublist:" + "'CF'"
   // console.log(form.querySelectorAll('input[type="checkbox"]:checked'));
   console.log(params);
-  // let checked = .map();
+  let lyrs = map.getLayerGroup().getLayers().array_.filter(e => {
+    return e.values_.title == 'Layers'
+  })[0];
+  let lyrGroups = lyrs.getLayers().getArray();
+  console.log(lyrGroups);
+  // let
+  let selectedLyr = lyrGroups.filter(l => l.get('title') == form.querySelector('#target-layer').value);
+  // selectedLyr.forEach(l => console.log(l.get('params')));
+  console.log(selectedLyr[0].getLayersArray());
+
+  // Update WMS layer
+  selectedLyr[0].getLayersArray()[0].getSource().updateParams({
+    'viewparams': params
+  });
+  // selectedLyr[0].getLayersArray()[0].getSource().updateParams({'viewparams': "minYear:2010-01-01;maxYear:2018-12-31;sublist:'CF'"});
+
+  // "minYear:2010-01-01;maxYear:2018-12-31;sublist:'WW'\\,'SN'"
+
+  // t[3].getLayersArray()[0].getSource().updateParams({'viewparams': "minYear:2010-01-01;maxYear:2018-12-31;sublist:'CF'"})
+
+  // Update WFS layer
+  let wfsl = selectedLyr[0].getLayersArray()[1];
+  // let wfssource = selectedLyr[0].getLayersArray()[1].getSource();
+  // console.log(wfssource);
+  // wfssource.clear(true);
+
+  refreshSource(wfsl,params);
+  // refreshSource(wfssource,params);
+
+  // selectedLyr[0].getLayersArray().forEach(i => map.removeLayer(i));
+  // console.log(map.getLayerGroup().getLayers().array_.filter(e => {
+  //   return e.values_.title == 'Layers'
+  // })[0].getLayers().getArray());
+  // map.removeLayer(selectedLyr);
+
+
 }
 
 targetLayer.onchange = function () {
@@ -820,7 +925,7 @@ targetLayer.onchange = function () {
   check.innerHTML = '';
   // subCategory.options.length = 0;
   switch (this.value) {
-    case 'nc_floods_sql':
+    case 'NC Floods ':
       sub = ['FA', 'FL', 'FF', 'CF'];
       for (s of sub) {
         var l = document.createElement('label');
@@ -836,10 +941,10 @@ targetLayer.onchange = function () {
         // check.appendChild(input);
         check.appendChild(l);
         // check.appendChild(document.createElement('br'));
-        
+
       }
       break;
-    case 'nc_ww_sql':
+    case 'NC Winter Weather ':
       sub = ['BZ', 'WC', 'WW', 'HS', 'SN', 'ZR', 'IS', 'WS'];
       for (s of sub) {
         var l = document.createElement('label');
@@ -857,7 +962,7 @@ targetLayer.onchange = function () {
         // check.appendChild(document.createElement('br'));
       }
       break;
-    case 'nc_heats_sql':
+    case 'NC Heat ':
       // check.style.visibility = 'hidden';
 
       break;

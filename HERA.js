@@ -794,10 +794,10 @@ document.addEventListener('mouseup', function (e) {
 
 // From the stackoverflow post: 
 // function refreshSource(source, params) {
-function refreshSource(l, params) {
+function refreshSource(lyrname, params, l) {
   let newurl = 'http://152.7.99.155:8080/geoserver/hera/wfs?service=WFS' +
     '&version=1.0.0&request=GetFeature' +
-    '&typeName=' + 'hera:nc_floods_sql' +
+    '&typeName=' + lyrname +
     '&outputFormat=application/json&srsname=EPSG:4326' +
     '&bbox=-84.321821,31.995954,-75.400119,36.588137' +
     '&viewparams=' + params;
@@ -832,6 +832,7 @@ updateMapBtn.onclick = function () {
   let lyrGroups = lyrs.getLayers().getArray();
   let selectedLyr = lyrGroups.filter(l => l.get('title') == selectedLayer);
   // console.log(selectedLyr[0].getLayersArray());
+  let lyrname = selectedLyr[0].getLayersArray()[0].getSource().getParams()['LAYERS'];
 
   // Update WMS layer
   selectedLyr[0].getLayersArray()[0].getSource().updateParams({
@@ -841,7 +842,7 @@ updateMapBtn.onclick = function () {
   // Update WFS layer
   let wfsl = selectedLyr[0].getLayersArray()[1];
   // let wfssource = selectedLyr[0].getLayersArray()[1].getSource();
-  refreshSource(wfsl, params);
+  refreshSource(lyrname, params, wfsl);
   // refreshSource(wfssource,params);
 }
 
@@ -859,6 +860,7 @@ targetLayer.onchange = function () {
 
       break;
     case 'NC Heat ':
+      sub = [];
       // check.style.visibility = 'hidden';
       break;
   }

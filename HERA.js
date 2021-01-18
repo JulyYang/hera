@@ -399,8 +399,6 @@ interactionSelect.on('select', function (e) {
   console.log(e.target.getFeatures());
   // console.log(e.target.getLength());
   // console.log(map.getFeaturesAtPixel(e.pixel));
-  // console.log(features);
-  // console.log(features.length);
 
   if (features.length >= 1) {
     var layerid = features[0].getId().split('.')[0];
@@ -742,14 +740,6 @@ function testtoggle() {
     $("#dialog").dialog("close");
     console.log("toggle off")
   }
-  // if (!$("#dialog").dialog("isOpen")) {
-  //   // $('#toggle').bootstrapToggle('on');
-  //   $("#dialog").dialog("open");
-  //   console.log("toggle on")
-  // } else {
-  //   $("#dialog").dialog("close");
-  //   console.log("toggle off")
-  // }
 }
 
 
@@ -797,7 +787,6 @@ let check = document.getElementById('checkboxes');
 let form = document.getElementById('filterForm');
 
 document.addEventListener('mouseup', function (e) {
-  // var container = document.getElementById('container');
   if (!check.contains(e.target)) {
     check.style.display = 'none';
   }
@@ -806,118 +795,54 @@ document.addEventListener('mouseup', function (e) {
 // From the stackoverflow post: 
 // function refreshSource(source, params) {
 function refreshSource(l, params) {
-  // var now = Date.now();
-  // var newsource = source;
-  // var format = new ol.format.GeoJSON();
-  var url = 'http://152.7.99.155:8080/geoserver/hera/wfs?service=WFS' +
+  let newurl = 'http://152.7.99.155:8080/geoserver/hera/wfs?service=WFS' +
     '&version=1.0.0&request=GetFeature' +
     '&typeName=' + 'hera:nc_floods_sql' +
     '&outputFormat=application/json&srsname=EPSG:4326' +
     '&bbox=-84.321821,31.995954,-75.400119,36.588137' +
     '&viewparams=' + params;
 
-
   let newsource = new ol.source.Vector({
-      renderMode: 'image', // Vector layers are rendered as images. Better performance. Default is 'vector'.
-      format: new ol.format.GeoJSON(),
-      url: function (extent) {
-        return 'http://152.7.99.155:8080/geoserver/hera/wfs?service=WFS' +
-        '&version=1.0.0&request=GetFeature' +
-        '&typeName=' + 'hera:nc_floods_sql' +
-        '&outputFormat=application/json&srsname=EPSG:4326' +
-        '&bbox=-84.321821,31.995954,-75.400119,36.588137' +
-        '&viewparams=' + params;
-        // + '&bbox=' + extent.join(',') + ',EPSG:3857'; // CQL filter and bbox are mutually exclusive. comment this to enable cql filter
-      },
-      strategy: ol.loadingstrategy.bbox,
-    });
+    renderMode: 'image',
+    format: new ol.format.GeoJSON(),
+    url: function () {
+      return newurl;
+    },
+    strategy: ol.loadingstrategy.bbox,
+  });
 
-    l.setSource(newsource);
-
-    // '//your_server.net/tmp/points.json?t=' + now;
-    // var loader = ol.featureloader.xhr(url, format);
-
-  //   var features = source.getFeatures();
-  // features.forEach((feature) => {
-  //   source.removeFeature(feature);
-  // });
-
-  // source.setUrl(url);
-  // source.clear(true);
-  // loader.call(newsource, [], 1, 'EPSG:4326');
-
-  // fetch(url)
-  // .then(function(response) {
-  //   return response.json();
-  // }).then(function(json) {
-  //   // console.log('parsed json', json);
-
-  //   source.clear(); // if this is not enough try yours
-
-  //   var features = format.readFeatures(json, {
-  //     featureProjection: 'EPSG:4326'
-  //   });
-  //   source.addFeatures(features);
-
-  // }).catch(function(ex) {
-  //   console.log('parsing failed', ex);
-  // });
-
+  l.setSource(newsource);
 }
 
 
 updateMapBtn.onclick = function () {
-  // let params = [];
-  // console.log('update map');
-  // console.log(form.querySelector('#target-layer').value);
+  let selectedLayer = form.querySelector('#target-layer').value;
   let minYear = form.querySelector('.slider-time').innerHTML.replace(/\//g, "-");
   let maxYear = form.querySelector('.slider-time2').innerHTML.replace(/\//g, "-");
-  console.log(minYear);
-  console.log(maxYear);
-  let selCategories = "";
-  // let categories = form.querySelectorAll('input[type="checkbox"]:checked').forEach(i => params.push(i.name));
-  let categories = form.querySelectorAll('input[type="checkbox"]:checked').forEach(i => selCategories += (i.name));
-  console.log(categories);
-  // form.querySelectorAll('input[type="checkbox"]:checked').forEach(i => params.push(i.name));
-  let params = "minYear:" + minYear + ";maxYear:" + maxYear + ";sublist:" + "'CF'"
-  // console.log(form.querySelectorAll('input[type="checkbox"]:checked'));
+  let categories = [];
+
+  form.querySelectorAll('input[type="checkbox"]:checked').forEach(i => categories.push("'" + i.name + "'"));
+  // let params = "minYear:" + minYear + ";maxYear:" + maxYear + ";sublist:" + "'CF'\\,'FA'";
+  let params = "minYear:" + minYear + ";maxYear:" + maxYear + ";sublist:" + categories.join("\\,");
   console.log(params);
+
   let lyrs = map.getLayerGroup().getLayers().array_.filter(e => {
     return e.values_.title == 'Layers'
   })[0];
   let lyrGroups = lyrs.getLayers().getArray();
-  console.log(lyrGroups);
-  // let
-  let selectedLyr = lyrGroups.filter(l => l.get('title') == form.querySelector('#target-layer').value);
-  // selectedLyr.forEach(l => console.log(l.get('params')));
-  console.log(selectedLyr[0].getLayersArray());
+  let selectedLyr = lyrGroups.filter(l => l.get('title') == selectedLayer);
+  // console.log(selectedLyr[0].getLayersArray());
 
   // Update WMS layer
   selectedLyr[0].getLayersArray()[0].getSource().updateParams({
     'viewparams': params
   });
-  // selectedLyr[0].getLayersArray()[0].getSource().updateParams({'viewparams': "minYear:2010-01-01;maxYear:2018-12-31;sublist:'CF'"});
-
-  // "minYear:2010-01-01;maxYear:2018-12-31;sublist:'WW'\\,'SN'"
-
-  // t[3].getLayersArray()[0].getSource().updateParams({'viewparams': "minYear:2010-01-01;maxYear:2018-12-31;sublist:'CF'"})
 
   // Update WFS layer
   let wfsl = selectedLyr[0].getLayersArray()[1];
   // let wfssource = selectedLyr[0].getLayersArray()[1].getSource();
-  // console.log(wfssource);
-  // wfssource.clear(true);
-
-  refreshSource(wfsl,params);
+  refreshSource(wfsl, params);
   // refreshSource(wfssource,params);
-
-  // selectedLyr[0].getLayersArray().forEach(i => map.removeLayer(i));
-  // console.log(map.getLayerGroup().getLayers().array_.filter(e => {
-  //   return e.values_.title == 'Layers'
-  // })[0].getLayers().getArray());
-  // map.removeLayer(selectedLyr);
-
-
 }
 
 targetLayer.onchange = function () {
@@ -927,45 +852,31 @@ targetLayer.onchange = function () {
   switch (this.value) {
     case 'NC Floods ':
       sub = ['FA', 'FL', 'FF', 'CF'];
-      for (s of sub) {
-        var l = document.createElement('label');
-        var input = document.createElement('input');
-        input.value = s;
-        input.id = s;
-        input.name = s;
-        input.type = 'checkbox';
-        l.setAttribute('for', s);
-        l.appendChild(input);
-        l.innerHTML = l.innerHTML + s;
 
-        // check.appendChild(input);
-        check.appendChild(l);
-        // check.appendChild(document.createElement('br'));
-
-      }
       break;
     case 'NC Winter Weather ':
       sub = ['BZ', 'WC', 'WW', 'HS', 'SN', 'ZR', 'IS', 'WS'];
-      for (s of sub) {
-        var l = document.createElement('label');
-        var input = document.createElement('input');
-        input.value = s;
-        input.id = s;
-        input.name = s;
-        input.type = 'checkbox';
-        l.setAttribute('for', s);
-        l.appendChild(input);
-        l.innerHTML = l.innerHTML + s;
 
-        // check.appendChild(input);
-        check.appendChild(l);
-        // check.appendChild(document.createElement('br'));
-      }
       break;
     case 'NC Heat ':
       // check.style.visibility = 'hidden';
-
       break;
+  }
+
+  for (s of sub) {
+    var l = document.createElement('label');
+    var input = document.createElement('input');
+    input.value = s;
+    input.id = s;
+    input.name = s;
+    input.type = 'checkbox';
+    l.setAttribute('for', s);
+    l.appendChild(input);
+    l.innerHTML = l.innerHTML + s;
+
+    // check.appendChild(input);
+    check.appendChild(l);
+    // check.appendChild(document.createElement('br'));
   }
 }
 

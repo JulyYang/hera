@@ -533,20 +533,48 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 });
 
 // Create mock-up highlight table as tableau
-var dummy = [
+let layerjson = (function () {
+  var json;
+  $.ajax({
+    async: false,
+    url: `http://152.7.99.155:8080/geoserver/hera/ows?service=WFS&version=1.0.0
+        &request=GetFeature&typeName=hera:floods_highlight&outputFormat=json
+        &format_options=callback:getJson`,
+    dataType: 'json',
+    jsonpCallback: 'getJson',
+    // success: parsejson
+    success: function (data) {
+      json = data
+    }
+  });
+  return json;
+})();
 
-  ['2006', 10, 30, 40, 40, 55, 36, 74, 39, 29],
-  ['2007', 32, 22, 33, 24, 35, 36, 57, 28, 29],
-  ['2008', 34, 13, 43, 43, 25, 46, 67, 48, 59],
-  ['2009', 44, 25, 33, 24, 15, 26, 74, 48, 59],
-  ['2010', 55, 62, 53, 44, 53, 56, 47, 83, 92],
-  ['2011', 67, 23, 23, 34, 56, 26, 77, 78, 79],
-  ['2012', 87, 42, 53, 84, 75, 66, 75, 28, 91],
-  ['2013', 88, 62, 37, 44, 53, 46, 73, 28, 19],
-  ['2014', 150, 26, 63, 44, 35, 62, 27, 82, 19]
 
-];
-var rowLabel = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
+var dummy = [];
+
+layerjson.features.forEach(
+  function (i) {
+    var yearlist = [];
+    yearlist.push(i.properties['year_issued'], i.properties['jan'], i.properties['feb'], i.properties['mar'], i.properties['apr'], i.properties['may'],
+      i.properties['jun'], i.properties['jul'], i.properties['aug'], i.properties['sep'], i.properties['oct'], i.properties['nov'], i.properties['dec']);
+    dummy.push(yearlist);
+  })
+
+function parsejson(data) {
+  data.features.forEach(
+    function (i) {
+      var yearlist = [];
+      yearlist.push(i.properties['year_issued'], i.properties['jan'], i.properties['feb'], i.properties['mar'], i.properties['apr'], i.properties['may'],
+        i.properties['jun'], i.properties['jul'], i.properties['aug'], i.properties['sep'], i.properties['oct'], i.properties['nov'], i.properties['dec']);
+      dummy.push(yearlist);
+    }
+  )
+  /*   console.log(data.features); */
+};
+
+
+var rowLabel = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 
 // Using RBG

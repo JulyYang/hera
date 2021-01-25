@@ -923,3 +923,30 @@ function showCheckboxes() {
 
   }
 }
+
+// function loadingIndicator() {
+  let allLyrs = map.getLayerGroup().getLayers().array_;
+  let lyrsArray = allLyrs.filter(e => {
+    return e.values_.title == 'Layers'
+  })[0].getLayersArray();
+  // let tilelyrs = lyrsGroup.getLayersArray().filter(e => {
+  //   return e.type == 'TILE'
+  // });
+
+  for (layer of lyrsArray){
+    if (layer instanceof ol.layer.Vector) {
+      layer.on("precompose", function () {
+                $("#ajaxSpinnerContainer").show();
+                $("#ajaxSpinnerImage").show();
+              });
+      layer.on("render", function () {
+                $("#ajaxSpinnerContainer").hide();
+                $("#ajaxSpinnerImage").hide();
+              });
+  }
+  
+}
+
+
+
+// }()

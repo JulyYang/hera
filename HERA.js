@@ -210,7 +210,7 @@ var map = new ol.Map({
         new ol.layer.Group({
           title: "2017 population ",
           combine: true,
-          visible: true,
+          visible: false,
           layers: [
             new ol.layer.Tile({
               // title: "2017 population",
@@ -249,7 +249,7 @@ var map = new ol.Map({
         new ol.layer.Group({
           title: "2015 Impervious Surface Area ",
           combine: true,
-          visible: true,
+          visible: false,
           layers: [
             new ol.layer.Tile({
               // title: "2015 Impervious Surface Area",
@@ -295,8 +295,9 @@ var map = new ol.Map({
         new ol.layer.Group({
           title: "NC Floods ",
           combine: true,
-          visible: false,
-          layers: createGroupedLyrs('hera:nc_floods_sql', "minYear:2010-01-01;maxYear:2018-12-31;sublist:'FA'\\,'CF'")
+          visible: true,
+          layers: createGroupedLyrs('hera:nc_floods_sql')
+          // layers: createGroupedLyrs('hera:nc_floods_sql', "minYear:2010;maxYear:2018;sublist:'FA'\\,'CF'")
         }),
 
         new ol.layer.Group({
@@ -305,8 +306,6 @@ var map = new ol.Map({
           visible: false,
           layers: createGroupedLyrs('hera:nc_heats_sql', "minYear:2010-01-01;maxYear:2018-12-31")
         }),
-
-
 
 
       ]
@@ -342,6 +341,9 @@ map.on('pointermove', function (e) {
 let createContent = function (lyr, features) {
   var counties = '';
   var total = 0;
+  var probaArray = [];
+  let startyear = parseInt($('.slider-time').html());
+  let endyear = parseInt($('.slider-time2').html());
   switch (lyr) {
     case 'ncsc_population_lyr':
       for (f of features) {
@@ -363,8 +365,32 @@ let createContent = function (lyr, features) {
       for (f of features) {
         counties += f.get('county') + ', ';
         total += f.get('count');
-        // console.log(f.get('record_id'));
+        features[0].getKeys().filter(i =>
+          endyear >= parseInt(i.slice(1)) && parseInt(i.slice(1)) >= startyear && f.get(i) != null
+        ).forEach(i => {
+          if (! probaArray.includes(i)){
+            probaArray.push(i)
+          }
+        });
+        // console.log(f.getKeys());
+        // console.log(f.getProperties());
       }
+      // Create an array of the year headers based on the year range, e.g. 'y2006',...,'y2019'
+      // var newarray = [...Array(2019-2006+1).keys()].map(i => 'y' + (i+2006).toString()) 
+      // var testarray = features[0].getKeys().filter(i => newarray.includes(i)&& features[0].get(i) != null);
+
+      // var testarray = features[0].getKeys().filter(i =>
+      //   endyear >= parseInt(i.slice(1)) && parseInt(i.slice(1)) >= startyear && features[0].get(i) != null
+      // );
+      // console.log((endyear - startyear + 1));
+      // console.log(testarray);
+      // console.log(testarray.length);
+      // console.log((testarray.length / (endyear - startyear + 1) * 100).toFixed(2) + '%');
+      
+      console.log(probaArray);  
+      console.log((probaArray.length / (endyear - startyear + 1) * 100).toFixed(2) + '%');
+
+      console.log(startyear, endyear);
       average = (total / features.length).toFixed(2);
       content.innerHTML = '<b>Layer: </b>Floods<br>' + '<h5>Selected County: ' + counties + '</h5><br><p>Year: 2006-2019</p><br><p>Total count: ' + total + '</p><br><p>Average count: ' + average + '</p>';
       // content.innerHTML = 'Number of records: ' + total;
@@ -373,7 +399,6 @@ let createContent = function (lyr, features) {
       for (f of features) {
         counties += f.get('county') + ', ';
         total += f.get('count');
-        // console.log(f.get('record_id'));
       }
       average = (total / features.length).toFixed(2);
       content.innerHTML = '<b>Layer: </b>Winter Weather<br>' + '<h5>Selected County: ' + counties + '</h5><br><p>Year: 2006-2019</p><br><p>Total count: ' + total + '</p><br><p>Average count: ' + average + '</p>';
@@ -383,7 +408,6 @@ let createContent = function (lyr, features) {
       for (f of features) {
         counties += f.get('county') + ', ';
         total += f.get('count');
-        // console.log(f.get('record_id'));
       }
       average = (total / features.length).toFixed(2);
       content.innerHTML = '<b>Layer: </b>Heat<br>' + '<h5>Selected County: ' + counties + '</h5><br><p>Year: 2006-2019</p><br><p>Total count: ' + total + '</p><br><p>Average count: ' + average + '</p>';
@@ -774,8 +798,10 @@ function testtoggle() {
 var dt_from = "2006/01/01";
 var dt_to = "2019/12/31";
 
-$('.slider-time').html(dt_from);
-$('.slider-time2').html(dt_to);
+// $('.slider-time').html(dt_from);
+// $('.slider-time2').html(dt_to);
+$('.slider-time').html('2006');
+$('.slider-time2').html('2019');
 var min_val = Date.parse(dt_from) / 1000;
 var max_val = Date.parse(dt_to) / 1000;
 
@@ -786,10 +812,11 @@ function zeroPad(num, places) {
 
 function formatDT(__dt) {
   var year = __dt.getFullYear();
-  var month = zeroPad(__dt.getMonth() + 1, 2);
-  var date = zeroPad(__dt.getDate(), 2);
+  // var month = zeroPad(__dt.getMonth() + 1, 2);
+  // var date = zeroPad(__dt.getDate(), 2);
 
-  return year + '/' + month + '/' + date;
+  // return year + '/' + month + '/' + date;
+  return year;
 };
 
 
@@ -844,6 +871,7 @@ function refreshSource(lyrname, params, l) {
 
 
 updateMapBtn.onclick = function () {
+  overlay.setPosition(undefined);
   let selectedLayer = form.querySelector('#target-layer').value;
   let minYear = form.querySelector('.slider-time').innerHTML.replace(/\//g, "-");
   let maxYear = form.querySelector('.slider-time2').innerHTML.replace(/\//g, "-");
@@ -924,7 +952,7 @@ function showCheckboxes() {
   }
 }
 
-// function loadingIndicator() {
+(function loadingIndicator() {
   let allLyrs = map.getLayerGroup().getLayers().array_;
   let lyrsArray = allLyrs.filter(e => {
     return e.values_.title == 'Layers'
@@ -933,20 +961,20 @@ function showCheckboxes() {
   //   return e.type == 'TILE'
   // });
 
-  for (layer of lyrsArray){
+  for (layer of lyrsArray) {
     if (layer instanceof ol.layer.Vector) {
       layer.on("precompose", function () {
-                $("#ajaxSpinnerContainer").show();
-                $("#ajaxSpinnerImage").show();
-              });
+        $("#ajaxSpinnerContainer").show();
+        $("#ajaxSpinnerImage").show();
+      });
       layer.on("render", function () {
-                $("#ajaxSpinnerContainer").hide();
-                $("#ajaxSpinnerImage").hide();
-              });
+        $("#ajaxSpinnerContainer").hide();
+        $("#ajaxSpinnerImage").hide();
+      });
+    }
+
   }
-  
-}
 
 
 
-// }()
+})()

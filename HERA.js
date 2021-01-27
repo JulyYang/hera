@@ -289,7 +289,8 @@ var map = new ol.Map({
           title: "NC Winter Weather ",
           combine: true,
           visible: false,
-          layers: createGroupedLyrs('hera:nc_ww_sql', "minYear:2010-01-01;maxYear:2018-12-31;sublist:'WW'\\,'SN'")
+          layers: createGroupedLyrs('hera:nc_ww_sql')
+          // layers: createGroupedLyrs('hera:nc_ww_sql', "minYear:2010-01-01;maxYear:2018-12-31;sublist:'WW'\\,'SN'")
         }),
 
         new ol.layer.Group({
@@ -304,7 +305,8 @@ var map = new ol.Map({
           title: "NC Heat ",
           combine: true,
           visible: false,
-          layers: createGroupedLyrs('hera:nc_heats_sql', "minYear:2010-01-01;maxYear:2018-12-31")
+          layers: createGroupedLyrs('hera:nc_heats_sql')
+          // layers: createGroupedLyrs('hera:nc_heats_sql', "minYear:2010-01-01;maxYear:2018-12-31")
         }),
 
 
@@ -342,6 +344,7 @@ let createContent = function (lyr, features) {
   var counties = '';
   var total = 0;
   var probaArray = [];
+  var probability = 0;
   let startyear = parseInt($('.slider-time').html());
   let endyear = parseInt($('.slider-time2').html());
   switch (lyr) {
@@ -368,12 +371,10 @@ let createContent = function (lyr, features) {
         features[0].getKeys().filter(i =>
           endyear >= parseInt(i.slice(1)) && parseInt(i.slice(1)) >= startyear && f.get(i) != null
         ).forEach(i => {
-          if (! probaArray.includes(i)){
+          if (!probaArray.includes(i)) {
             probaArray.push(i)
           }
         });
-        // console.log(f.getKeys());
-        // console.log(f.getProperties());
       }
       // Create an array of the year headers based on the year range, e.g. 'y2006',...,'y2019'
       // var newarray = [...Array(2019-2006+1).keys()].map(i => 'y' + (i+2006).toString()) 
@@ -382,35 +383,50 @@ let createContent = function (lyr, features) {
       // var testarray = features[0].getKeys().filter(i =>
       //   endyear >= parseInt(i.slice(1)) && parseInt(i.slice(1)) >= startyear && features[0].get(i) != null
       // );
-      // console.log((endyear - startyear + 1));
-      // console.log(testarray);
-      // console.log(testarray.length);
-      // console.log((testarray.length / (endyear - startyear + 1) * 100).toFixed(2) + '%');
-      
-      console.log(probaArray);  
-      console.log((probaArray.length / (endyear - startyear + 1) * 100).toFixed(2) + '%');
+
+      // console.log(probaArray);
+      probability = (probaArray.length / (endyear - startyear + 1) * 100).toFixed(2) + '%';
 
       console.log(startyear, endyear);
       average = (total / features.length).toFixed(2);
-      content.innerHTML = '<b>Layer: </b>Floods<br>' + '<h5>Selected County: ' + counties + '</h5><br><p>Year: 2006-2019</p><br><p>Total count: ' + total + '</p><br><p>Average count: ' + average + '</p>';
+      content.innerHTML = '<b>Layer: </b>Floods<br>' + '<h5>Selected County: ' + counties + '</h5><br><p>Year: 2006-2019</p><br><p>Total count: ' +
+        total + '</p><br><p>Probability: ' + probability + '</p><br><p>Average count: ' + average + '</p>';
       // content.innerHTML = 'Number of records: ' + total;
       break;
     case 'nc_ww_sql':
       for (f of features) {
         counties += f.get('county') + ', ';
         total += f.get('count');
-      }
+        features[0].getKeys().filter(i =>
+          endyear >= parseInt(i.slice(1)) && parseInt(i.slice(1)) >= startyear && f.get(i) != null
+        ).forEach(i => {
+          if (!probaArray.includes(i)) {
+            probaArray.push(i)
+          }
+        });
+      };
+      probability = (probaArray.length / (endyear - startyear + 1) * 100).toFixed(2) + '%';
       average = (total / features.length).toFixed(2);
-      content.innerHTML = '<b>Layer: </b>Winter Weather<br>' + '<h5>Selected County: ' + counties + '</h5><br><p>Year: 2006-2019</p><br><p>Total count: ' + total + '</p><br><p>Average count: ' + average + '</p>';
+      content.innerHTML = '<b>Layer: </b>Winter Weather<br>' + '<h5>Selected County: ' + counties + '</h5><br><p>Year: 2006-2019</p><br><p>Total count: ' +
+        total + '</p><br><p>Probability: ' + probability + '</p><br><p>Average count: ' + average + '</p>';
       // content.innerHTML = 'Number of records: ' + total;
       break;
     case 'nc_heats_sql':
       for (f of features) {
         counties += f.get('county') + ', ';
         total += f.get('count');
-      }
+        features[0].getKeys().filter(i =>
+          endyear >= parseInt(i.slice(1)) && parseInt(i.slice(1)) >= startyear && f.get(i) != null
+        ).forEach(i => {
+          if (!probaArray.includes(i)) {
+            probaArray.push(i)
+          }
+        });
+      };
+      probability = (probaArray.length / (endyear - startyear + 1) * 100).toFixed(2) + '%';
       average = (total / features.length).toFixed(2);
-      content.innerHTML = '<b>Layer: </b>Heat<br>' + '<h5>Selected County: ' + counties + '</h5><br><p>Year: 2006-2019</p><br><p>Total count: ' + total + '</p><br><p>Average count: ' + average + '</p>';
+      content.innerHTML = '<b>Layer: </b>Heat<br>' + '<h5>Selected County: ' + counties + '</h5><br><p>Year: 2006-2019</p><br><p>Total count: ' +
+        total + '</p><br><p>Probability: ' + probability + '</p><br><p>Average count: ' + average + '</p>';
       // content.innerHTML = 'Number of records: ' + total;
       break;
 

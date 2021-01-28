@@ -131,6 +131,7 @@ var boundarySource = new ol.source.TileWMS({
     'FORMAT': 'image/png'
   },
   serverType: 'geoserver',
+  crossOrigin: 'anonymous',
   // Countries have transparency, so do not fade tiles:
   transition: 0,
 });
@@ -171,7 +172,7 @@ var map = new ol.Map({
     interactionSelectPointerMove,
     new ol.interaction.MouseWheelZoom(),
     new ol.interaction.DragPan(),
-    interactionSelect,
+    // interactionSelect,
   ],
   layers: [
     new ol.layer.Group({
@@ -296,16 +297,32 @@ var map = new ol.Map({
         new ol.layer.Group({
           title: "NC Floods ",
           combine: true,
-          visible: true,
+          visible: false,
           layers: createGroupedLyrs('hera:nc_floods_sql')
           // layers: createGroupedLyrs('hera:nc_floods_sql', "minYear:2010;maxYear:2018;sublist:'FA'\\,'CF'")
         }),
 
         new ol.layer.Group({
-          title: "NC Heat ",
+          title: "NC High Winds ",
           combine: true,
           visible: false,
+          layers: createGroupedLyrs('hera:nc_hw_sql')
+          // layers: createGroupedLyrs('hera:nc_hw_sql', "minYear:2010;maxYear:2018;sublist:'FA'\\,'CF'")
+        }),
+
+        new ol.layer.Group({
+          title: "NC Heat ",
+          combine: true,
+          visible: true,
           layers: createGroupedLyrs('hera:nc_heats_sql')
+          // layers: createGroupedLyrs('hera:nc_heats_sql', "minYear:2010-01-01;maxYear:2018-12-31")
+        }),
+
+        new ol.layer.Group({
+          title: "NC Hails ",
+          combine: true,
+          visible: false,
+          layers: createGroupedLyrs('hera:nc_hl_sql')
           // layers: createGroupedLyrs('hera:nc_heats_sql', "minYear:2010-01-01;maxYear:2018-12-31")
         }),
 
@@ -411,6 +428,48 @@ let createContent = function (lyr, features) {
         total + '</p><br><p>Probability: ' + probability + '</p><br><p>Average count: ' + average + '</p>';
       // content.innerHTML = 'Number of records: ' + total;
       break;
+    case 'nc_hw_sql':
+      for (f of features) {
+        counties += f.get('county') + ', ';
+        total += f.get('count');
+        features[0].getKeys().filter(i =>
+          endyear >= parseInt(i.slice(1)) && parseInt(i.slice(1)) >= startyear && f.get(i) != null
+        ).forEach(i => {
+          if (!probaArray.includes(i)) {
+            probaArray.push(i)
+          }
+        });
+      };
+      // console.log(endyear, startyear)
+      // endyear = 2018;
+      // startyear = 1989;
+      probability = (probaArray.length / (endyear - startyear + 1) * 100).toFixed(2) + '%';
+      average = (total / features.length).toFixed(2);
+      content.innerHTML = '<b>Layer: </b>High Winds<br>' + '<h5>Selected County: ' + counties + '</h5><br><p>Year: 1989-2018</p><br><p>Total count: ' +
+        total + '</p><br><p>Probability: ' + probability + '</p><br><p>Average count: ' + average + '</p>';
+      // content.innerHTML = 'Number of records: ' + total;
+      break;
+    case 'nc_hl_sql':
+      for (f of features) {
+        counties += f.get('county') + ', ';
+        total += f.get('count');
+        features[0].getKeys().filter(i =>
+          endyear >= parseInt(i.slice(1)) && parseInt(i.slice(1)) >= startyear && f.get(i) != null
+        ).forEach(i => {
+          if (!probaArray.includes(i)) {
+            probaArray.push(i)
+          }
+        });
+      };
+      // console.log(endyear, startyear)
+      // endyear = 2018;
+      // startyear = 1989;
+      probability = (probaArray.length / (endyear - startyear + 1) * 100).toFixed(2) + '%';
+      average = (total / features.length).toFixed(2);
+      content.innerHTML = '<b>Layer: </b>Hails<br>' + '<h5>Selected County: ' + counties + '</h5><br><p>Year: 1989-2018</p><br><p>Total count: ' +
+        total + '</p><br><p>Probability: ' + probability + '</p><br><p>Average count: ' + average + '</p>';
+      // content.innerHTML = 'Number of records: ' + total;
+      break;
     case 'nc_heats_sql':
       for (f of features) {
         counties += f.get('county') + ', ';
@@ -432,6 +491,70 @@ let createContent = function (lyr, features) {
 
   }
 }
+
+let shiftClicked = function(evt){
+  if (evt.browserEvent.shiftKey){
+    console.log("multi mode on")
+  }
+}
+
+var shiftPressed = false;
+$(document).keydown(function(event) {
+    shiftPressed = event.keyCode==16;
+});
+
+map.on('singleclick', function (evt) {
+  // console.log(evt)
+  // if (evt.text.length> 658) {
+  var coord = evt.coordinate;
+  let resolution = map.getView().getResolution();
+  let projection = map.getView().getProjection();
+
+  let wmslayerSource = map.forEachLayerAtPixel(evt.pixel,
+    function (layer) {
+      // return only layers with ol.source.TileWMS
+      var source = layer.getSource();
+      if (source instanceof ol.source.TileWMS) {
+        return source;
+      }
+    });
+  if (wmslayerSource) {
+    var url = wmslayerSource.getGetFeatureInfoUrl(
+      coord, resolution, projection, {
+        'INFO_FORMAT': 'application/json',
+      }
+      // 'propertyName': 'fips, county, population'}
+    );
+    if (shiftPressed){
+      console.log('multi selec mode is on!!')
+    };
+    // if (url) {
+      fetch(url)
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (json) {
+          var lyrId = json['features'][0]['id'].split('.')[0];
+          console.log(lyrId);
+          if (lyrId = 'nc_heats_sql') {
+            content.innerHTML = '<b>Layer: </b>Heat<br>' + '<h5>Selected County: ' +
+              json["features"][0]["properties"]["county"] + '</h5><br><p>Year: 2006-2019</p><br><p>Total count: ' +
+              json["features"][0]["properties"]["count"] + '</p><br><p>Probability: '
+            // + probability + '</p><br><p>Average count: ' + average + '</p>';
+            // content.innerHTML = '<h3>population:' + json["features"][0]["properties"]["population"] + '</h3>' + 'county name:' + json["features"][0]["properties"]["county"];
+            console.log(json);
+          } else if (lyrId = 'ncsc_isa_lyr') {
+            content.innerHTML = '<h3>population:' + json["features"][0]["properties"]["percent_isa"] + '</h3>' + 'county name:' + json["features"][0]["properties"]["county"];
+            console.log(json);
+          }
+        });
+      overlay.setPosition(coord);
+    // }
+  } else {
+    overlay.setPosition(undefined);
+  }
+  // }
+});
 
 interactionSelect.on('select', function (e) {
   var coord = e.mapBrowserEvent.coordinate;
@@ -614,7 +737,8 @@ function parsejson(data) {
 };
 
 
-var rowLabel = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+// var rowLabel = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+var rowLabel = ['', 'J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
 
 
 // Using RBG
@@ -925,14 +1049,28 @@ targetLayer.onchange = function () {
   switch (this.value) {
     case 'NC Floods ':
       sub = ['FA', 'FL', 'FF', 'CF'];
+      $('.slider-time').html('2006');
+      $('.slider-time2').html('2019');
 
       break;
     case 'NC Winter Weather ':
       sub = ['BZ', 'WC', 'WW', 'HS', 'SN', 'ZR', 'IS', 'WS'];
+      $('.slider-time').html('2006');
+      $('.slider-time2').html('2019');
 
       break;
     case 'NC Heat ':
       sub = [];
+      $('.slider-time').html('2006');
+      $('.slider-time2').html('2019');
+      // check.style.visibility = 'hidden';
+      break;
+    case 'NC High Winds ':
+      sub = ['Gale Force', 'Storm Force', 'Hurricane Force'];
+      $('.slider-time').html('1989');
+      $('.slider-time2').html('2018');
+      // dt_from = "1989/01/01";
+      // dt_to = "2018/12/31";
       // check.style.visibility = 'hidden';
       break;
   }

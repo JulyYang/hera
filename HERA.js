@@ -716,38 +716,29 @@ map.on('singleclick', function (evt) {
         let counties = '';
         let total = 0;
         let flength = Object.keys(selected).length;
+        let probaArray = [];
+        let probability = 0;
+        let startyear = parseInt($('.slider-time').html());
+        let endyear = parseInt($('.slider-time2').html());
 
-        Object.keys(selected).forEach(function(key){
+
+        Object.keys(selected).forEach(function (key) {
           console.log('counties: ', counties += selected[key]['county']);
           console.log('total: ', total += selected[key]['count']);
-          console.log('average: ', (total += selected[key]['count'])/flength);
+          console.log('average: ', (total += selected[key]['count']) / flength);
 
-
+          console.log(Object.keys(selected[key]));
+          Object.keys(selected[key]).filter(i =>
+            endyear >= parseInt(i.slice(1)) && parseInt(i.slice(1)) >= startyear && selected[key][i] != null
+          ).forEach(i => {
+            if (!probaArray.includes(i)) {
+              probaArray.push(i)
+            }
+          });
+          probability = (probaArray.length / (endyear - startyear + 1) * 100).toFixed(2) + '%';
+          console.log(probability);
         })
 
-        // features[0].getKeys().filter(i =>
-        //   endyear >= parseInt(i.slice(1)) && parseInt(i.slice(1)) >= startyear && f.get(i) != null
-        // ).forEach(i => {
-        //   if (!probaArray.includes(i)) {
-        //     probaArray.push(i)
-        //   }
-        // });
-
-        //   for (s of selected) {
-        //     // var lyrId = json['features'][0]['id'].split('.')[0];
-        //     // console.log(lyrId);
-        //     let properties = json["features"][0]["properties"];
-        //     var counties = properties['county'];
-        //     var total = 0;
-        //     var probaArray = [];
-        //     counties += f.get('county') + ', ';
-        //     total += f.get('population');
-        //     // content.innerHTML = '<b>Layer: </b>Heat<br>' + '<h5>Selected County: ' +
-        //     content.innerHTML = '<b>Layer: </b>' + lyrId + '<br>' +
-        //       '<h5>Selected County: ' + properties["county"] +
-        //       '</h5><br><p>Year: 2006-2019</p><br><p>Total count: ' + properties["count"] +
-        //       '</p><br><p>Probability: '
-        // }
       });
     overlay.setPosition(coord);
   } else {

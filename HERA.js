@@ -54,34 +54,35 @@ let createGroupedLyrs = function (lyr, params = null, cqlFilter = null) {
     })
   });
 
-  let wfsLayer = new ol.layer.Vector({
-    // title: "NC SC ISA - Vector",
-    source: new ol.source.Vector({
-      renderMode: 'image', // Vector layers are rendered as images. Better performance. Default is 'vector'.
-      format: new ol.format.GeoJSON(),
-      url: function (extent) {
-        return 'http://152.7.99.155:8080/geoserver/hera/wfs?service=WFS' +
-          '&version=1.0.0&request=GetFeature' +
-          '&typeName=' + lyr +
-          '&outputFormat=application/json&srsname=EPSG:4326' +
-          '&bbox=-84.321821,31.995954,-75.400119,36.588137' +
-          '&viewparams=' + params
-        // + '&bbox=' + extent.join(',') + ',EPSG:3857'; // CQL filter and bbox are mutually exclusive. comment this to enable cql filter
-      },
-      strategy: ol.loadingstrategy.bbox,
-    }),
-    style: new ol.style.Style({
-      fill: new ol.style.Fill({
-        color: [255, 255, 255, 0],
-      }),
-      stroke: new ol.style.Stroke({
-        color: '#867E77',
-        width: 0.1
-      })
-    }),
-  });
+  // let wfsLayer = new ol.layer.Vector({
+  //   // title: "NC SC ISA - Vector",
+  //   source: new ol.source.Vector({
+  //     renderMode: 'image', // Vector layers are rendered as images. Better performance. Default is 'vector'.
+  //     format: new ol.format.GeoJSON(),
+  //     url: function (extent) {
+  //       return 'http://152.7.99.155:8080/geoserver/hera/wfs?service=WFS' +
+  //         '&version=1.0.0&request=GetFeature' +
+  //         '&typeName=' + lyr +
+  //         '&outputFormat=application/json&srsname=EPSG:4326' +
+  //         '&bbox=-84.321821,31.995954,-75.400119,36.588137' +
+  //         '&viewparams=' + params
+  //       // + '&bbox=' + extent.join(',') + ',EPSG:3857'; // CQL filter and bbox are mutually exclusive. comment this to enable cql filter
+  //     },
+  //     strategy: ol.loadingstrategy.bbox,
+  //   }),
+  //   style: new ol.style.Style({
+  //     fill: new ol.style.Fill({
+  //       color: [255, 255, 255, 0],
+  //     }),
+  //     stroke: new ol.style.Stroke({
+  //       color: '#867E77',
+  //       width: 0.1
+  //     })
+  //   }),
+  // });
 
-  return [wmsLayer, wfsLayer];
+  return [wmsLayer];
+  // return [wmsLayer, wfsLayer];
 };
 
 var wmsSource = new ol.source.TileWMS({
@@ -120,21 +121,22 @@ var wmsSource2 = new ol.source.TileWMS({
 });
 
 
-var boundarySource = new ol.source.TileWMS({
-  url: 'http://152.7.99.155:8080/geoserver/hera/wms',
-  projection: 'EPSG:4269',
-  params: {
-    "VERSION": "1.3.0",
-    'LAYERS': 'hera:ncsc_county',
-    // 'bbox': [-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641],
-    'TILED': true,
-    'FORMAT': 'image/png'
-  },
-  serverType: 'geoserver',
-  crossOrigin: 'anonymous',
-  // Countries have transparency, so do not fade tiles:
-  transition: 0,
-});
+// var boundarySource = new ol.source.TileWMS({
+//   url: 'http://152.7.99.155:8080/geoserver/hera/wms',
+//   projection: 'EPSG:4269',
+//   params: {
+//     "VERSION": "1.3.0",
+//     'LAYERS': 'hera:ncsc_county',
+//     // 'bbox': [-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641],
+//     'TILED': true,
+//     'FORMAT': 'image/png'
+//   },
+//   serverType: 'geoserver',
+//   crossOrigin: 'anonymous',
+//   // Countries have transparency, so do not fade tiles:
+//   transition: 0,
+// });
+
 
 var testVm = new ol.source.TileWMS({
   url: 'http://hera1.oasis.unc.edu:8080/geoserver/topp/wms',
@@ -172,7 +174,7 @@ var map = new ol.Map({
     interactionSelectPointerMove,
     new ol.interaction.MouseWheelZoom(),
     new ol.interaction.DragPan(),
-    // interactionSelect,
+    interactionSelect,
   ],
   layers: [
     new ol.layer.Group({
@@ -192,12 +194,35 @@ var map = new ol.Map({
               source: new ol.source.OSM()
             }),
 
-            new ol.layer.Tile({
-              // title: 'NC SC County',
-              // type: "base",
-              // visible: true,
-              source: boundarySource,
+            new ol.layer.Vector({
+              source: new ol.source.Vector({
+                renderMode: 'image', // Vector layers are rendered as images. Better performance. Default is 'vector'.
+                format: new ol.format.GeoJSON(),
+                url: function (extent) {
+                  return 'http://152.7.99.155:8080/geoserver/hera/wfs?service=WFS' +
+                    '&version=1.0.0&request=GetFeature' +
+                    '&typeName=hera:ncsc_county' +
+                    '&outputFormat=application/json&srsname=EPSG:4326' +
+                    '&CQL_FILTER=stusps=%27NC%27'
+                },
+                strategy: ol.loadingstrategy.bbox,
+              }),
+              style: new ol.style.Style({
+                fill: new ol.style.Fill({
+                  color: [255, 255, 255, 0],
+                }),
+                stroke: new ol.style.Stroke({
+                  color: '#867E77',
+                  width: 0.1
+                })
+              }),
             })
+            // new ol.layer.Tile({
+            //   // title: 'NC SC County',
+            //   // type: "base",
+            //   // visible: true,
+            //   source: boundarySource,
+            // })
           ]
         }),
       ]
@@ -357,8 +382,144 @@ map.on('pointermove', function (e) {
 });
 
 
-let createContent = function (lyr, features) {
-  var counties = '';
+// let createContent = function (lyr, features) {
+//   var counties = '';
+//   var total = 0;
+//   var probaArray = [];
+//   var probability = 0;
+//   let startyear = parseInt($('.slider-time').html());
+//   let endyear = parseInt($('.slider-time2').html());
+//   switch (lyr) {
+//     case 'ncsc_population_lyr':
+//       for (f of features) {
+//         counties += f.get('county') + ', ';
+//         total += f.get('population');
+//       }
+//       averagePopulation = Math.round((total / features.length));
+//       content.innerHTML = '<h5>Selected County: ' + counties + '</h5><br><p>2017 Population: ' + averagePopulation + '</p>';
+//       break;
+//     case 'ncsc_isa_lyr':
+//       for (f of features) {
+//         counties += f.get('county') + ', ';
+//         total += f.get('percent_isa');
+//       }
+//       averageIsa = (total / features.length * 100).toFixed(2);
+//       content.innerHTML = '<h5>Selected County: ' + counties + '</h5><br><p>2015 ISA: ' + averageIsa + '</p>';
+//       break;
+//     case 'nc_floods_sql':
+//       for (f of features) {
+//         counties += f.get('county') + ', ';
+//         total += f.get('count');
+//         features[0].getKeys().filter(i =>
+//           endyear >= parseInt(i.slice(1)) && parseInt(i.slice(1)) >= startyear && f.get(i) != null
+//         ).forEach(i => {
+//           if (!probaArray.includes(i)) {
+//             probaArray.push(i)
+//           }
+//         });
+//       }
+//       // Create an array of the year headers based on the year range, e.g. 'y2006',...,'y2019'
+//       // var newarray = [...Array(2019-2006+1).keys()].map(i => 'y' + (i+2006).toString()) 
+//       // var testarray = features[0].getKeys().filter(i => newarray.includes(i)&& features[0].get(i) != null);
+
+//       // var testarray = features[0].getKeys().filter(i =>
+//       //   endyear >= parseInt(i.slice(1)) && parseInt(i.slice(1)) >= startyear && features[0].get(i) != null
+//       // );
+
+//       // console.log(probaArray);
+//       probability = (probaArray.length / (endyear - startyear + 1) * 100).toFixed(2) + '%';
+
+//       console.log(startyear, endyear);
+//       average = (total / features.length).toFixed(2);
+//       content.innerHTML = '<b>Layer: </b>Floods<br>' + '<h5>Selected County: ' + counties + '</h5><br><p>Year: 2006-2019</p><br><p>Total count: ' +
+//         total + '</p><br><p>Probability: ' + probability + '</p><br><p>Average count: ' + average + '</p>';
+//       // content.innerHTML = 'Number of records: ' + total;
+//       break;
+//     case 'nc_ww_sql':
+//       for (f of features) {
+//         counties += f.get('county') + ', ';
+//         total += f.get('count');
+//         features[0].getKeys().filter(i =>
+//           endyear >= parseInt(i.slice(1)) && parseInt(i.slice(1)) >= startyear && f.get(i) != null
+//         ).forEach(i => {
+//           if (!probaArray.includes(i)) {
+//             probaArray.push(i)
+//           }
+//         });
+//       };
+//       probability = (probaArray.length / (endyear - startyear + 1) * 100).toFixed(2) + '%';
+//       average = (total / features.length).toFixed(2);
+//       content.innerHTML = '<b>Layer: </b>Winter Weather<br>' + '<h5>Selected County: ' + counties + '</h5><br><p>Year: 2006-2019</p><br><p>Total count: ' +
+//         total + '</p><br><p>Probability: ' + probability + '</p><br><p>Average count: ' + average + '</p>';
+//       // content.innerHTML = 'Number of records: ' + total;
+//       break;
+//     case 'nc_hw_sql':
+//       for (f of features) {
+//         counties += f.get('county') + ', ';
+//         total += f.get('count');
+//         features[0].getKeys().filter(i =>
+//           endyear >= parseInt(i.slice(1)) && parseInt(i.slice(1)) >= startyear && f.get(i) != null
+//         ).forEach(i => {
+//           if (!probaArray.includes(i)) {
+//             probaArray.push(i)
+//           }
+//         });
+//       };
+//       // console.log(endyear, startyear)
+//       // endyear = 2018;
+//       // startyear = 1989;
+//       probability = (probaArray.length / (endyear - startyear + 1) * 100).toFixed(2) + '%';
+//       average = (total / features.length).toFixed(2);
+//       content.innerHTML = '<b>Layer: </b>High Winds<br>' + '<h5>Selected County: ' + counties + '</h5><br><p>Year: 1989-2018</p><br><p>Total count: ' +
+//         total + '</p><br><p>Probability: ' + probability + '</p><br><p>Average count: ' + average + '</p>';
+//       // content.innerHTML = 'Number of records: ' + total;
+//       break;
+//     case 'nc_hl_sql':
+//       for (f of features) {
+//         counties += f.get('county') + ', ';
+//         total += f.get('count');
+//         features[0].getKeys().filter(i =>
+//           endyear >= parseInt(i.slice(1)) && parseInt(i.slice(1)) >= startyear && f.get(i) != null
+//         ).forEach(i => {
+//           if (!probaArray.includes(i)) {
+//             probaArray.push(i)
+//           }
+//         });
+//       };
+//       // console.log(endyear, startyear)
+//       // endyear = 2018;
+//       // startyear = 1989;
+//       probability = (probaArray.length / (endyear - startyear + 1) * 100).toFixed(2) + '%';
+//       average = (total / features.length).toFixed(2);
+//       content.innerHTML = '<b>Layer: </b>Hails<br>' + '<h5>Selected County: ' + counties + '</h5><br><p>Year: 1989-2018</p><br><p>Total count: ' +
+//         total + '</p><br><p>Probability: ' + probability + '</p><br><p>Average count: ' + average + '</p>';
+//       // content.innerHTML = 'Number of records: ' + total;
+//       break;
+//     case 'nc_heats_sql':
+//       for (f of features) {
+//         counties += f.get('county') + ', ';
+//         total += f.get('count');
+//         features[0].getKeys().filter(i =>
+//           endyear >= parseInt(i.slice(1)) && parseInt(i.slice(1)) >= startyear && f.get(i) != null
+//         ).forEach(i => {
+//           if (!probaArray.includes(i)) {
+//             probaArray.push(i)
+//           }
+//         });
+//       };
+//       probability = (probaArray.length / (endyear - startyear + 1) * 100).toFixed(2) + '%';
+//       average = (total / features.length).toFixed(2);
+//       content.innerHTML = '<b>Layer: </b>Heat<br>' + '<h5>Selected County: ' + counties + '</h5><br><p>Year: 2006-2019</p><br><p>Total count: ' +
+//         total + '</p><br><p>Probability: ' + probability + '</p><br><p>Average count: ' + average + '</p>';
+//       // content.innerHTML = 'Number of records: ' + total;
+//       break;
+
+//   }
+// }
+
+let createContent = function (lyrId, properties) {
+  // var counties = '';
+  var counties = properties['county'];
   var total = 0;
   var probaArray = [];
   var probability = 0;
@@ -366,20 +527,24 @@ let createContent = function (lyr, features) {
   let endyear = parseInt($('.slider-time2').html());
   switch (lyr) {
     case 'ncsc_population_lyr':
-      for (f of features) {
-        counties += f.get('county') + ', ';
-        total += f.get('population');
-      }
-      averagePopulation = Math.round((total / features.length));
-      content.innerHTML = '<h5>Selected County: ' + counties + '</h5><br><p>2017 Population: ' + averagePopulation + '</p>';
+      // for (f of features) {
+      //   counties += f.get('county') + ', ';
+      //   total += f.get('population');
+      // }
+      // averagePopulation = Math.round((total / features.length));
+      let population = properties['population'];
+      content.innerHTML = '<h5>Selected County: ' + counties + '</h5><br><p>2017 Population: ' + population + '</p>';
+      // content.innerHTML = '<h5>Selected County: ' + counties + '</h5><br><p>2017 Population: ' + averagePopulation + '</p>';
       break;
     case 'ncsc_isa_lyr':
-      for (f of features) {
-        counties += f.get('county') + ', ';
-        total += f.get('percent_isa');
-      }
-      averageIsa = (total / features.length * 100).toFixed(2);
-      content.innerHTML = '<h5>Selected County: ' + counties + '</h5><br><p>2015 ISA: ' + averageIsa + '</p>';
+      // for (f of features) {
+      //   counties += f.get('county') + ', ';
+      //   total += f.get('percent_isa');
+      // }
+      let percent_isa = properties['percent_isa'];
+      // averageIsa = (total / features.length * 100).toFixed(2);
+      content.innerHTML = '<h5>Selected County: ' + counties + '</h5><br><p>2015 ISA: ' + percent_isa + '</p>';
+      // content.innerHTML = '<h5>Selected County: ' + counties + '</h5><br><p>2015 ISA: ' + averageIsa + '</p>';
       break;
     case 'nc_floods_sql':
       for (f of features) {
@@ -393,15 +558,6 @@ let createContent = function (lyr, features) {
           }
         });
       }
-      // Create an array of the year headers based on the year range, e.g. 'y2006',...,'y2019'
-      // var newarray = [...Array(2019-2006+1).keys()].map(i => 'y' + (i+2006).toString()) 
-      // var testarray = features[0].getKeys().filter(i => newarray.includes(i)&& features[0].get(i) != null);
-
-      // var testarray = features[0].getKeys().filter(i =>
-      //   endyear >= parseInt(i.slice(1)) && parseInt(i.slice(1)) >= startyear && features[0].get(i) != null
-      // );
-
-      // console.log(probaArray);
       probability = (probaArray.length / (endyear - startyear + 1) * 100).toFixed(2) + '%';
 
       console.log(startyear, endyear);
@@ -471,50 +627,52 @@ let createContent = function (lyr, features) {
       // content.innerHTML = 'Number of records: ' + total;
       break;
     case 'nc_heats_sql':
-      for (f of features) {
-        counties += f.get('county') + ', ';
-        total += f.get('count');
-        features[0].getKeys().filter(i =>
-          endyear >= parseInt(i.slice(1)) && parseInt(i.slice(1)) >= startyear && f.get(i) != null
-        ).forEach(i => {
-          if (!probaArray.includes(i)) {
-            probaArray.push(i)
-          }
-        });
-      };
-      probability = (probaArray.length / (endyear - startyear + 1) * 100).toFixed(2) + '%';
-      average = (total / features.length).toFixed(2);
+      // for (f of features) {
+      //   counties += f.get('county') + ', ';
+      //   total += f.get('count');
+      //   features[0].getKeys().filter(i =>
+      //     endyear >= parseInt(i.slice(1)) && parseInt(i.slice(1)) >= startyear && f.get(i) != null
+      //   ).forEach(i => {
+      //     if (!probaArray.includes(i)) {
+      //       probaArray.push(i)
+      //     }
+      //   });
+      // };
+      // probability = (probaArray.length / (endyear - startyear + 1) * 100).toFixed(2) + '%';
+      // average = (total / features.length).toFixed(2);
       content.innerHTML = '<b>Layer: </b>Heat<br>' + '<h5>Selected County: ' + counties + '</h5><br><p>Year: 2006-2019</p><br><p>Total count: ' +
-        total + '</p><br><p>Probability: ' + probability + '</p><br><p>Average count: ' + average + '</p>';
+        properties['count'] + '</p><br><p>Probability: ' + probability + '</p><br><p>Average count: ' + average + '</p>';
+      // content.innerHTML = '<b>Layer: </b>Heat<br>' + '<h5>Selected County: ' + counties + '</h5><br><p>Year: 2006-2019</p><br><p>Total count: ' +
+      //   total + '</p><br><p>Probability: ' + probability + '</p><br><p>Average count: ' + average + '</p>';
       // content.innerHTML = 'Number of records: ' + total;
       break;
 
   }
 }
 
-let shiftClicked = function(evt){
-  if (evt.browserEvent.shiftKey){
-    console.log("multi mode on")
-  }
-}
-
 var shiftPressed = false;
-$(document).keydown(function(event) {
-    shiftPressed = event.keyCode==16;
+$(document).keydown(function (event) {
+  shiftPressed = event.keyCode == 16;
+});
+$(document).keyup(function (event) {
+  shiftPressed = false;
 });
 
+// var selected = [];
+var selected = {};
+
 map.on('singleclick', function (evt) {
-  // console.log(evt)
-  // if (evt.text.length> 658) {
-  var coord = evt.coordinate;
+  let coord = evt.coordinate;
   let resolution = map.getView().getResolution();
   let projection = map.getView().getProjection();
+  let testl;
 
   let wmslayerSource = map.forEachLayerAtPixel(evt.pixel,
     function (layer) {
       // return only layers with ol.source.TileWMS
       var source = layer.getSource();
       if (source instanceof ol.source.TileWMS) {
+        testl = layer;
         return source;
       }
     });
@@ -525,53 +683,93 @@ map.on('singleclick', function (evt) {
       }
       // 'propertyName': 'fips, county, population'}
     );
-    if (shiftPressed){
+    if (!shiftPressed) {
+      console.log('multi selec mode is off!!');
+      // selected.length = 0;
+    } else {
       console.log('multi selec mode is on!!')
     };
     // if (url) {
-      fetch(url)
-        .then(function (response) {
-          return response.json();
-        })
-        .then(function (json) {
-          var lyrId = json['features'][0]['id'].split('.')[0];
-          console.log(lyrId);
-          if (lyrId = 'nc_heats_sql') {
-            content.innerHTML = '<b>Layer: </b>Heat<br>' + '<h5>Selected County: ' +
-              json["features"][0]["properties"]["county"] + '</h5><br><p>Year: 2006-2019</p><br><p>Total count: ' +
-              json["features"][0]["properties"]["count"] + '</p><br><p>Probability: '
-            // + probability + '</p><br><p>Average count: ' + average + '</p>';
-            // content.innerHTML = '<h3>population:' + json["features"][0]["properties"]["population"] + '</h3>' + 'county name:' + json["features"][0]["properties"]["county"];
-            console.log(json);
-          } else if (lyrId = 'ncsc_isa_lyr') {
-            content.innerHTML = '<h3>population:' + json["features"][0]["properties"]["percent_isa"] + '</h3>' + 'county name:' + json["features"][0]["properties"]["county"];
-            console.log(json);
-          }
-        });
-      overlay.setPosition(coord);
-    // }
-  } else {
-    overlay.setPosition(undefined);
-  }
-  // }
-});
+    fetch(url)
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (json) {
+        console.log("shiftpressed?: ", shiftPressed);
+        let featureid = json["features"][0]['id'];
+        console.log(featureid);
+        console.log(typeof(featureid));
+        let properties = json["features"][0]["properties"];
+        console.log(typeof(properties));
+        let countyname = properties['county'];
+        if (!shiftPressed) {
+          console.log('if')
+          selected = {};
+          selected[featureid] = properties;
+        } else if (featureid in selected) {
+          console.log('else if');
+          delete selected[featureid];
+        } else {
+          console.log('else');
+          selected[featureid] = properties;
+        };
 
-interactionSelect.on('select', function (e) {
-  var coord = e.mapBrowserEvent.coordinate;
-  var features = e.target.getFeatures().getArray();
-  console.log(e.target.getFeatures());
-  // console.log(e.target.getLength());
-  // console.log(map.getFeaturesAtPixel(e.pixel));
+        console.log(Object.keys(selected).length);
+        console.log(selected)
 
-  if (features.length >= 1) {
-    var layerid = features[0].getId().split('.')[0];
-    // console.log(layerid);
-    createContent(layerid, features);
+        
+
+        // if (!shiftPressed) {
+        //   var lyrId = json['features'][0]['id'].split('.')[0];
+        //   // console.log(lyrId);
+        //   let properties = json["features"][0]["properties"];
+        //   // content.innerHTML = '<b>Layer: </b>Heat<br>' + '<h5>Selected County: ' +
+        //   content.innerHTML = '<b>Layer: </b>' + lyrId + '<br>' +
+        //     '<h5>Selected County: ' + properties["county"] +
+        //     '</h5><br><p>Year: 2006-2019</p><br><p>Total count: ' + properties["count"] +
+        //     '</p><br><p>Probability: '
+        // } else {
+        //   selected.push(json);
+        //   for (s of selected) {
+        //     // var lyrId = json['features'][0]['id'].split('.')[0];
+        //     // console.log(lyrId);
+        //     let properties = json["features"][0]["properties"];
+        //     var counties = properties['county'];
+        //     var total = 0;
+        //     var probaArray = [];
+        //     counties += f.get('county') + ', ';
+        //     total += f.get('population');
+        //     // content.innerHTML = '<b>Layer: </b>Heat<br>' + '<h5>Selected County: ' +
+        //     content.innerHTML = '<b>Layer: </b>' + lyrId + '<br>' +
+        //       '<h5>Selected County: ' + properties["county"] +
+        //       '</h5><br><p>Year: 2006-2019</p><br><p>Total count: ' + properties["count"] +
+        //       '</p><br><p>Probability: '
+
+
+        //   }
+        // }
+      });
     overlay.setPosition(coord);
   } else {
     overlay.setPosition(undefined);
+    selected.length = 0;
   }
 });
+
+// interactionSelect.on('select', function (e) {
+// var coord = e.mapBrowserEvent.coordinate;
+// var features = e.target.getFeatures().getArray();
+// console.log(e.target.getFeatures());
+
+// if (features.length >= 1) {
+//   var layerid = features[0].getId().split('.')[0];
+//   // console.log(layerid);
+//   createContent(layerid, features);
+//   overlay.setPosition(coord);
+// } else {
+//   overlay.setPosition(undefined);
+// }
+// });
 
 
 var sidebar = new ol.control.Sidebar({
@@ -1036,10 +1234,8 @@ updateMapBtn.onclick = function () {
   });
 
   // Update WFS layer
-  let wfsl = selectedLyr[0].getLayersArray()[1];
-  // let wfssource = selectedLyr[0].getLayersArray()[1].getSource();
-  refreshSource(lyrname, params, wfsl);
-  // refreshSource(wfssource,params);
+  // let wfsl = selectedLyr[0].getLayersArray()[1];
+  // refreshSource(lyrname, params, wfsl);
 }
 
 targetLayer.onchange = function () {
@@ -1059,7 +1255,7 @@ targetLayer.onchange = function () {
       $('.slider-time2').html('2019');
 
       break;
-    case 'NC Heat ':
+    case 'NC Heat ', 'NC Hails ':
       sub = [];
       $('.slider-time').html('2006');
       $('.slider-time2').html('2019');
@@ -1106,7 +1302,7 @@ function showCheckboxes() {
   }
 }
 
-(function loadingIndicator() {
+function loadingIndicator() {
   let allLyrs = map.getLayerGroup().getLayers().array_;
   let lyrsArray = allLyrs.filter(e => {
     return e.values_.title == 'Layers'
@@ -1116,7 +1312,8 @@ function showCheckboxes() {
   // });
 
   for (layer of lyrsArray) {
-    if (layer instanceof ol.layer.Vector) {
+    if (layer instanceof ol.layer.Tile) {
+      // if (layer instanceof ol.layer.Vector) {
       layer.on("precompose", function () {
         $("#ajaxSpinnerContainer").show();
         $("#ajaxSpinnerImage").show();
@@ -1131,4 +1328,5 @@ function showCheckboxes() {
 
 
 
-})()
+}
+// })()

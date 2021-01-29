@@ -233,107 +233,107 @@ var map = new ol.Map({
       fold: 'open',
       layers: [
 
-        new ol.layer.Group({
-          title: "2017 population ",
-          combine: true,
-          visible: false,
-          layers: [
-            new ol.layer.Tile({
-              // title: "2017 population",
-              source: wmsSource
-            }),
+        // new ol.layer.Group({
+        //   title: "2017 population ",
+        //   combine: true,
+        //   visible: false,
+        //   layers: [
+        //     new ol.layer.Tile({
+        //       // title: "2017 population",
+        //       source: wmsSource
+        //     }),
 
-            new ol.layer.Vector({
-              // title: "NC SC population - Vector",
-              source: new ol.source.Vector({
-                renderMode: 'image', // Vector layers are rendered as images. Better performance. Default is 'vector'.
-                format: new ol.format.GeoJSON(),
-                url: function (extent) {
-                  return 'http://152.7.99.155:8080/geoserver/hera/wfs?service=WFS' +
-                    '&version=1.0.0&request=GetFeature' +
-                    '&typeName=hera:ncsc_population_lyr' +
-                    '&outputFormat=application/json&srsname=EPSG:4326' +
-                    '&CQL_FILTER=stusps=%27NC%27'
-                  // '&bbox=-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641'
-                  // + '&bbox=' + extent.join(',') + ',EPSG:3857'; // CQL filter and bbox are mutually exclusive. comment this to enable cql filter
-                },
-                strategy: ol.loadingstrategy.bbox,
-              }),
-              style: new ol.style.Style({
-                fill: new ol.style.Fill({
-                  color: [255, 255, 255, 0],
-                }),
-                stroke: new ol.style.Stroke({
-                  color: '#867E77',
-                  width: 0.1
-                })
-              }),
-            }),
-          ]
-        }),
+        //     new ol.layer.Vector({
+        //       // title: "NC SC population - Vector",
+        //       source: new ol.source.Vector({
+        //         renderMode: 'image', // Vector layers are rendered as images. Better performance. Default is 'vector'.
+        //         format: new ol.format.GeoJSON(),
+        //         url: function (extent) {
+        //           return 'http://152.7.99.155:8080/geoserver/hera/wfs?service=WFS' +
+        //             '&version=1.0.0&request=GetFeature' +
+        //             '&typeName=hera:ncsc_population_lyr' +
+        //             '&outputFormat=application/json&srsname=EPSG:4326' +
+        //             '&CQL_FILTER=stusps=%27NC%27'
+        //           // '&bbox=-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641'
+        //           // + '&bbox=' + extent.join(',') + ',EPSG:3857'; // CQL filter and bbox are mutually exclusive. comment this to enable cql filter
+        //         },
+        //         strategy: ol.loadingstrategy.bbox,
+        //       }),
+        //       style: new ol.style.Style({
+        //         fill: new ol.style.Fill({
+        //           color: [255, 255, 255, 0],
+        //         }),
+        //         stroke: new ol.style.Stroke({
+        //           color: '#867E77',
+        //           width: 0.1
+        //         })
+        //       }),
+        //     }),
+        //   ]
+        // }),
 
-        new ol.layer.Group({
-          title: "2015 Impervious Surface Area ",
-          combine: true,
-          visible: false,
-          layers: [
-            new ol.layer.Tile({
-              // title: "2015 Impervious Surface Area",
-              source: wmsSource2
-            }),
+        // new ol.layer.Group({
+        //   title: "2015 Impervious Surface Area ",
+        //   combine: true,
+        //   visible: false,
+        //   layers: [
+        //     new ol.layer.Tile({
+        //       // title: "2015 Impervious Surface Area",
+        //       source: wmsSource2
+        //     }),
 
-            new ol.layer.Vector({
-              // title: "NC SC ISA - Vector",
-              source: new ol.source.Vector({
-                renderMode: 'image', // Vector layers are rendered as images. Better performance. Default is 'vector'.
-                format: new ol.format.GeoJSON(),
-                url: function (extent) {
-                  return 'http://152.7.99.155:8080/geoserver/hera/wfs?service=WFS' +
-                    '&version=1.0.0&request=GetFeature' +
-                    '&typeName=hera:ncsc_isa_lyr' +
-                    '&outputFormat=application/json&srsname=EPSG:4326' +
-                    '&CQL_FILTER=stusps=%27NC%27'
-                  // '&bbox=-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641'
-                  // + '&bbox=' + extent.join(',') + ',EPSG:3857'; // CQL filter and bbox are mutually exclusive. comment this to enable cql filter
-                },
-                strategy: ol.loadingstrategy.bbox,
-              }),
-              style: new ol.style.Style({
-                fill: new ol.style.Fill({
-                  color: [255, 255, 255, 0],
-                }),
-                stroke: new ol.style.Stroke({
-                  color: '#867E77',
-                  width: 0.1
-                })
-              }),
-            }),
-          ]
-        }),
+        //     new ol.layer.Vector({
+        //       // title: "NC SC ISA - Vector",
+        //       source: new ol.source.Vector({
+        //         renderMode: 'image', // Vector layers are rendered as images. Better performance. Default is 'vector'.
+        //         format: new ol.format.GeoJSON(),
+        //         url: function (extent) {
+        //           return 'http://152.7.99.155:8080/geoserver/hera/wfs?service=WFS' +
+        //             '&version=1.0.0&request=GetFeature' +
+        //             '&typeName=hera:ncsc_isa_lyr' +
+        //             '&outputFormat=application/json&srsname=EPSG:4326' +
+        //             '&CQL_FILTER=stusps=%27NC%27'
+        //           // '&bbox=-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641'
+        //           // + '&bbox=' + extent.join(',') + ',EPSG:3857'; // CQL filter and bbox are mutually exclusive. comment this to enable cql filter
+        //         },
+        //         strategy: ol.loadingstrategy.bbox,
+        //       }),
+        //       style: new ol.style.Style({
+        //         fill: new ol.style.Fill({
+        //           color: [255, 255, 255, 0],
+        //         }),
+        //         stroke: new ol.style.Stroke({
+        //           color: '#867E77',
+        //           width: 0.1
+        //         })
+        //       }),
+        //     }),
+        //   ]
+        // }),
 
-        new ol.layer.Group({
-          title: "NC Winter Weather ",
-          combine: true,
-          visible: false,
-          layers: createGroupedLyrs('hera:nc_ww_sql')
-          // layers: createGroupedLyrs('hera:nc_ww_sql', "minYear:2010-01-01;maxYear:2018-12-31;sublist:'WW'\\,'SN'")
-        }),
+        // new ol.layer.Group({
+        //   title: "NC Winter Weather ",
+        //   combine: true,
+        //   visible: false,
+        //   layers: createGroupedLyrs('hera:nc_ww_sql')
+        //   // layers: createGroupedLyrs('hera:nc_ww_sql', "minYear:2010-01-01;maxYear:2018-12-31;sublist:'WW'\\,'SN'")
+        // }),
 
-        new ol.layer.Group({
-          title: "NC Floods ",
-          combine: true,
-          visible: false,
-          layers: createGroupedLyrs('hera:nc_floods_sql')
-          // layers: createGroupedLyrs('hera:nc_floods_sql', "minYear:2010;maxYear:2018;sublist:'FA'\\,'CF'")
-        }),
+        // new ol.layer.Group({
+        //   title: "NC Floods ",
+        //   combine: true,
+        //   visible: false,
+        //   layers: createGroupedLyrs('hera:nc_floods_sql')
+        //   // layers: createGroupedLyrs('hera:nc_floods_sql', "minYear:2010;maxYear:2018;sublist:'FA'\\,'CF'")
+        // }),
 
-        new ol.layer.Group({
-          title: "NC High Winds ",
-          combine: true,
-          visible: false,
-          layers: createGroupedLyrs('hera:nc_hw_sql')
-          // layers: createGroupedLyrs('hera:nc_hw_sql', "minYear:2010;maxYear:2018;sublist:'FA'\\,'CF'")
-        }),
+        // new ol.layer.Group({
+        //   title: "NC High Winds ",
+        //   combine: true,
+        //   visible: false,
+        //   layers: createGroupedLyrs('hera:nc_hw_sql')
+        //   // layers: createGroupedLyrs('hera:nc_hw_sql', "minYear:2010;maxYear:2018;sublist:'FA'\\,'CF'")
+        // }),
 
         new ol.layer.Group({
           title: "NC Heat ",
@@ -343,13 +343,13 @@ var map = new ol.Map({
           // layers: createGroupedLyrs('hera:nc_heats_sql', "minYear:2010-01-01;maxYear:2018-12-31")
         }),
 
-        new ol.layer.Group({
-          title: "NC Hails ",
-          combine: true,
-          visible: false,
-          layers: createGroupedLyrs('hera:nc_hl_sql')
-          // layers: createGroupedLyrs('hera:nc_heats_sql', "minYear:2010-01-01;maxYear:2018-12-31")
-        }),
+        // new ol.layer.Group({
+        //   title: "NC Hails ",
+        //   combine: true,
+        //   visible: false,
+        //   layers: createGroupedLyrs('hera:nc_hl_sql')
+        //   // layers: createGroupedLyrs('hera:nc_heats_sql', "minYear:2010-01-01;maxYear:2018-12-31")
+        // }),
 
 
       ]
@@ -665,14 +665,14 @@ map.on('singleclick', function (evt) {
   let coord = evt.coordinate;
   let resolution = map.getView().getResolution();
   let projection = map.getView().getProjection();
-  let testl;
+  // let testl;
 
   let wmslayerSource = map.forEachLayerAtPixel(evt.pixel,
     function (layer) {
       // return only layers with ol.source.TileWMS
       var source = layer.getSource();
       if (source instanceof ol.source.TileWMS) {
-        testl = layer;
+        // testl = layer;
         return source;
       }
     });
@@ -681,7 +681,6 @@ map.on('singleclick', function (evt) {
       coord, resolution, projection, {
         'INFO_FORMAT': 'application/json',
       }
-      // 'propertyName': 'fips, county, population'}
     );
     console.log("shiftpressed?: ", shiftPressed);
 
@@ -718,12 +717,14 @@ map.on('singleclick', function (evt) {
         let flength = Object.keys(selected).length;
         let probaArray = [];
         let probability = 0;
+        // let startyear = parseInt($('.slider-time').html());
+        // let endyear = parseInt($('.slider-time2').html());
         let startyear = parseInt($('.slider-time').html());
         let endyear = parseInt($('.slider-time2').html());
 
 
         Object.keys(selected).forEach(function (key) {
-          console.log('counties: ', counties += selected[key]['county']);
+          console.log('counties: ', counties += selected[key]['county'] + ', ');
           console.log('total: ', total += selected[key]['count']);
           console.log('average: ', (total += selected[key]['count']) / flength);
 
@@ -737,6 +738,8 @@ map.on('singleclick', function (evt) {
           });
           probability = (probaArray.length / (endyear - startyear + 1) * 100).toFixed(2) + '%';
           console.log(probability);
+          content.innerHTML = '<h5>Selected County: ' + counties + '</h5><br><p>Year: 1989-2018</p><br><p>Total count: ' +
+            total + '</p><br><p>Probability: ' + probability + '</p>';
         })
 
       });
@@ -1293,7 +1296,9 @@ function showCheckboxes() {
   }
 }
 
-function loadingIndicator() {
+
+
+(function loadingIndicator() {
   let allLyrs = map.getLayerGroup().getLayers().array_;
   let lyrsArray = allLyrs.filter(e => {
     return e.values_.title == 'Layers'
@@ -1301,17 +1306,34 @@ function loadingIndicator() {
   // let tilelyrs = lyrsGroup.getLayersArray().filter(e => {
   //   return e.type == 'TILE'
   // });
-
+  var tilesLoading = 0;
+  var tilesLoaded = 0;
+  
   for (layer of lyrsArray) {
     if (layer instanceof ol.layer.Tile) {
+      console.log('tileloaded: ', tilesLoaded);
+      console.log('tileloading: ', tilesLoading);
       // if (layer instanceof ol.layer.Vector) {
-      layer.on("precompose", function () {
+      // layer.on("precompose", function () {
+      layer.getSource().on('tileloadstart', function () {
+        tilesLoading++;
         $("#ajaxSpinnerContainer").show();
         $("#ajaxSpinnerImage").show();
+        console.log('show')
       });
-      layer.on("render", function () {
-        $("#ajaxSpinnerContainer").hide();
-        $("#ajaxSpinnerImage").hide();
+      // layer.on("render", function () {
+      layer.getSource().on('tileloadend', function () {
+        tilesLoaded++;
+        if (tilesLoading === tilesLoaded) {
+          console.log(tilesLoaded + ' tiles finished loading');
+          $("#ajaxSpinnerContainer").hide();
+          $("#ajaxSpinnerImage").hide();
+          console.log("hide")
+          tilesLoading = 0;
+          tilesLoaded = 0;
+          //trigger another event, do something etc...
+        }
+
       });
     }
 
@@ -1319,5 +1341,5 @@ function loadingIndicator() {
 
 
 
-}
+})()
 // })()

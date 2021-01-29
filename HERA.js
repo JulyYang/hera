@@ -683,25 +683,20 @@ map.on('singleclick', function (evt) {
       }
       // 'propertyName': 'fips, county, population'}
     );
-    if (!shiftPressed) {
-      console.log('multi selec mode is off!!');
-      // selected.length = 0;
-    } else {
-      console.log('multi selec mode is on!!')
-    };
+    console.log("shiftpressed?: ", shiftPressed);
+
     // if (url) {
     fetch(url)
       .then(function (response) {
         return response.json();
       })
       .then(function (json) {
-        console.log("shiftpressed?: ", shiftPressed);
         let featureid = json["features"][0]['id'];
-        console.log(featureid);
-        console.log(typeof(featureid));
+        // console.log(featureid);
+        // console.log(typeof(featureid));
         let properties = json["features"][0]["properties"];
-        console.log(typeof(properties));
-        let countyname = properties['county'];
+        // console.log(typeof(properties));
+        // let countyname = properties['county'];
         if (!shiftPressed) {
           console.log('if')
           selected = {};
@@ -715,21 +710,29 @@ map.on('singleclick', function (evt) {
         };
 
         console.log(Object.keys(selected).length);
-        console.log(selected)
+        // console.log(selected)
 
-        
 
-        // if (!shiftPressed) {
-        //   var lyrId = json['features'][0]['id'].split('.')[0];
-        //   // console.log(lyrId);
-        //   let properties = json["features"][0]["properties"];
-        //   // content.innerHTML = '<b>Layer: </b>Heat<br>' + '<h5>Selected County: ' +
-        //   content.innerHTML = '<b>Layer: </b>' + lyrId + '<br>' +
-        //     '<h5>Selected County: ' + properties["county"] +
-        //     '</h5><br><p>Year: 2006-2019</p><br><p>Total count: ' + properties["count"] +
-        //     '</p><br><p>Probability: '
-        // } else {
-        //   selected.push(json);
+        let counties = '';
+        let total = 0;
+        let flength = Object.keys(selected).length;
+
+        Object.keys(selected).forEach(function(key){
+          console.log('counties: ', counties += selected[key]['county']);
+          console.log('total: ', total += selected[key]['count']);
+          console.log('average: ', (total += selected[key]['count'])/flength);
+
+
+        })
+
+        // features[0].getKeys().filter(i =>
+        //   endyear >= parseInt(i.slice(1)) && parseInt(i.slice(1)) >= startyear && f.get(i) != null
+        // ).forEach(i => {
+        //   if (!probaArray.includes(i)) {
+        //     probaArray.push(i)
+        //   }
+        // });
+
         //   for (s of selected) {
         //     // var lyrId = json['features'][0]['id'].split('.')[0];
         //     // console.log(lyrId);
@@ -744,9 +747,6 @@ map.on('singleclick', function (evt) {
         //       '<h5>Selected County: ' + properties["county"] +
         //       '</h5><br><p>Year: 2006-2019</p><br><p>Total count: ' + properties["count"] +
         //       '</p><br><p>Probability: '
-
-
-        //   }
         // }
       });
     overlay.setPosition(coord);

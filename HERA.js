@@ -33,93 +33,79 @@ closer.onclick = function () {
   return false;
 };
 
-let createGroupedLyrs = function (lyr, params = null, cqlFilter = null) {
-  let wmsLayer = new ol.layer.Tile({
-    source: new ol.source.TileWMS({
-      url: 'http://152.7.99.155:8080/geoserver/hera/wms',
-      projection: 'EPSG:4269',
-      params: {
-        "VERSION": "1.3.0",
-        'LAYERS': lyr,
-        // 'bbox': [-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641],
-        'TILED': true,
-        'FORMAT': 'image/png',
-        'viewparams': params,
-        'CQL_FILTER': cqlFilter,
-      },
-      serverType: 'geoserver',
-      crossOrigin: 'anonymous', // Add to enable CQL filter on WMS
-      // Countries have transparency, so do not fade tiles:
-      transition: 0,
-    })
+// let createGroupedLyrs = function (lyr, params = null, cqlFilter = null) {
+//   let wmsLayer = new ol.layer.Tile({
+//     source: new ol.source.TileWMS({
+//       url: 'http://152.7.99.155:8080/geoserver/hera/wms',
+//       projection: 'EPSG:4269',
+//       params: {
+//         "VERSION": "1.3.0",
+//         'LAYERS': lyr,
+//         // 'bbox': [-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641],
+//         'TILED': true,
+//         'FORMAT': 'image/png',
+//         'viewparams': params,
+//         'CQL_FILTER': cqlFilter,
+//       },
+//       serverType: 'geoserver',
+//       crossOrigin: 'anonymous', // Add to enable CQL filter on WMS
+//       // Countries have transparency, so do not fade tiles:
+//       transition: 0,
+//     })
+//   });
+
+//   // let wfsLayer = new ol.layer.Vector({
+//   //   // title: "NC SC ISA - Vector",
+//   //   source: new ol.source.Vector({
+//   //     renderMode: 'image', // Vector layers are rendered as images. Better performance. Default is 'vector'.
+//   //     format: new ol.format.GeoJSON(),
+//   //     url: function (extent) {
+//   //       return 'http://152.7.99.155:8080/geoserver/hera/wfs?service=WFS' +
+//   //         '&version=1.0.0&request=GetFeature' +
+//   //         '&typeName=' + lyr +
+//   //         '&outputFormat=application/json&srsname=EPSG:4326' +
+//   //         '&bbox=-84.321821,31.995954,-75.400119,36.588137' +
+//   //         '&viewparams=' + params
+//   //       // + '&bbox=' + extent.join(',') + ',EPSG:3857'; // CQL filter and bbox are mutually exclusive. comment this to enable cql filter
+//   //     },
+//   //     strategy: ol.loadingstrategy.bbox,
+//   //   }),
+//   //   style: new ol.style.Style({
+//   //     fill: new ol.style.Fill({
+//   //       color: [255, 255, 255, 0],
+//   //     }),
+//   //     stroke: new ol.style.Stroke({
+//   //       color: '#867E77',
+//   //       width: 0.1
+//   //     })
+//   //   }),
+//   // });
+
+//   return [wmsLayer];
+//   // return [wmsLayer, wfsLayer];
+// };
+
+let WMSsource = function (lyr, params = null, cqlFilter = null) {
+  let source = new ol.source.TileWMS({
+    url: 'http://152.7.99.155:8080/geoserver/hera/wms',
+    projection: 'EPSG:4269',
+    params: {
+      "VERSION": "1.3.0",
+      'LAYERS': lyr,
+      // 'bbox': [-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641],
+      'TILED': true,
+      'FORMAT': 'image/png',
+      'viewparams': params,
+      'CQL_FILTER': cqlFilter,
+    },
+    serverType: 'geoserver',
+    crossOrigin: 'anonymous', // Add to enable CQL filter on WMS
+    // Countries have transparency, so do not fade tiles:
+    transition: 0,
   });
 
-  // let wfsLayer = new ol.layer.Vector({
-  //   // title: "NC SC ISA - Vector",
-  //   source: new ol.source.Vector({
-  //     renderMode: 'image', // Vector layers are rendered as images. Better performance. Default is 'vector'.
-  //     format: new ol.format.GeoJSON(),
-  //     url: function (extent) {
-  //       return 'http://152.7.99.155:8080/geoserver/hera/wfs?service=WFS' +
-  //         '&version=1.0.0&request=GetFeature' +
-  //         '&typeName=' + lyr +
-  //         '&outputFormat=application/json&srsname=EPSG:4326' +
-  //         '&bbox=-84.321821,31.995954,-75.400119,36.588137' +
-  //         '&viewparams=' + params
-  //       // + '&bbox=' + extent.join(',') + ',EPSG:3857'; // CQL filter and bbox are mutually exclusive. comment this to enable cql filter
-  //     },
-  //     strategy: ol.loadingstrategy.bbox,
-  //   }),
-  //   style: new ol.style.Style({
-  //     fill: new ol.style.Fill({
-  //       color: [255, 255, 255, 0],
-  //     }),
-  //     stroke: new ol.style.Stroke({
-  //       color: '#867E77',
-  //       width: 0.1
-  //     })
-  //   }),
-  // });
-
-  return [wmsLayer];
-  // return [wmsLayer, wfsLayer];
+  return source;
 };
-
-var wmsSource = new ol.source.TileWMS({
-  url: 'http://152.7.99.155:8080/geoserver/hera/wms',
-  projection: 'EPSG:4269',
-  params: {
-    "VERSION": "1.3.0",
-    'LAYERS': 'hera:ncsc_population_lyr',
-    // 'bbox': [-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641],
-    'TILED': true,
-    'FORMAT': 'image/png',
-    // 'CQL_FILTER': "stusps = 'NC'",
-    'CQL_FILTER': "stusps = 'NC'",
-  },
-  serverType: 'geoserver',
-  crossOrigin: 'anonymous', // Add to enable CQL filter on WMS
-  // Countries have transparency, so do not fade tiles:
-  transition: 0,
-});
-
-var wmsSource2 = new ol.source.TileWMS({
-  url: 'http://152.7.99.155:8080/geoserver/hera/wms',
-  projection: 'EPSG:4269',
-  params: {
-    "VERSION": "1.3.0",
-    'LAYERS': 'hera:ncsc_isa_lyr',
-    // 'bbox': [-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641],
-    'TILED': true,
-    'FORMAT': 'image/png',
-    'CQL_FILTER': "stusps = 'NC'",
-  },
-  serverType: 'geoserver',
-  crossOrigin: 'anonymous',
-  // Countries have transparency, so do not fade tiles:
-  transition: 0,
-});
-
 
 // var boundarySource = new ol.source.TileWMS({
 //   url: 'http://152.7.99.155:8080/geoserver/hera/wms',
@@ -233,123 +219,66 @@ var map = new ol.Map({
       fold: 'open',
       layers: [
 
-        // new ol.layer.Group({
-        //   title: "2017 population ",
-        //   combine: true,
-        //   visible: false,
-        //   layers: [
-        //     new ol.layer.Tile({
-        //       // title: "2017 population",
-        //       source: wmsSource
-        //     }),
+        new ol.layer.Tile({
+          title: "2017 population",
+          visible: false,
+          source: WMSsource('hera:ncsc_population_lyr', null, "stusps = 'NC'")
+        }),
 
-        //     new ol.layer.Vector({
-        //       // title: "NC SC population - Vector",
-        //       source: new ol.source.Vector({
-        //         renderMode: 'image', // Vector layers are rendered as images. Better performance. Default is 'vector'.
-        //         format: new ol.format.GeoJSON(),
-        //         url: function (extent) {
-        //           return 'http://152.7.99.155:8080/geoserver/hera/wfs?service=WFS' +
-        //             '&version=1.0.0&request=GetFeature' +
-        //             '&typeName=hera:ncsc_population_lyr' +
-        //             '&outputFormat=application/json&srsname=EPSG:4326' +
-        //             '&CQL_FILTER=stusps=%27NC%27'
-        //           // '&bbox=-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641'
-        //           // + '&bbox=' + extent.join(',') + ',EPSG:3857'; // CQL filter and bbox are mutually exclusive. comment this to enable cql filter
-        //         },
-        //         strategy: ol.loadingstrategy.bbox,
-        //       }),
-        //       style: new ol.style.Style({
-        //         fill: new ol.style.Fill({
-        //           color: [255, 255, 255, 0],
-        //         }),
-        //         stroke: new ol.style.Stroke({
-        //           color: '#867E77',
-        //           width: 0.1
-        //         })
-        //       }),
-        //     }),
-        //   ]
-        // }),
-
-        // new ol.layer.Group({
-        //   title: "2015 Impervious Surface Area ",
-        //   combine: true,
-        //   visible: false,
-        //   layers: [
-        //     new ol.layer.Tile({
-        //       // title: "2015 Impervious Surface Area",
-        //       source: wmsSource2
-        //     }),
-
-        //     new ol.layer.Vector({
-        //       // title: "NC SC ISA - Vector",
-        //       source: new ol.source.Vector({
-        //         renderMode: 'image', // Vector layers are rendered as images. Better performance. Default is 'vector'.
-        //         format: new ol.format.GeoJSON(),
-        //         url: function (extent) {
-        //           return 'http://152.7.99.155:8080/geoserver/hera/wfs?service=WFS' +
-        //             '&version=1.0.0&request=GetFeature' +
-        //             '&typeName=hera:ncsc_isa_lyr' +
-        //             '&outputFormat=application/json&srsname=EPSG:4326' +
-        //             '&CQL_FILTER=stusps=%27NC%27'
-        //           // '&bbox=-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641'
-        //           // + '&bbox=' + extent.join(',') + ',EPSG:3857'; // CQL filter and bbox are mutually exclusive. comment this to enable cql filter
-        //         },
-        //         strategy: ol.loadingstrategy.bbox,
-        //       }),
-        //       style: new ol.style.Style({
-        //         fill: new ol.style.Fill({
-        //           color: [255, 255, 255, 0],
-        //         }),
-        //         stroke: new ol.style.Stroke({
-        //           color: '#867E77',
-        //           width: 0.1
-        //         })
-        //       }),
-        //     }),
-        //   ]
-        // }),
-
-        // new ol.layer.Group({
-        //   title: "NC Winter Weather ",
-        //   combine: true,
-        //   visible: false,
-        //   layers: createGroupedLyrs('hera:nc_ww_sql')
-        //   // layers: createGroupedLyrs('hera:nc_ww_sql', "minYear:2010-01-01;maxYear:2018-12-31;sublist:'WW'\\,'SN'")
-        // }),
-
-        // new ol.layer.Group({
-        //   title: "NC Floods ",
-        //   combine: true,
-        //   visible: false,
-        //   layers: createGroupedLyrs('hera:nc_floods_sql')
-        //   // layers: createGroupedLyrs('hera:nc_floods_sql', "minYear:2010;maxYear:2018;sublist:'FA'\\,'CF'")
-        // }),
-
-        // new ol.layer.Group({
-        //   title: "NC High Winds ",
-        //   combine: true,
-        //   visible: false,
-        //   layers: createGroupedLyrs('hera:nc_hw_sql')
-        //   // layers: createGroupedLyrs('hera:nc_hw_sql', "minYear:2010;maxYear:2018;sublist:'FA'\\,'CF'")
-        // }),
-
-        new ol.layer.Group({
-          title: "NC Heat ",
-          combine: true,
-          visible: true,
-          layers: createGroupedLyrs('hera:nc_heats_sql')
-          // layers: createGroupedLyrs('hera:nc_heats_sql', "minYear:2010-01-01;maxYear:2018-12-31")
+        new ol.layer.Tile({
+          title: "2015 Impervious Surface Area",
+          visible: false,
+          source: WMSsource('hera:ncsc_isa_lyr', null, "stusps = 'NC'")
         }),
 
         // new ol.layer.Group({
-        //   title: "NC Hails ",
+        //   title: "NC Heat ",
         //   combine: true,
-        //   visible: false,
-        //   layers: createGroupedLyrs('hera:nc_hl_sql')
+        //   visible: true,
+        //   layers: createGroupedLyrs('hera:nc_heats_sql')
         //   // layers: createGroupedLyrs('hera:nc_heats_sql', "minYear:2010-01-01;maxYear:2018-12-31")
         // }),
+
+
+        new ol.layer.Tile({
+          title: "NC Winter Weather ",
+          // combine: true,
+          visible: false,
+          source: WMSsource('hera:nc_ww_sql')
+          // layers: createGroupedLyrs('hera:nc_ww_sql', "minYear:2010-01-01;maxYear:2018-12-31;sublist:'WW'\\,'SN'")
+        }),
+
+        new ol.layer.Tile({
+          title: "NC Floods ",
+          // combine: true,
+          visible: false,
+          source: WMSsource('hera:nc_floods_sql')
+          // layers: createGroupedLyrs('hera:nc_floods_sql', "minYear:2010;maxYear:2018;sublist:'FA'\\,'CF'")
+        }),
+
+        new ol.layer.Tile({
+          title: "NC High Winds ",
+          // combine: true,
+          visible: true,
+          source: WMSsource('hera:nc_hw_sql')
+          // layers: createGroupedLyrs('hera:nc_hw_sql', "minYear:2010;maxYear:2018;sublist:'FA'\\,'CF'")
+        }),
+
+        new ol.layer.Tile({
+          title: "NC Heat ",
+          // combine: true,
+          visible: true,
+          source: WMSsource('hera:nc_heats_sql')
+          // layers: createGroupedLyrs('hera:nc_heats_sql', "minYear:2010-01-01;maxYear:2018-12-31")
+        }),
+
+        new ol.layer.Tile({
+          title: "NC Hails ",
+          // combine: true,
+          visible: true,
+          source: WMSsource('hera:nc_hl_sql')
+          // layers: createGroupedLyrs('hera:nc_heats_sql', "minYear:2010-01-01;maxYear:2018-12-31")
+        }),
 
 
       ]
@@ -517,138 +446,38 @@ map.on('pointermove', function (e) {
 //   }
 // }
 
-let createContent = function (lyrId, properties) {
-  // var counties = '';
-  var counties = properties['county'];
-  var total = 0;
-  var probaArray = [];
-  var probability = 0;
+let createContent = function (selected) {
+  let counties = '';
+  let total = 0;
+  let flength = Object.keys(selected).length;
+  let probaArray = [];
+  let probability = 0;
+  // let startyear = parseInt($('.slider-time').html());
+  // let endyear = parseInt($('.slider-time2').html());
   let startyear = parseInt($('.slider-time').html());
   let endyear = parseInt($('.slider-time2').html());
-  switch (lyr) {
-    case 'ncsc_population_lyr':
-      // for (f of features) {
-      //   counties += f.get('county') + ', ';
-      //   total += f.get('population');
-      // }
-      // averagePopulation = Math.round((total / features.length));
-      let population = properties['population'];
-      content.innerHTML = '<h5>Selected County: ' + counties + '</h5><br><p>2017 Population: ' + population + '</p>';
-      // content.innerHTML = '<h5>Selected County: ' + counties + '</h5><br><p>2017 Population: ' + averagePopulation + '</p>';
-      break;
-    case 'ncsc_isa_lyr':
-      // for (f of features) {
-      //   counties += f.get('county') + ', ';
-      //   total += f.get('percent_isa');
-      // }
-      let percent_isa = properties['percent_isa'];
-      // averageIsa = (total / features.length * 100).toFixed(2);
-      content.innerHTML = '<h5>Selected County: ' + counties + '</h5><br><p>2015 ISA: ' + percent_isa + '</p>';
-      // content.innerHTML = '<h5>Selected County: ' + counties + '</h5><br><p>2015 ISA: ' + averageIsa + '</p>';
-      break;
-    case 'nc_floods_sql':
-      for (f of features) {
-        counties += f.get('county') + ', ';
-        total += f.get('count');
-        features[0].getKeys().filter(i =>
-          endyear >= parseInt(i.slice(1)) && parseInt(i.slice(1)) >= startyear && f.get(i) != null
-        ).forEach(i => {
-          if (!probaArray.includes(i)) {
-            probaArray.push(i)
-          }
-        });
+
+
+  Object.keys(selected).forEach(function (key) {
+    total += selected[key]['count'];
+    console.log('counties: ', counties += selected[key]['county'] + ', ');
+    console.log('total: ', total);
+    console.log('average: ', total / flength);
+
+    console.log(Object.keys(selected[key]));
+    Object.keys(selected[key]).filter(i =>
+      endyear >= parseInt(i.slice(1)) && parseInt(i.slice(1)) >= startyear && selected[key][i] != null
+    ).forEach(i => {
+      if (!probaArray.includes(i)) {
+        probaArray.push(i)
       }
-      probability = (probaArray.length / (endyear - startyear + 1) * 100).toFixed(2) + '%';
-
-      console.log(startyear, endyear);
-      average = (total / features.length).toFixed(2);
-      content.innerHTML = '<b>Layer: </b>Floods<br>' + '<h5>Selected County: ' + counties + '</h5><br><p>Year: 2006-2019</p><br><p>Total count: ' +
-        total + '</p><br><p>Probability: ' + probability + '</p><br><p>Average count: ' + average + '</p>';
-      // content.innerHTML = 'Number of records: ' + total;
-      break;
-    case 'nc_ww_sql':
-      for (f of features) {
-        counties += f.get('county') + ', ';
-        total += f.get('count');
-        features[0].getKeys().filter(i =>
-          endyear >= parseInt(i.slice(1)) && parseInt(i.slice(1)) >= startyear && f.get(i) != null
-        ).forEach(i => {
-          if (!probaArray.includes(i)) {
-            probaArray.push(i)
-          }
-        });
-      };
-      probability = (probaArray.length / (endyear - startyear + 1) * 100).toFixed(2) + '%';
-      average = (total / features.length).toFixed(2);
-      content.innerHTML = '<b>Layer: </b>Winter Weather<br>' + '<h5>Selected County: ' + counties + '</h5><br><p>Year: 2006-2019</p><br><p>Total count: ' +
-        total + '</p><br><p>Probability: ' + probability + '</p><br><p>Average count: ' + average + '</p>';
-      // content.innerHTML = 'Number of records: ' + total;
-      break;
-    case 'nc_hw_sql':
-      for (f of features) {
-        counties += f.get('county') + ', ';
-        total += f.get('count');
-        features[0].getKeys().filter(i =>
-          endyear >= parseInt(i.slice(1)) && parseInt(i.slice(1)) >= startyear && f.get(i) != null
-        ).forEach(i => {
-          if (!probaArray.includes(i)) {
-            probaArray.push(i)
-          }
-        });
-      };
-      // console.log(endyear, startyear)
-      // endyear = 2018;
-      // startyear = 1989;
-      probability = (probaArray.length / (endyear - startyear + 1) * 100).toFixed(2) + '%';
-      average = (total / features.length).toFixed(2);
-      content.innerHTML = '<b>Layer: </b>High Winds<br>' + '<h5>Selected County: ' + counties + '</h5><br><p>Year: 1989-2018</p><br><p>Total count: ' +
-        total + '</p><br><p>Probability: ' + probability + '</p><br><p>Average count: ' + average + '</p>';
-      // content.innerHTML = 'Number of records: ' + total;
-      break;
-    case 'nc_hl_sql':
-      for (f of features) {
-        counties += f.get('county') + ', ';
-        total += f.get('count');
-        features[0].getKeys().filter(i =>
-          endyear >= parseInt(i.slice(1)) && parseInt(i.slice(1)) >= startyear && f.get(i) != null
-        ).forEach(i => {
-          if (!probaArray.includes(i)) {
-            probaArray.push(i)
-          }
-        });
-      };
-      // console.log(endyear, startyear)
-      // endyear = 2018;
-      // startyear = 1989;
-      probability = (probaArray.length / (endyear - startyear + 1) * 100).toFixed(2) + '%';
-      average = (total / features.length).toFixed(2);
-      content.innerHTML = '<b>Layer: </b>Hails<br>' + '<h5>Selected County: ' + counties + '</h5><br><p>Year: 1989-2018</p><br><p>Total count: ' +
-        total + '</p><br><p>Probability: ' + probability + '</p><br><p>Average count: ' + average + '</p>';
-      // content.innerHTML = 'Number of records: ' + total;
-      break;
-    case 'nc_heats_sql':
-      // for (f of features) {
-      //   counties += f.get('county') + ', ';
-      //   total += f.get('count');
-      //   features[0].getKeys().filter(i =>
-      //     endyear >= parseInt(i.slice(1)) && parseInt(i.slice(1)) >= startyear && f.get(i) != null
-      //   ).forEach(i => {
-      //     if (!probaArray.includes(i)) {
-      //       probaArray.push(i)
-      //     }
-      //   });
-      // };
-      // probability = (probaArray.length / (endyear - startyear + 1) * 100).toFixed(2) + '%';
-      // average = (total / features.length).toFixed(2);
-      content.innerHTML = '<b>Layer: </b>Heat<br>' + '<h5>Selected County: ' + counties + '</h5><br><p>Year: 2006-2019</p><br><p>Total count: ' +
-        properties['count'] + '</p><br><p>Probability: ' + probability + '</p><br><p>Average count: ' + average + '</p>';
-      // content.innerHTML = '<b>Layer: </b>Heat<br>' + '<h5>Selected County: ' + counties + '</h5><br><p>Year: 2006-2019</p><br><p>Total count: ' +
-      //   total + '</p><br><p>Probability: ' + probability + '</p><br><p>Average count: ' + average + '</p>';
-      // content.innerHTML = 'Number of records: ' + total;
-      break;
-
-  }
-}
+    });
+    probability = (probaArray.length / (endyear - startyear + 1) * 100).toFixed(2) + '%';
+    console.log(probability);
+    content.innerHTML = '<h5>Selected County: ' + counties + '</h5><br><p>Year: 1989-2018</p><br><p>Total count: ' +
+      total + '</p><br><p>Probability: ' + probability + '</p>';
+  })
+};
 
 var shiftPressed = false;
 $(document).keydown(function (event) {
@@ -712,35 +541,7 @@ map.on('singleclick', function (evt) {
         // console.log(selected)
 
 
-        let counties = '';
-        let total = 0;
-        let flength = Object.keys(selected).length;
-        let probaArray = [];
-        let probability = 0;
-        // let startyear = parseInt($('.slider-time').html());
-        // let endyear = parseInt($('.slider-time2').html());
-        let startyear = parseInt($('.slider-time').html());
-        let endyear = parseInt($('.slider-time2').html());
-
-
-        Object.keys(selected).forEach(function (key) {
-          console.log('counties: ', counties += selected[key]['county'] + ', ');
-          console.log('total: ', total += selected[key]['count']);
-          console.log('average: ', (total += selected[key]['count']) / flength);
-
-          console.log(Object.keys(selected[key]));
-          Object.keys(selected[key]).filter(i =>
-            endyear >= parseInt(i.slice(1)) && parseInt(i.slice(1)) >= startyear && selected[key][i] != null
-          ).forEach(i => {
-            if (!probaArray.includes(i)) {
-              probaArray.push(i)
-            }
-          });
-          probability = (probaArray.length / (endyear - startyear + 1) * 100).toFixed(2) + '%';
-          console.log(probability);
-          content.innerHTML = '<h5>Selected County: ' + counties + '</h5><br><p>Year: 1989-2018</p><br><p>Total count: ' +
-            total + '</p><br><p>Probability: ' + probability + '</p>';
-        })
+        createContent(selected);
 
       });
     overlay.setPosition(coord);
@@ -1308,7 +1109,7 @@ function showCheckboxes() {
   // });
   var tilesLoading = 0;
   var tilesLoaded = 0;
-  
+
   for (layer of lyrsArray) {
     if (layer instanceof ol.layer.Tile) {
       console.log('tileloaded: ', tilesLoaded);

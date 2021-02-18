@@ -107,6 +107,28 @@ let WMSsource = function (lyr, params = null, cqlFilter = null) {
   return source;
 };
 
+let WMSsource_oasis = function (lyr, params = null, cqlFilter = null) {
+  let source = new ol.source.TileWMS({
+    url: 'http://hera1.oasis.unc.edu:8080/geoserver/hera/wms',
+    projection: 'EPSG:4269',
+    params: {
+      "VERSION": "1.3.0",
+      'LAYERS': lyr,
+      // 'bbox': [-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641],
+      'TILED': true,
+      'FORMAT': 'image/png',
+      'viewparams': params,
+      'CQL_FILTER': cqlFilter,
+    },
+    serverType: 'geoserver',
+    crossOrigin: 'anonymous', // Add to enable CQL filter on WMS
+    // Countries have transparency, so do not fade tiles:
+    transition: 0,
+  });
+
+  return source;
+};
+
 // var boundarySource = new ol.source.TileWMS({
 //   url: 'http://152.7.99.155:8080/geoserver/hera/wms',
 //   projection: 'EPSG:4269',
@@ -185,11 +207,11 @@ var map = new ol.Map({
                 renderMode: 'image', // Vector layers are rendered as images. Better performance. Default is 'vector'.
                 format: new ol.format.GeoJSON(),
                 url: function (extent) {
-                  return 'http://152.7.99.155:8080/geoserver/hera/wfs?service=WFS' +
+                  return 'http://hera1.oasis.unc.edu:8080/geoserver/hera/wfs?service=WFS' +
                     '&version=1.0.0&request=GetFeature' +
-                    '&typeName=hera:ncsc_county' +
-                    '&outputFormat=application/json&srsname=EPSG:4326' +
-                    '&CQL_FILTER=stusps=%27NC%27'
+                    '&typeName=hera:tl_nc_county' +
+                    '&outputFormat=application/json&srsname=EPSG:4326' 
+                    // '&CQL_FILTER=stusps=%27NC%27'
                 },
                 strategy: ol.loadingstrategy.bbox,
               }),
@@ -222,29 +244,32 @@ var map = new ol.Map({
         new ol.layer.Tile({
           title: "2017 population",
           visible: false,
-          source: WMSsource('hera:ncsc_population_lyr', null, "stusps = 'NC'")
+          // source: WMSsource('hera:ncsc_population_lyr', null, "stusps = 'NC'")
+          source: WMSsource_oasis('hera:tl_nc_population_lyr')
         }),
-
-        new ol.layer.Tile({
-          title: "2015 Impervious Surface Area",
-          visible: false,
-          source: WMSsource('hera:ncsc_isa_lyr', null, "stusps = 'NC'")
-        }),
-
-        // new ol.layer.Group({
-        //   title: "NC Heat ",
-        //   combine: true,
-        //   visible: true,
-        //   layers: createGroupedLyrs('hera:nc_heats_sql')
-        //   // layers: createGroupedLyrs('hera:nc_heats_sql', "minYear:2010-01-01;maxYear:2018-12-31")
+        
+        // new ol.layer.Tile({
+        //   title: "2015 Impervious Surface Area",
+        //   visible: false,
+        //   // source: WMSsource('hera:ncsc_isa_lyr', null, "stusps = 'NC'")
+        //   source: WMSsource_oasis('hera:tl_nc_population_lyr')
         // }),
+
+        // // new ol.layer.Group({
+        // //   title: "NC Heat ",
+        // //   combine: true,
+        // //   visible: true,
+        // //   layers: createGroupedLyrs('hera:nc_heats_sql')
+        // //   // layers: createGroupedLyrs('hera:nc_heats_sql', "minYear:2010-01-01;maxYear:2018-12-31")
+        // // }),
 
 
         new ol.layer.Tile({
           title: "NC Winter Weather ",
           // combine: true,
           visible: false,
-          source: WMSsource('hera:nc_ww_sql')
+          // source: WMSsource('hera:nc_ww_sql')
+          source: WMSsource_oasis('hera:nc_ww_sql')
           // layers: createGroupedLyrs('hera:nc_ww_sql', "minYear:2010-01-01;maxYear:2018-12-31;sublist:'WW'\\,'SN'")
         }),
 
@@ -252,7 +277,8 @@ var map = new ol.Map({
           title: "NC Floods ",
           // combine: true,
           visible: false,
-          source: WMSsource('hera:nc_floods_sql')
+          // source: WMSsource('hera:nc_floods_sql')
+          source: WMSsource_oasis('hera:nc_floods_sql')
           // layers: createGroupedLyrs('hera:nc_floods_sql', "minYear:2010;maxYear:2018;sublist:'FA'\\,'CF'")
         }),
 
@@ -260,26 +286,28 @@ var map = new ol.Map({
           title: "NC High Winds ",
           // combine: true,
           visible: true,
-          source: WMSsource('hera:nc_hw_sql')
+          // source: WMSsource('hera:nc_hw_sql')
+          source: WMSsource_oasis('hera:nc_hw_sql')
           // layers: createGroupedLyrs('hera:nc_hw_sql', "minYear:2010;maxYear:2018;sublist:'FA'\\,'CF'")
         }),
 
         new ol.layer.Tile({
           title: "NC Heat ",
           // combine: true,
-          visible: true,
-          source: WMSsource('hera:nc_heats_sql')
+          visible: false,
+          // source: WMSsource('hera:nc_heats_sql')
+          source: WMSsource_oasis('hera:nc_heats_sql')
           // layers: createGroupedLyrs('hera:nc_heats_sql', "minYear:2010-01-01;maxYear:2018-12-31")
         }),
 
         new ol.layer.Tile({
           title: "NC Hails ",
           // combine: true,
-          visible: true,
-          source: WMSsource('hera:nc_hl_sql')
+          visible: false,
+          // source: WMSsource('hera:nc_hl_sql')
+          source: WMSsource_oasis('hera:nc_hl_sql')
           // layers: createGroupedLyrs('hera:nc_heats_sql', "minYear:2010-01-01;maxYear:2018-12-31")
         }),
-
 
       ]
     }),
@@ -446,20 +474,28 @@ map.on('pointermove', function (e) {
 //   }
 // }
 
-let createContent = function (selected) {
+let createContent = function (lyr, selected) {
   let counties = '';
   let total = 0;
   let flength = Object.keys(selected).length;
   let probaArray = [];
   let probability = 0;
-  // let startyear = parseInt($('.slider-time').html());
-  // let endyear = parseInt($('.slider-time2').html());
   let startyear = parseInt($('.slider-time').html());
   let endyear = parseInt($('.slider-time2').html());
 
 
   Object.keys(selected).forEach(function (key) {
-    total += selected[key]['count'];
+    switch (lyr.split(':')[1]) {
+      case 'ncsc_population_lyr':
+        total += selected[key]['population'];
+        break;
+      case 'ncsc_isa_lyr':
+        total += selected[key]['percent_isa'];
+        break;
+      default:
+        total += selected[key]['count'];
+    }
+
     console.log('counties: ', counties += selected[key]['county'] + ', ');
     console.log('total: ', total);
     console.log('average: ', total / flength);
@@ -494,14 +530,14 @@ map.on('singleclick', function (evt) {
   let coord = evt.coordinate;
   let resolution = map.getView().getResolution();
   let projection = map.getView().getProjection();
-  // let testl;
+  let lyr;
 
   let wmslayerSource = map.forEachLayerAtPixel(evt.pixel,
     function (layer) {
       // return only layers with ol.source.TileWMS
       var source = layer.getSource();
       if (source instanceof ol.source.TileWMS) {
-        // testl = layer;
+        lyr = layer['values_']['source']['params_']['LAYERS'];
         return source;
       }
     });
@@ -541,7 +577,7 @@ map.on('singleclick', function (evt) {
         // console.log(selected)
 
 
-        createContent(selected);
+        createContent(lyr, selected);
 
       });
     overlay.setPosition(coord);
@@ -615,71 +651,71 @@ function createTabTable(attributeTableID, layerID, properties) {
   return table;
 };
 
-createTabTable('#attributeTb', 'ncsc_population_lyr', [{
-    "title": "FIPS",
-    data: "properties.fips",
-    "class": "center"
-  },
-  {
-    "title": "Population",
-    data: "properties.population",
-    "class": "center"
-  },
-  {
-    "title": "County",
-    data: "properties.county",
-    "class": "center"
-  },
-], );
+// createTabTable('#attributeTb', 'ncsc_population_lyr', [{
+//     "title": "FIPS",
+//     data: "properties.fips",
+//     "class": "center"
+//   },
+//   {
+//     "title": "Population",
+//     data: "properties.population",
+//     "class": "center"
+//   },
+//   {
+//     "title": "County",
+//     data: "properties.county",
+//     "class": "center"
+//   },
+// ], );
 
-createTabTable('#attributeTb2', 'ncsc_isa_lyr', [{
-    "title": "FIPS",
-    data: "properties.fips",
-    "class": "center"
-  },
-  {
-    "title": "County",
-    data: "properties.county",
-    "class": "center"
-  },
-  {
-    "title": "Percent ISA",
-    data: "properties.percent_isa",
-    "class": "center"
-  },
-], );
+// createTabTable('#attributeTb2', 'ncsc_isa_lyr', [{
+//     "title": "FIPS",
+//     data: "properties.fips",
+//     "class": "center"
+//   },
+//   {
+//     "title": "County",
+//     data: "properties.county",
+//     "class": "center"
+//   },
+//   {
+//     "title": "Percent ISA",
+//     data: "properties.percent_isa",
+//     "class": "center"
+//   },
+// ], );
 
-createTabTable('#attributeTb3', 'v_nc_yearlyfloods_lyr', [{
-    "title": "FIPS",
-    data: "properties.fips",
-    "class": "center"
-  },
-  {
-    "title": "County",
-    data: "properties.county",
-    "class": "center"
-  },
-  {
-    "title": "Count",
-    data: "properties.count",
-    "class": "center"
-  },
-  // {
-  //   "title": "Year",
-  //   data: "properties.year_issued",
-  //   "class": "center"
-  // },
-  // {
-  //   "title": "Month",
-  //   data: "properties.month_issued",
-  //   "class": "center"
-  // },
-  // {
-  //   "title": "Subgroup",
-  //   data: "properties.description",
-  //   "class": "center"
-  // },
-], );
+// createTabTable('#attributeTb3', 'v_nc_yearlyfloods_lyr', [{
+//     "title": "FIPS",
+//     data: "properties.fips",
+//     "class": "center"
+//   },
+//   {
+//     "title": "County",
+//     data: "properties.county",
+//     "class": "center"
+//   },
+//   {
+//     "title": "Count",
+//     data: "properties.count",
+//     "class": "center"
+//   },
+//   // {
+//   //   "title": "Year",
+//   //   data: "properties.year_issued",
+//   //   "class": "center"
+//   // },
+//   // {
+//   //   "title": "Month",
+//   //   data: "properties.month_issued",
+//   //   "class": "center"
+//   // },
+//   // {
+//   //   "title": "Subgroup",
+//   //   data: "properties.description",
+//   //   "class": "center"
+//   // },
+// ], );
 
 $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
   $.fn.dataTable.tables({
@@ -688,46 +724,48 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
   }).columns.adjust();
 });
 
+
+// var jsonSource = 'hera:floods_highlight'
 // Create mock-up highlight table as tableau
-let layerjson = (function () {
-  var json;
-  $.ajax({
-    async: false,
-    url: `http://152.7.99.155:8080/geoserver/hera/ows?service=WFS&version=1.0.0
-        &request=GetFeature&typeName=hera:floods_highlight&outputFormat=json
-        &format_options=callback:getJson`,
-    dataType: 'json',
-    jsonpCallback: 'getJson',
-    // success: parsejson
-    success: function (data) {
-      json = data
-    }
-  });
-  return json;
-})();
+// let layerjson = (function (jsonSource) {
+//   var json;
+//   $.ajax({
+//     async: false,
+//     url: `http://152.7.99.155:8080/geoserver/hera/ows?service=WFS&version=1.0.0
+//         &request=GetFeature&typeName=hera:floods_highlight&outputFormat=json
+//         &format_options=callback:getJson`,
+//     dataType: 'json',
+//     jsonpCallback: 'getJson',
+//     // success: parsejson
+//     success: function (data) {
+//       json = data
+//     }
+//   });
+//   return json;
+// })();
 
 
 var dummy = [];
 
-layerjson.features.forEach(
-  function (i) {
-    var yearlist = [];
-    yearlist.push(i.properties['year_issued'], i.properties['jan'], i.properties['feb'], i.properties['mar'], i.properties['apr'], i.properties['may'],
-      i.properties['jun'], i.properties['jul'], i.properties['aug'], i.properties['sep'], i.properties['oct'], i.properties['nov'], i.properties['dec']);
-    dummy.push(yearlist);
-  })
+// layerjson.features.forEach(
+//   function (i) {
+//     var yearlist = [];
+//     yearlist.push(i.properties['year_issued'], i.properties['jan'], i.properties['feb'], i.properties['mar'], i.properties['apr'], i.properties['may'],
+//       i.properties['jun'], i.properties['jul'], i.properties['aug'], i.properties['sep'], i.properties['oct'], i.properties['nov'], i.properties['dec']);
+//     dummy.push(yearlist);
+//   })
 
-function parsejson(data) {
-  data.features.forEach(
-    function (i) {
-      var yearlist = [];
-      yearlist.push(i.properties['year_issued'], i.properties['jan'], i.properties['feb'], i.properties['mar'], i.properties['apr'], i.properties['may'],
-        i.properties['jun'], i.properties['jul'], i.properties['aug'], i.properties['sep'], i.properties['oct'], i.properties['nov'], i.properties['dec']);
-      dummy.push(yearlist);
-    }
-  )
-  /*   console.log(data.features); */
-};
+// function parsejson(data) {
+//   data.features.forEach(
+//     function (i) {
+//       var yearlist = [];
+//       yearlist.push(i.properties['year_issued'], i.properties['jan'], i.properties['feb'], i.properties['mar'], i.properties['apr'], i.properties['may'],
+//         i.properties['jun'], i.properties['jul'], i.properties['aug'], i.properties['sep'], i.properties['oct'], i.properties['nov'], i.properties['dec']);
+//       dummy.push(yearlist);
+//     }
+//   )
+//   /*   console.log(data.features); */
+// };
 
 
 // var rowLabel = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -1099,48 +1137,47 @@ function showCheckboxes() {
 
 
 
-(function loadingIndicator() {
-  let allLyrs = map.getLayerGroup().getLayers().array_;
-  let lyrsArray = allLyrs.filter(e => {
-    return e.values_.title == 'Layers'
-  })[0].getLayersArray();
-  // let tilelyrs = lyrsGroup.getLayersArray().filter(e => {
-  //   return e.type == 'TILE'
-  // });
-  var tilesLoading = 0;
-  var tilesLoaded = 0;
+// (function loadingIndicator() {
+//   let allLyrs = map.getLayerGroup().getLayers().array_;
+//   let lyrsArray = allLyrs.filter(e => {
+//     return e.values_.title == 'Layers'
+//   })[0].getLayersArray();
+//   // let tilelyrs = lyrsGroup.getLayersArray().filter(e => {
+//   //   return e.type == 'TILE'
+//   // });
+//   var tilesLoading = 0;
+//   var tilesLoaded = 0;
 
-  for (layer of lyrsArray) {
-    if (layer instanceof ol.layer.Tile) {
-      console.log('tileloaded: ', tilesLoaded);
-      console.log('tileloading: ', tilesLoading);
-      // if (layer instanceof ol.layer.Vector) {
-      // layer.on("precompose", function () {
-      layer.getSource().on('tileloadstart', function () {
-        tilesLoading++;
-        $("#ajaxSpinnerContainer").show();
-        $("#ajaxSpinnerImage").show();
-        console.log('show')
-      });
-      // layer.on("render", function () {
-      layer.getSource().on('tileloadend', function () {
-        tilesLoaded++;
-        if (tilesLoading === tilesLoaded) {
-          console.log(tilesLoaded + ' tiles finished loading');
-          $("#ajaxSpinnerContainer").hide();
-          $("#ajaxSpinnerImage").hide();
-          console.log("hide")
-          tilesLoading = 0;
-          tilesLoaded = 0;
-          //trigger another event, do something etc...
-        }
+//   for (layer of lyrsArray) {
+//     if (layer instanceof ol.layer.Tile) {
+//       console.log('tileloaded: ', tilesLoaded);
+//       console.log('tileloading: ', tilesLoading);
+//       // if (layer instanceof ol.layer.Vector) {
+//       // layer.on("precompose", function () {
+//       layer.getSource().on('tileloadstart', function () {
+//         tilesLoading++;
+//         $("#ajaxSpinnerContainer").show();
+//         $("#ajaxSpinnerImage").show();
+//         console.log('show')
+//       });
+//       // layer.on("render", function () {
+//       layer.getSource().on('tileloadend', function () {
+//         tilesLoaded++;
+//         if (tilesLoading === tilesLoaded) {
+//           console.log(tilesLoaded + ' tiles finished loading');
+//           $("#ajaxSpinnerContainer").hide();
+//           $("#ajaxSpinnerImage").hide();
+//           console.log("hide")
+//           tilesLoading = 0;
+//           tilesLoaded = 0;
+//           //trigger another event, do something etc...
+//         }
 
-      });
-    }
+//       });
+//     }
 
-  }
+//   }
 
 
 
-})()
 // })()

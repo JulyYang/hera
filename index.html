@@ -49,6 +49,46 @@
 <body>
   <div class="map-header">
     <h1 id="header">Hazardous Extremes for Risk Assessment (HERA) Tool</h1>
+    <form id="filterForm">
+      <select id='target-layer'>
+        <option value=none selected disabled hidden>Target Layer</option>
+        <option value='NC Floods '>NC Floods </option>
+        <option value='NC Winter Weather '>NC Winter Weather </option>
+        <option value='NC Heat '>NC Heat </option>
+        <option value='NC High Winds '>NC High Winds </option>
+        <option value='NC Hails '>NC Hails </option>
+      </select>
+      <!-- <div id="time-range">
+      <label>Time Range: </label>
+      <p><span class="slider-time"></span> to <span class="slider-time2"></span></p>
+      <div class="sliders_step1">
+        <div id="slider-range"></div>
+      </div>
+    </div> -->
+
+
+      <div id="multiselect" class="multiselect">
+        <!-- <label>Subcategory: </label> -->
+        <div class="selectBox" onclick="showCheckboxes()">
+          <select id='subcategory'>
+            <option value=none selected disabled hidden>Subcategory</option>
+          </select>
+          <div class="overSelect"></div>
+        </div>
+        <div id="checkboxes">
+        </div>
+      </div>
+
+    </form>
+    <button id="updateMap">update map</button>
+
+    <!-- <div id="time-range2">
+      <label>Time Range: </label>
+      <p><span class="slider-time"></span> to <span class="slider-time2"></span></p>
+      <div class="sliders_step1">
+        <div id="slider-range"></div>
+      </div>
+    </div> -->
     <!-- <p id="header">Hazardous Extremes for Risk Assessment (HERA) Tool</p> -->
   </div>
 
@@ -117,7 +157,7 @@
 
       <div class="sidebar-pane" id="filter">
         <h1 class="sidebar-header">Filter<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
-        <form id="filterForm">
+        <!-- <form id="filterForm">
           <label>Target Layer: </label>
           <select id='target-layer'>
             <option value=none selected disabled hidden>Target Layer</option>
@@ -126,7 +166,6 @@
             <option value='NC Heat '>NC Heat </option>
             <option value='NC High Winds '>NC High Winds </option>
             <option value='NC Hails '>NC Hails </option>
-            <!-- <option value='accept'></option> -->
           </select></br>
           <div id="time-range">
             <label>Time Range: </label>
@@ -150,7 +189,7 @@
           </div>
 
         </form> </br>
-        <button id="updateMap">update map</button>
+        <button id="updateMap">update map</button> -->
       </div>
 
       <div class="sidebar-pane" id="chart">
@@ -214,9 +253,9 @@
 
   <div id="map">
     <!-- Loading indicator -->
-    <div id="ajaxSpinnerContainer">
+    <!-- <div id="ajaxSpinnerContainer">
       <img src="image/ajax-loader.gif" id="ajaxSpinnerImage" title="working...">
-    </div>
+    </div> -->
 
     <!-- Floating legend box -->
     <div id="dialog" title="Legend">
@@ -240,13 +279,13 @@
       <!-- <button id='updateLegend'>Update legend</button> -->
       <a role="button">
         <span id='updateLegend' class="ui-icon ui-icon-arrowrefresh-1-s" title="Refresh Legend"></span></a>
-      <p>To navigate through HERA, click on the Hazard tabs or move the navigation slider that appears under tabs when
+      <!-- <p>To navigate through HERA, click on the Hazard tabs or move the navigation slider that appears under tabs when
         hovering over them. On each page, you may select State, Years, and Subcategories depending on the hazard of
         interest. To view a Count of the number of hazard events that have occurred and the Probability that at least
-        one event of that hazard will happen in a year, ....</p>
+        one event of that hazard will happen in a year, ....</p> -->
       <div>
         <img id="legend"
-          src="http://152.7.99.155:8080/geoserver/hera/wms?&REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=hera:ncsc_isa_lyr">
+          src="http://hera1.oasis.unc.edu:8080/geoserver/hera/wms?&REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=hera:hera:nc_hl_sql">
 
       </div>
     </div>

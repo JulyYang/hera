@@ -26,13 +26,14 @@ body {
 
 #header {
   margin-top: 0px;
+  margin-bottom: 0px;
   color: white;
   word-spacing: 3px;
   font-size: 25px;
   font-weight: bold;
   padding: 10px 10px;
   font-family: Arial, Helvetica, sans-serif;
-  /* display: inline-block; */
+  display: inline-block;
 }
 
 #toggleLabel {display:block; text-align:right;}
@@ -275,6 +276,7 @@ body {
 /* dropdown with checkbox */
 .multiselect {
   width: 200px;
+  display: inline-block;
 }
 
 .selectBox {
@@ -296,13 +298,16 @@ body {
 
 #checkboxes {
   border: 1px #dadada solid;
+  z-index: 6000;
+  position: absolute;
+  width: 200px;
+  background-color: white;
 }
 
 #checkboxes label {
   /* display: inline-block; */
   display: block;
   font-weight: 300;
-
 }
 
 #checkboxes label:hover {
@@ -332,3 +337,7 @@ body {
   left: 50%;
   /* margin: -33px 0 0 -33px; */
   display:none;}
+
+  #filterForm {
+    display: inline-block;
+  }

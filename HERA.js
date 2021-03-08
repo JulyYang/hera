@@ -33,79 +33,6 @@ closer.onclick = function () {
   return false;
 };
 
-// let createGroupedLyrs = function (lyr, params = null, cqlFilter = null) {
-//   let wmsLayer = new ol.layer.Tile({
-//     source: new ol.source.TileWMS({
-//       url: 'http://152.7.99.155:8080/geoserver/hera/wms',
-//       projection: 'EPSG:4269',
-//       params: {
-//         "VERSION": "1.3.0",
-//         'LAYERS': lyr,
-//         // 'bbox': [-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641],
-//         'TILED': true,
-//         'FORMAT': 'image/png',
-//         'viewparams': params,
-//         'CQL_FILTER': cqlFilter,
-//       },
-//       serverType: 'geoserver',
-//       crossOrigin: 'anonymous', // Add to enable CQL filter on WMS
-//       // Countries have transparency, so do not fade tiles:
-//       transition: 0,
-//     })
-//   });
-
-//   // let wfsLayer = new ol.layer.Vector({
-//   //   // title: "NC SC ISA - Vector",
-//   //   source: new ol.source.Vector({
-//   //     renderMode: 'image', // Vector layers are rendered as images. Better performance. Default is 'vector'.
-//   //     format: new ol.format.GeoJSON(),
-//   //     url: function (extent) {
-//   //       return 'http://152.7.99.155:8080/geoserver/hera/wfs?service=WFS' +
-//   //         '&version=1.0.0&request=GetFeature' +
-//   //         '&typeName=' + lyr +
-//   //         '&outputFormat=application/json&srsname=EPSG:4326' +
-//   //         '&bbox=-84.321821,31.995954,-75.400119,36.588137' +
-//   //         '&viewparams=' + params
-//   //       // + '&bbox=' + extent.join(',') + ',EPSG:3857'; // CQL filter and bbox are mutually exclusive. comment this to enable cql filter
-//   //     },
-//   //     strategy: ol.loadingstrategy.bbox,
-//   //   }),
-//   //   style: new ol.style.Style({
-//   //     fill: new ol.style.Fill({
-//   //       color: [255, 255, 255, 0],
-//   //     }),
-//   //     stroke: new ol.style.Stroke({
-//   //       color: '#867E77',
-//   //       width: 0.1
-//   //     })
-//   //   }),
-//   // });
-
-//   return [wmsLayer];
-//   // return [wmsLayer, wfsLayer];
-// };
-
-let WMSsource = function (lyr, params = null, cqlFilter = null) {
-  let source = new ol.source.TileWMS({
-    url: 'http://152.7.99.155:8080/geoserver/hera/wms',
-    projection: 'EPSG:4269',
-    params: {
-      "VERSION": "1.3.0",
-      'LAYERS': lyr,
-      // 'bbox': [-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641],
-      'TILED': true,
-      'FORMAT': 'image/png',
-      'viewparams': params,
-      'CQL_FILTER': cqlFilter,
-    },
-    serverType: 'geoserver',
-    crossOrigin: 'anonymous', // Add to enable CQL filter on WMS
-    // Countries have transparency, so do not fade tiles:
-    transition: 0,
-  });
-
-  return source;
-};
 
 let WMSsource_oasis = function (lyr, params = null, cqlFilter = null) {
   let source = new ol.source.TileWMS({
@@ -129,44 +56,32 @@ let WMSsource_oasis = function (lyr, params = null, cqlFilter = null) {
   return source;
 };
 
-// var boundarySource = new ol.source.TileWMS({
-//   url: 'http://152.7.99.155:8080/geoserver/hera/wms',
-//   projection: 'EPSG:4269',
-//   params: {
-//     "VERSION": "1.3.0",
-//     'LAYERS': 'hera:ncsc_county',
-//     // 'bbox': [-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641],
-//     'TILED': true,
-//     'FORMAT': 'image/png'
-//   },
-//   serverType: 'geoserver',
-//   crossOrigin: 'anonymous',
-//   // Countries have transparency, so do not fade tiles:
-//   transition: 0,
-// });
-
-
-var testVm = new ol.source.TileWMS({
-  url: 'http://hera1.oasis.unc.edu:8080/geoserver/topp/wms',
-  projection: 'EPSG:4326',
-  params: {
-    "VERSION": "1.3.0",
-    'LAYERS': 'topp:states',
-    // 'bbox': [-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641],
-    'TILED': true,
-    'FORMAT': 'image/png'
-  },
-  serverType: 'geoserver',
-  // Countries have transparency, so do not fade tiles:
-  transition: 0,
+var basemap = new ol.layer.Tile({
+    source: new ol.source.OSM()
 });
+  // var boundarySource = new ol.source.TileWMS({
+  //   url: 'http://152.7.99.155:8080/geoserver/hera/wms',
+  //   projection: 'EPSG:4269',
+  //   params: {
+  //     "VERSION": "1.3.0",
+  //     'LAYERS': 'hera:ncsc_county',
+  //     // 'bbox': [-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641],
+  //     'TILED': true,
+  //     'FORMAT': 'image/png'
+  //   },
+  //   serverType: 'geoserver',
+  //   crossOrigin: 'anonymous',
+  //   // Countries have transparency, so do not fade tiles:
+  //   transition: 0,
+  // });
 
-var view = new ol.View({
-  // projection: 'EPSG:3857',
-  center: ol.proj.fromLonLat([-79.5, 34.9]),
-  zoom: 7.5
 
-})
+  var view = new ol.View({
+    // projection: 'EPSG:3857',
+    center: ol.proj.fromLonLat([-79.5, 34.9]),
+    zoom: 7.5
+
+  })
 
 
 var map = new ol.Map({
@@ -195,12 +110,10 @@ var map = new ol.Map({
           combine: true,
           visible: true,
           layers: [
-            new ol.layer.Tile({
-              // title: "Open Street Map",
-              // type: "base",
-              // visible: true,
-              source: new ol.source.OSM()
-            }),
+            // new ol.layer.Tile({
+            //   source: new ol.source.OSM()
+            // }),
+            basemap,
 
             new ol.layer.Vector({
               source: new ol.source.Vector({
@@ -210,8 +123,8 @@ var map = new ol.Map({
                   return 'http://hera1.oasis.unc.edu:8080/geoserver/hera/wfs?service=WFS' +
                     '&version=1.0.0&request=GetFeature' +
                     '&typeName=hera:tl_nc_county' +
-                    '&outputFormat=application/json&srsname=EPSG:4326' 
-                    // '&CQL_FILTER=stusps=%27NC%27'
+                    '&outputFormat=application/json&srsname=EPSG:4326'
+                  // '&CQL_FILTER=stusps=%27NC%27'
                 },
                 strategy: ol.loadingstrategy.bbox,
               }),
@@ -225,12 +138,7 @@ var map = new ol.Map({
                 })
               }),
             })
-            // new ol.layer.Tile({
-            //   // title: 'NC SC County',
-            //   // type: "base",
-            //   // visible: true,
-            //   source: boundarySource,
-            // })
+
           ]
         }),
       ]
@@ -247,7 +155,7 @@ var map = new ol.Map({
           // source: WMSsource('hera:ncsc_population_lyr', null, "stusps = 'NC'")
           source: WMSsource_oasis('hera:tl_nc_population_lyr')
         }),
-        
+
         // new ol.layer.Tile({
         //   title: "2015 Impervious Surface Area",
         //   visible: false,
@@ -325,7 +233,45 @@ var map = new ol.Map({
   // })
 });
 
+// adjust the base map color
+basemap.on('postcompose', function (e) {
+  greyscale(e.context);
+  // document.querySelector('canvas').style.filter = "invert(90%)";
+});
 
+
+// grey scale function
+function greyscale(context) {
+  var width = context.canvas.width;
+  var height = context.canvas.height;
+  // console.log('width: ' + width);
+  // console.log('height: ' + height);
+
+  var inputData = context.getImageData(0, 0, width, height).data;
+  // console.log('inputData.length: ' + inputData.length);
+
+  var canvas = document.getElementsByClassName('ol-unselectable')[0];
+  var ctx = canvas.getContext('2d');
+  ctx.fillStyle = "rgba(0, 0, 0, 0)"
+  var myImageData = ctx.createImageData(width, height);
+  var d = myImageData.data;
+
+  for (i = 0; i < inputData.length; i += 4) {
+
+    var r = inputData[i];
+    var g = inputData[i + 1];
+    var b = inputData[i + 2];
+    // CIE luminance for the RGB
+    var v = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    d[i + 0] = v; // Red
+    d[i + 1] = v; // Green
+    d[i + 2] = v; // Blue
+    d[i + 3] = 255; // Alpha
+
+  }
+  ctx.putImageData(myImageData, 0, 0);
+
+}
 
 // If there is any feature at the event pixel (where the mouse points at), the pointer will change to the 'hand' symbol
 map.on('pointermove', function (e) {
@@ -639,7 +585,7 @@ function createTabTable(attributeTableID, layerID, properties) {
     "ajax": {
       // Delete the limitation: maxFeatures=50
       // Solved from Stackoverflow questions no.48147970
-      "url": 'http://152.7.99.155:8080/geoserver/hera/wfs?service=WFS' +
+      "url": 'http://hera1.oasis.unc.edu:8080/geoserver/hera/wfs?service=WFS' +
         '&version=1.0.0&request=GetFeature' +
         '&typeName=hera:' + layerID +
         '&outputFormat=application/json',
@@ -930,7 +876,7 @@ $(function () {
 
 let legendBtn = document.getElementById("updateLegend");
 let legendImg = document.getElementById("legend");
-let legendSrc = "http://152.7.99.155:8080/geoserver/hera/wms?&REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER="
+let legendSrc = "http://hera1.oasis.unc.edu:8080/geoserver/hera/wms?&REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER="
 let firstLyr = 'hera:ncsc_isa_lyr';
 legendImg.src = legendSrc + firstLyr;
 // legendImg.src = legendSrc + 'hera:ncsc_isa_lyr';
@@ -1047,10 +993,16 @@ updateMapBtn.onclick = function () {
   let minYear = form.querySelector('.slider-time').innerHTML.replace(/\//g, "-");
   let maxYear = form.querySelector('.slider-time2').innerHTML.replace(/\//g, "-");
   let categories = [];
+  let params;
 
   form.querySelectorAll('input[type="checkbox"]:checked').forEach(i => categories.push("'" + i.name + "'"));
   // let params = "minYear:" + minYear + ";maxYear:" + maxYear + ";sublist:" + "'CF'\\,'FA'";
-  let params = "minYear:" + minYear + ";maxYear:" + maxYear + ";sublist:" + categories.join("\\,");
+  if (categories.length > 0){
+    params = "minYear:" + minYear + ";maxYear:" + maxYear + ";sublist:" + categories.join("\\,");
+  } else {
+    params = "minYear:" + minYear + ";maxYear:" + maxYear;
+  }
+  // let params = "sublist:" + categories.join("\\,");
   console.log(params);
 
   let lyrs = map.getLayerGroup().getLayers().array_.filter(e => {

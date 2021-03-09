@@ -34,6 +34,7 @@ body {
   padding: 10px 10px;
   font-family: Arial, Helvetica, sans-serif;
   display: inline-block;
+  padding-right: 0px;
 }
 
 #toggleLabel {display:block; text-align:right;}
@@ -178,6 +179,7 @@ body {
     font-family:"Arial", sans-serif;
     font-size:14px;
     color:#333;
+    display: inline-block;
 }
 .ui-slider-horizontal {
     height: 8px;
@@ -336,8 +338,54 @@ body {
   top: 50%;
   left: 50%;
   /* margin: -33px 0 0 -33px; */
-  display:none;}
+  display:none;
+}
 
-  #filterForm {
+  /* #filterForm {
+    float: right;
+  } */
+
+  #filterDiv {
+    float: right;
+  }
+
+  #subheader {
+    color:whitesmoke;
     display: inline-block;
+  }
+
+  
+#btnTable {
+  position: absolute;
+  top: 40px;
+	right: 20px;
+	/* color: white; */
+	background-color: yellow; 
+}
+
+#tableSidenav {
+	height: 0;
+	width: 100%;
+	position: fixed;
+	/* The z-index of sidebar is set to 2000 */
+	z-index: 2001; 
+	bottom: 0;
+	left: 0;
+	background-color: #FFFFFF;
+	overflow-x: hidden;
+	transition: 0.5s;
+	padding-left: 0px;
+}
+
+#tableSidenav a {
+	padding: 8px 8px 8px 8px;
+	text-decoration: none;
+	font-size: 14px;
+	color: #818181;
+	/* display: block; */
+	transition: 0.3s;
+}
+
+#tableSidenav a:hover {
+	color: #f1f1f1;
   }

@@ -57,31 +57,15 @@ let WMSsource_oasis = function (lyr, params = null, cqlFilter = null) {
 };
 
 var basemap = new ol.layer.Tile({
-    source: new ol.source.OSM()
+  source: new ol.source.OSM()
 });
-  // var boundarySource = new ol.source.TileWMS({
-  //   url: 'http://152.7.99.155:8080/geoserver/hera/wms',
-  //   projection: 'EPSG:4269',
-  //   params: {
-  //     "VERSION": "1.3.0",
-  //     'LAYERS': 'hera:ncsc_county',
-  //     // 'bbox': [-84.3664321899414,31.9729919433594,-75.3555068969727,36.6110992431641],
-  //     'TILED': true,
-  //     'FORMAT': 'image/png'
-  //   },
-  //   serverType: 'geoserver',
-  //   crossOrigin: 'anonymous',
-  //   // Countries have transparency, so do not fade tiles:
-  //   transition: 0,
-  // });
 
+var view = new ol.View({
+  // projection: 'EPSG:3857',
+  center: ol.proj.fromLonLat([-79.5, 34.9]),
+  zoom: 7.5
 
-  var view = new ol.View({
-    // projection: 'EPSG:3857',
-    center: ol.proj.fromLonLat([-79.5, 34.9]),
-    zoom: 7.5
-
-  })
+});
 
 
 var map = new ol.Map({
@@ -110,9 +94,6 @@ var map = new ol.Map({
           combine: true,
           visible: true,
           layers: [
-            // new ol.layer.Tile({
-            //   source: new ol.source.OSM()
-            // }),
             basemap,
 
             new ol.layer.Vector({
@@ -160,61 +141,37 @@ var map = new ol.Map({
         //   title: "2015 Impervious Surface Area",
         //   visible: false,
         //   // source: WMSsource('hera:ncsc_isa_lyr', null, "stusps = 'NC'")
-        //   source: WMSsource_oasis('hera:tl_nc_population_lyr')
         // }),
-
-        // // new ol.layer.Group({
-        // //   title: "NC Heat ",
-        // //   combine: true,
-        // //   visible: true,
-        // //   layers: createGroupedLyrs('hera:nc_heats_sql')
-        // //   // layers: createGroupedLyrs('hera:nc_heats_sql', "minYear:2010-01-01;maxYear:2018-12-31")
-        // // }),
-
 
         new ol.layer.Tile({
           title: "NC Winter Weather ",
-          // combine: true,
           visible: false,
-          // source: WMSsource('hera:nc_ww_sql')
           source: WMSsource_oasis('hera:nc_ww_sql')
-          // layers: createGroupedLyrs('hera:nc_ww_sql', "minYear:2010-01-01;maxYear:2018-12-31;sublist:'WW'\\,'SN'")
         }),
 
         new ol.layer.Tile({
           title: "NC Floods ",
-          // combine: true,
           visible: false,
-          // source: WMSsource('hera:nc_floods_sql')
           source: WMSsource_oasis('hera:nc_floods_sql')
-          // layers: createGroupedLyrs('hera:nc_floods_sql', "minYear:2010;maxYear:2018;sublist:'FA'\\,'CF'")
+          // layers: createGroupedLyrs('hera:nc_floods_sql', "minYear:2010-01-01;maxYear:2018-12-31;sublist:'FA'\\,'CF'")
         }),
 
         new ol.layer.Tile({
           title: "NC High Winds ",
-          // combine: true,
           visible: true,
-          // source: WMSsource('hera:nc_hw_sql')
           source: WMSsource_oasis('hera:nc_hw_sql')
-          // layers: createGroupedLyrs('hera:nc_hw_sql', "minYear:2010;maxYear:2018;sublist:'FA'\\,'CF'")
         }),
 
         new ol.layer.Tile({
           title: "NC Heat ",
-          // combine: true,
           visible: false,
-          // source: WMSsource('hera:nc_heats_sql')
           source: WMSsource_oasis('hera:nc_heats_sql')
-          // layers: createGroupedLyrs('hera:nc_heats_sql', "minYear:2010-01-01;maxYear:2018-12-31")
         }),
 
         new ol.layer.Tile({
           title: "NC Hails ",
-          // combine: true,
           visible: false,
-          // source: WMSsource('hera:nc_hl_sql')
           source: WMSsource_oasis('hera:nc_hl_sql')
-          // layers: createGroupedLyrs('hera:nc_heats_sql', "minYear:2010-01-01;maxYear:2018-12-31")
         }),
 
       ]
@@ -227,7 +184,6 @@ var map = new ol.Map({
   //   // projection: 'EPSG:3857',
   //   center: ol.proj.fromLonLat([-80,35.5]),
   //   zoom: 7
-
   view: view
 
   // })
@@ -240,13 +196,10 @@ basemap.on('postcompose', function (e) {
 });
 
 
-// grey scale function
+// grey scale function for the base map
 function greyscale(context) {
   var width = context.canvas.width;
   var height = context.canvas.height;
-  // console.log('width: ' + width);
-  // console.log('height: ' + height);
-
   var inputData = context.getImageData(0, 0, width, height).data;
   // console.log('inputData.length: ' + inputData.length);
 
@@ -549,20 +502,20 @@ map.on('singleclick', function (evt) {
 // });
 
 
-var sidebar = new ol.control.Sidebar({
-  element: 'sidebar',
-  position: 'right'
-});
-var toc = document.getElementById("layers");
-ol.control.LayerSwitcher.renderPanel(map, toc);
-map.addControl(sidebar);
+// var sidebar = new ol.control.Sidebar({
+//   element: 'sidebar',
+//   position: 'right'
+// });
+// var toc = document.getElementById("layers");
+// ol.control.LayerSwitcher.renderPanel(map, toc);
+// map.addControl(sidebar);
 
 document.getElementById("tab-1").innerHTML = "2017 population";
 document.getElementById("tab-2").innerHTML = "2015 Impervious Surface Area";
 document.getElementById("tab-3").innerHTML = "NC floods";
 
-document.getElementById("about-tab-1").innerHTML = "HERA Data Source";
-document.getElementById("about-tab-2").innerHTML = "Contact Us";
+// document.getElementById("about-tab-1").innerHTML = "HERA Data Source";
+// document.getElementById("about-tab-2").innerHTML = "Contact Us";
 
 
 // Create attribute table using Jquery library DataTable
@@ -597,71 +550,57 @@ function createTabTable(attributeTableID, layerID, properties) {
   return table;
 };
 
-// createTabTable('#attributeTb', 'ncsc_population_lyr', [{
-//     "title": "FIPS",
-//     data: "properties.fips",
-//     "class": "center"
-//   },
-//   {
-//     "title": "Population",
-//     data: "properties.population",
-//     "class": "center"
-//   },
-//   {
-//     "title": "County",
-//     data: "properties.county",
-//     "class": "center"
-//   },
-// ], );
+createTabTable('#attributeTb', 'nc_ww_sql', [{
+  //   "title": "FIPS",
+  //   data: "properties.fips",
+  //   "class": "center"
+  // },
+  // {
+    "title": "County",
+    data: "properties.county",
+    "class": "center"
+  },
+  {
+    "title": "Count",
+    data: "properties.count",
+    "class": "center"
+  },
+], );
 
-// createTabTable('#attributeTb2', 'ncsc_isa_lyr', [{
-//     "title": "FIPS",
-//     data: "properties.fips",
-//     "class": "center"
-//   },
-//   {
-//     "title": "County",
-//     data: "properties.county",
-//     "class": "center"
-//   },
-//   {
-//     "title": "Percent ISA",
-//     data: "properties.percent_isa",
-//     "class": "center"
-//   },
-// ], );
+createTabTable('#attributeTb2', 'nc_floods_sql', [{
+  //   "title": "FIPS",
+  //   data: "properties.fips",
+  //   "class": "center"
+  // },
+  // {
+    "title": "County",
+    data: "properties.county",
+    "class": "center"
+  },
+  {
+    "title": "Count",
+    data: "properties.count",
+    "class": "center"
+  },
+], );
 
-// createTabTable('#attributeTb3', 'v_nc_yearlyfloods_lyr', [{
-//     "title": "FIPS",
-//     data: "properties.fips",
-//     "class": "center"
-//   },
-//   {
-//     "title": "County",
-//     data: "properties.county",
-//     "class": "center"
-//   },
-//   {
-//     "title": "Count",
-//     data: "properties.count",
-//     "class": "center"
-//   },
-//   // {
-//   //   "title": "Year",
-//   //   data: "properties.year_issued",
-//   //   "class": "center"
-//   // },
-//   // {
-//   //   "title": "Month",
-//   //   data: "properties.month_issued",
-//   //   "class": "center"
-//   // },
-//   // {
-//   //   "title": "Subgroup",
-//   //   data: "properties.description",
-//   //   "class": "center"
-//   // },
-// ], );
+createTabTable('#attributeTb3', 'nc_hw_sql', [{
+  //   "title": "FIPS",
+  //   data: "properties.fips",
+  //   "class": "center"
+  // },
+  // {
+    "title": "County",
+    data: "properties.county",
+    "class": "center"
+  },
+  {
+    "title": "Count",
+    data: "properties.count",
+    "class": "center"
+  },
+
+], );
 
 $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
   $.fn.dataTable.tables({
@@ -986,6 +925,13 @@ function refreshSource(lyrname, params, l) {
   l.setSource(newsource);
 }
 
+let lyrObject = {
+  'NC Floods ': 'hera:nc_floods_sql',
+  "NC Heat ": 'hera:nc_heats_sql',
+  "NC Winter Weather ": 'hera:nc_ww_sql',
+  "NC High Winds ": 'hera:nc_hw_sql',
+  "NC Hails ": 'hera:nc_hl_sql'
+};
 
 updateMapBtn.onclick = function () {
   overlay.setPosition(undefined);
@@ -995,9 +941,17 @@ updateMapBtn.onclick = function () {
   let categories = [];
   let params;
 
+  let testlayer = new ol.layer.Tile({
+    title: selectedLayer,
+    visible: false,
+    source: WMSsource_oasis(lyrObject[selectedLayer])
+  });
+
+  // map.addLayer(testlayer);
+
   form.querySelectorAll('input[type="checkbox"]:checked').forEach(i => categories.push("'" + i.name + "'"));
   // let params = "minYear:" + minYear + ";maxYear:" + maxYear + ";sublist:" + "'CF'\\,'FA'";
-  if (categories.length > 0){
+  if (categories.length > 0) {
     params = "minYear:" + minYear + ";maxYear:" + maxYear + ";sublist:" + categories.join("\\,");
   } else {
     params = "minYear:" + minYear + ";maxYear:" + maxYear;
@@ -1010,6 +964,8 @@ updateMapBtn.onclick = function () {
   })[0];
   let lyrGroups = lyrs.getLayers().getArray();
   let selectedLyr = lyrGroups.filter(l => l.get('title') == selectedLayer);
+  // added to test non selected layers
+  let nonselectedLyr = lyrGroups.filter(l => l.get('title') != selectedLayer);
   // console.log(selectedLyr[0].getLayersArray());
   let lyrname = selectedLyr[0].getLayersArray()[0].getSource().getParams()['LAYERS'];
 
@@ -1017,6 +973,10 @@ updateMapBtn.onclick = function () {
   selectedLyr[0].getLayersArray()[0].getSource().updateParams({
     'viewparams': params
   });
+
+  // test lyr visibility
+  nonselectedLyr.forEach(l => l.setVisible(false));
+  selectedLyr[0].getLayersArray()[0].setVisible(true);
 
   // Update WFS layer
   // let wfsl = selectedLyr[0].getLayersArray()[1];
@@ -1133,3 +1093,23 @@ function showCheckboxes() {
 
 
 // })()
+
+function toggleNav() {
+  navSize = document.getElementById("tableSidenav").style.height;
+  // If the height of table navigation bar equals to 250 px (the table is opened), close the table; otherwise, open it.
+  if (navSize == "50%") {
+    console.log("close");
+    return closeNav();
+  }
+  return openNav();
+}
+
+function openNav() {
+  document.getElementById("tableSidenav").style.height = "50%";
+  document.getElementById("map").style.marginBottom = "50%";
+}
+
+function closeNav() {
+  document.getElementById("tableSidenav").style.height = "0";
+  document.getElementById("map").style.marginBottom = "0";
+}

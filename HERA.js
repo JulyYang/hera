@@ -60,10 +60,34 @@ var basemap = new ol.layer.Tile({
   source: new ol.source.OSM()
 });
 
+var countyvector = new ol.layer.Vector({
+  source: new ol.source.Vector({
+    renderMode: 'image', // Vector layers are rendered as images. Better performance. Default is 'vector'.
+    format: new ol.format.GeoJSON(),
+    url: function (extent) {
+      return 'http://hera1.oasis.unc.edu:8080/geoserver/hera/wfs?service=WFS' +
+        '&version=1.0.0&request=GetFeature' +
+        '&typeName=hera:tl_nc_county' +
+        '&outputFormat=application/json&srsname=EPSG:4326'
+      // '&CQL_FILTER=stusps=%27NC%27'
+    },
+    strategy: ol.loadingstrategy.bbox,
+  }),
+  style: new ol.style.Style({
+    fill: new ol.style.Fill({
+      color: [255, 255, 255, 0],
+    }),
+    stroke: new ol.style.Stroke({
+      color: '#867E77',
+      width: 0.1
+    })
+  }),
+});
+
 var view = new ol.View({
   // projection: 'EPSG:3857',
   center: ol.proj.fromLonLat([-79.5, 34.9]),
-  zoom: 7.5
+  zoom: 8
 
 });
 
@@ -91,34 +115,35 @@ var map = new ol.Map({
         new ol.layer.Group({
           title: "North and South Carolina county",
           type: 'base',
-          combine: true,
+          // combine: true,
           visible: true,
           layers: [
             basemap,
 
-            new ol.layer.Vector({
-              source: new ol.source.Vector({
-                renderMode: 'image', // Vector layers are rendered as images. Better performance. Default is 'vector'.
-                format: new ol.format.GeoJSON(),
-                url: function (extent) {
-                  return 'http://hera1.oasis.unc.edu:8080/geoserver/hera/wfs?service=WFS' +
-                    '&version=1.0.0&request=GetFeature' +
-                    '&typeName=hera:tl_nc_county' +
-                    '&outputFormat=application/json&srsname=EPSG:4326'
-                  // '&CQL_FILTER=stusps=%27NC%27'
-                },
-                strategy: ol.loadingstrategy.bbox,
-              }),
-              style: new ol.style.Style({
-                fill: new ol.style.Fill({
-                  color: [255, 255, 255, 0],
-                }),
-                stroke: new ol.style.Stroke({
-                  color: '#867E77',
-                  width: 0.1
-                })
-              }),
-            })
+            countyvector
+            // new ol.layer.Vector({
+            //   source: new ol.source.Vector({
+            //     renderMode: 'image', // Vector layers are rendered as images. Better performance. Default is 'vector'.
+            //     format: new ol.format.GeoJSON(),
+            //     url: function (extent) {
+            //       return 'http://hera1.oasis.unc.edu:8080/geoserver/hera/wfs?service=WFS' +
+            //         '&version=1.0.0&request=GetFeature' +
+            //         '&typeName=hera:tl_nc_county' +
+            //         '&outputFormat=application/json&srsname=EPSG:4326'
+            //       // '&CQL_FILTER=stusps=%27NC%27'
+            //     },
+            //     strategy: ol.loadingstrategy.bbox,
+            //   }),
+            //   style: new ol.style.Style({
+            //     fill: new ol.style.Fill({
+            //       color: [255, 255, 255, 0],
+            //     }),
+            //     stroke: new ol.style.Stroke({
+            //       color: '#867E77',
+            //       width: 0.1
+            //     })
+            //   }),
+            // })
 
           ]
         }),
@@ -144,32 +169,37 @@ var map = new ol.Map({
         // }),
 
         new ol.layer.Tile({
-          title: "NC Winter Weather ",
+          // title: "NC Winter Weather ",
+          title: "Winter Weather ",
           visible: false,
           source: WMSsource_oasis('hera:nc_ww_sql')
         }),
 
         new ol.layer.Tile({
-          title: "NC Floods ",
+          // title: "NC Floods ",
+          title: "Floods ",
           visible: false,
           source: WMSsource_oasis('hera:nc_floods_sql')
           // layers: createGroupedLyrs('hera:nc_floods_sql', "minYear:2010-01-01;maxYear:2018-12-31;sublist:'FA'\\,'CF'")
         }),
 
         new ol.layer.Tile({
-          title: "NC High Winds ",
+          // title: "NC High Winds ",
+          title: "High Winds ",
           visible: true,
           source: WMSsource_oasis('hera:nc_hw_sql')
         }),
 
         new ol.layer.Tile({
-          title: "NC Heat ",
+          // title: "NC Heat ",
+          title: "Heat ",
           visible: false,
           source: WMSsource_oasis('hera:nc_heats_sql')
         }),
 
         new ol.layer.Tile({
-          title: "NC Hails ",
+          // title: "NC Hails ",
+          title: "Hails ",
           visible: false,
           source: WMSsource_oasis('hera:nc_hl_sql')
         }),
@@ -551,11 +581,11 @@ function createTabTable(attributeTableID, layerID, properties) {
 };
 
 createTabTable('#attributeTb', 'nc_ww_sql', [{
-  //   "title": "FIPS",
-  //   data: "properties.fips",
-  //   "class": "center"
-  // },
-  // {
+    //   "title": "FIPS",
+    //   data: "properties.fips",
+    //   "class": "center"
+    // },
+    // {
     "title": "County",
     data: "properties.county",
     "class": "center"
@@ -568,11 +598,11 @@ createTabTable('#attributeTb', 'nc_ww_sql', [{
 ], );
 
 createTabTable('#attributeTb2', 'nc_floods_sql', [{
-  //   "title": "FIPS",
-  //   data: "properties.fips",
-  //   "class": "center"
-  // },
-  // {
+    //   "title": "FIPS",
+    //   data: "properties.fips",
+    //   "class": "center"
+    // },
+    // {
     "title": "County",
     data: "properties.county",
     "class": "center"
@@ -585,11 +615,11 @@ createTabTable('#attributeTb2', 'nc_floods_sql', [{
 ], );
 
 createTabTable('#attributeTb3', 'nc_hw_sql', [{
-  //   "title": "FIPS",
-  //   data: "properties.fips",
-  //   "class": "center"
-  // },
-  // {
+    //   "title": "FIPS",
+    //   data: "properties.fips",
+    //   "class": "center"
+    // },
+    // {
     "title": "County",
     data: "properties.county",
     "class": "center"
@@ -964,6 +994,7 @@ updateMapBtn.onclick = function () {
   })[0];
   let lyrGroups = lyrs.getLayers().getArray();
   let selectedLyr = lyrGroups.filter(l => l.get('title') == selectedLayer);
+  console.log(selectedLyr);
   // added to test non selected layers
   let nonselectedLyr = lyrGroups.filter(l => l.get('title') != selectedLayer);
   // console.log(selectedLyr[0].getLayersArray());
@@ -988,25 +1019,25 @@ targetLayer.onchange = function () {
   check.innerHTML = '';
   // subCategory.options.length = 0;
   switch (this.value) {
-    case 'NC Floods ':
+    case 'Floods ':
       sub = ['FA', 'FL', 'FF', 'CF'];
       $('.slider-time').html('2006');
       $('.slider-time2').html('2019');
 
       break;
-    case 'NC Winter Weather ':
+    case 'Winter Weather ':
       sub = ['BZ', 'WC', 'WW', 'HS', 'SN', 'ZR', 'IS', 'WS'];
       $('.slider-time').html('2006');
       $('.slider-time2').html('2019');
 
       break;
-    case 'NC Heat ', 'NC Hails ':
+    case 'Heat ', 'Hails ':
       sub = [];
       $('.slider-time').html('2006');
       $('.slider-time2').html('2019');
       // check.style.visibility = 'hidden';
       break;
-    case 'NC High Winds ':
+    case 'High Winds ':
       sub = ['Gale Force', 'Storm Force', 'Hurricane Force'];
       $('.slider-time').html('1989');
       $('.slider-time2').html('2018');
@@ -1112,4 +1143,60 @@ function openNav() {
 function closeNav() {
   document.getElementById("tableSidenav").style.height = "0";
   document.getElementById("map").style.marginBottom = "0";
+}
+
+
+let viewObject = {
+  'nc': [-79.5, 34.9],
+  'sc': [-80.98, 33]
+}
+
+var statepicker = document.getElementById('state-picker');
+
+statepicker.onchange = function (e) {
+  let selstate = e.srcElement.value;
+  let baselyrs = map.getLayerGroup().getLayers().array_.filter(e => {
+    return e.values_.title == 'Base maps'
+  })[0];
+
+
+  let statelyr = baselyrs.getLayersArray().filter(l => l.type == 'VECTOR')[0];
+
+  let newsource = new ol.source.Vector({
+    renderMode: 'image', // Vector layers are rendered as images. Better performance. Default is 'vector'.
+    format: new ol.format.GeoJSON(),
+    url: function (extent) {
+      return 'http://hera1.oasis.unc.edu:8080/geoserver/hera/wfs?service=WFS' +
+        '&version=1.0.0&request=GetFeature' +
+        '&typeName=hera:tl_' + selstate + '_county' +
+        '&outputFormat=application/json&srsname=EPSG:4326'
+    },
+    strategy: ol.loadingstrategy.bbox,
+  });
+  statelyr.setSource(newsource);
+
+  let lyrs = map.getLayerGroup().getLayers().array_.filter(e => {
+    return e.values_.title == 'Layers'
+  })[0];
+
+  let lyrsArray = lyrs.getLayersArray();
+  let newurl = 'http://152.7.99.155:8080/geoserver/hera/wfs?service=WFS' +
+    '&version=1.0.0&request=GetFeature' +
+    '&typeName=hera:tl_' + selstate + '_county' +
+    '&outputFormat=application/json&srsname=EPSG:4326' +
+    '&bbox=-84.321821,31.995954,-75.400119,36.588137';
+
+  lyrsArray.forEach(function (l) {
+    newl = l.getSource().getParams()['LAYERS'].replace('nc', 'sc');
+    l.getSource().updateParams({
+      LAYERS: newl
+    })
+  });
+
+
+  let newView = new ol.View({
+    center: ol.proj.fromLonLat(viewObject[selstate]),
+    zoom: 8
+  });
+  map.setView(newView);
 }

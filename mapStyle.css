@@ -179,7 +179,7 @@ body {
     font-family:"Arial", sans-serif;
     font-size:14px;
     color:#333;
-    display: inline-block;
+    /* display: inline-block; */
 }
 .ui-slider-horizontal {
     height: 8px;
@@ -347,6 +347,7 @@ body {
 
   #filterDiv {
     float: right;
+    /* z-index: 2000; */
   }
 
   #subheader {

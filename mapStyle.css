@@ -175,6 +175,11 @@ body {
   background-repeat: no-repeat;
 } */
 
+#time-range {
+  z-index: 3000;
+  position: absolute;
+}
+
 #time-range p {
     font-family:"Arial", sans-serif;
     font-size:14px;

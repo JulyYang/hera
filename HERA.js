@@ -179,7 +179,8 @@ var map = new ol.Map({
           // title: "NC Floods ",
           title: "Floods ",
           visible: false,
-          source: WMSsource_oasis('hera:nc_floods_sql')
+          // source: WMSsource_oasis('hera:nc_floods_sql')
+          source: WMSsource_oasis('hera:nc_floods_sql_2')
           // layers: createGroupedLyrs('hera:nc_floods_sql', "minYear:2010-01-01;maxYear:2018-12-31;sublist:'FA'\\,'CF'")
         }),
 
@@ -409,8 +410,11 @@ let createContent = function (lyr, selected) {
   let flength = Object.keys(selected).length;
   let probaArray = [];
   let probability = 0;
-  let startyear = parseInt($('.slider-time').html());
-  let endyear = parseInt($('.slider-time2').html());
+  // let startyear = parseInt($('.slider-time').html());
+  // let endyear = parseInt($('.slider-time2').html());
+  let startyear = selected[Object.keys(selected)[0]]['minyear'];
+  console.log(startyear);
+  let endyear = selected[Object.keys(selected)[0]]['maxyear'];
 
 
   Object.keys(selected).forEach(function (key) {
@@ -439,7 +443,7 @@ let createContent = function (lyr, selected) {
     });
     probability = (probaArray.length / (endyear - startyear + 1) * 100).toFixed(2) + '%';
     console.log(probability);
-    content.innerHTML = '<h5>Selected County: ' + counties + '</h5><br><p>Year: 1989-2018</p><br><p>Total count: ' +
+    content.innerHTML = '<h5>Selected County: ' + counties + '</h5><br><p>Year: '+ startyear + '-'+ endyear +'</p><br><p>Total count: ' +
       total + '</p><br><p>Probability: ' + probability + '</p>';
   })
 };
@@ -830,14 +834,15 @@ $('a[href="#about-tabpanel-2"]').click(function (e) {
 
 $(function () {
   $("#dialog").dialog({
-    autoOpen: false,
+    autoOpen: true,
     modal: false,
-    minHeight: 400,
-    minWidth: 300,
+    minHeight: 300,
+    // width: 'auto',
+    minWidth: 180,
     close: function (e, ui) {
       $('#toggle').bootstrapToggle('off');
       $(this).dialog("close");
-    }
+    },
     // resizable: true
   });
 });
@@ -846,7 +851,7 @@ $(function () {
 let legendBtn = document.getElementById("updateLegend");
 let legendImg = document.getElementById("legend");
 let legendSrc = "http://hera1.oasis.unc.edu:8080/geoserver/hera/wms?&REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER="
-let firstLyr = 'hera:ncsc_isa_lyr';
+let firstLyr = 'hera:nc_hw_sql';
 legendImg.src = legendSrc + firstLyr;
 // legendImg.src = legendSrc + 'hera:ncsc_isa_lyr';
 
@@ -956,7 +961,7 @@ function refreshSource(lyrname, params, l) {
 }
 
 let lyrObject = {
-  'NC Floods ': 'hera:nc_floods_sql',
+  'NC Floods ': 'hera:nc_floods_sql_2',
   "NC Heat ": 'hera:nc_heats_sql',
   "NC Winter Weather ": 'hera:nc_ww_sql',
   "NC High Winds ": 'hera:nc_hw_sql',
@@ -996,18 +1001,18 @@ updateMapBtn.onclick = function () {
   let selectedLyr = lyrGroups.filter(l => l.get('title') == selectedLayer);
   console.log(selectedLyr);
   // added to test non selected layers
-  let nonselectedLyr = lyrGroups.filter(l => l.get('title') != selectedLayer);
-  // console.log(selectedLyr[0].getLayersArray());
-  let lyrname = selectedLyr[0].getLayersArray()[0].getSource().getParams()['LAYERS'];
+  // let nonselectedLyr = lyrGroups.filter(l => l.get('title') != selectedLayer);
+  // // console.log(selectedLyr[0].getLayersArray());
+  // let lyrname = selectedLyr[0].getLayersArray()[0].getSource().getParams()['LAYERS'];
 
   // Update WMS layer
   selectedLyr[0].getLayersArray()[0].getSource().updateParams({
     'viewparams': params
   });
 
-  // test lyr visibility
-  nonselectedLyr.forEach(l => l.setVisible(false));
-  selectedLyr[0].getLayersArray()[0].setVisible(true);
+  // // test lyr visibility
+  // nonselectedLyr.forEach(l => l.setVisible(false));
+  // selectedLyr[0].getLayersArray()[0].setVisible(true);
 
   // Update WFS layer
   // let wfsl = selectedLyr[0].getLayersArray()[1];
@@ -1015,6 +1020,19 @@ updateMapBtn.onclick = function () {
 }
 
 targetLayer.onchange = function () {
+  let selectedLayer = form.querySelector('#target-layer').value;
+
+  let lyrs = map.getLayerGroup().getLayers().array_.filter(e => {
+    return e.values_.title == 'Layers'
+  })[0];
+  let lyrGroups = lyrs.getLayers().getArray();
+  let selectedLyr = lyrGroups.filter(l => l.get('title') == selectedLayer);
+  let nonselectedLyr = lyrGroups.filter(l => l.get('title') != selectedLayer);
+  nonselectedLyr.forEach(l => l.setVisible(false));
+  selectedLyr[0].getLayersArray()[0].setVisible(true);
+  // selectedLyr[0].getLayersArray()[0].getSource().getFeatureInfoUrl()
+  
+
   console.log(this.value);
   check.innerHTML = '';
   // subCategory.options.length = 0;
@@ -1061,7 +1079,13 @@ targetLayer.onchange = function () {
     // check.appendChild(input);
     check.appendChild(l);
     // check.appendChild(document.createElement('br'));
-  }
+  };
+
+  document.getElementsByClassName('ui-slider-handle ui-corner-all ui-state-default')[0].style.left = '0%';
+  document.getElementsByClassName('ui-slider-handle ui-corner-all ui-state-default')[1].style.left = '100%';
+  document.getElementsByClassName('ui-slider-range ui-corner-all ui-widget-header')[0].style.left = '0%';
+  document.getElementsByClassName('ui-slider-range ui-corner-all ui-widget-header')[0].style.width = '100%';
+
 }
 
 var expanded = false;
@@ -1187,7 +1211,12 @@ statepicker.onchange = function (e) {
     '&bbox=-84.321821,31.995954,-75.400119,36.588137';
 
   lyrsArray.forEach(function (l) {
-    newl = l.getSource().getParams()['LAYERS'].replace('nc', 'sc');
+    let newlstring = l.getSource().getParams()['LAYERS'].split('_');
+    if (newlstring[0] != selstate){
+      newlstring[0] = selstate
+    };
+    let newl = newlstring.join('_');
+    // newl = l.getSource().getParams()['LAYERS'].replace('nc', 'sc');
     l.getSource().updateParams({
       LAYERS: newl
     })

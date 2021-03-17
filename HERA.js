@@ -420,7 +420,7 @@ let createContent = function (lyr, selected) {
     });
     probability = (probaArray.length / (endyear - startyear + 1) * 100).toFixed(2) + '%';
     console.log(probability);
-    content.innerHTML = '<h5>Selected County: ' + counties + '</h5><br><p>Year: '+ startyear + '-'+ endyear +'</p><br><p>Total count: ' +
+    content.innerHTML = '<h5>Selected County: ' + counties + '</h5><br><p>Year: ' + startyear + '-' + endyear + '</p><br><p>Total count: ' +
       total + '</p><br><p>Probability: ' + probability + '</p>';
   })
 };
@@ -824,30 +824,14 @@ $(function () {
 });
 
 
-let legendBtn = document.getElementById("updateLegend");
 let legendImg = document.getElementById("legend");
 let legendSrc = "http://hera1.oasis.unc.edu:8080/geoserver/hera/wms?&REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER="
 let firstLyr = 'hera:hw_sql';
 legendImg.src = legendSrc + firstLyr;
-// legendImg.src = legendSrc + 'hera:ncsc_isa_lyr';
 
-legendBtn.onclick = function () {
-  let currentLyrs = map.getLayerGroup().getLayers().array_;
-  let lyrsGroup = currentLyrs.filter(e => {
-    return e.values_.title == 'Layers'
-  })[0];
-  let tilelyrs = lyrsGroup.getLayersArray().filter(e => {
-    return e.type == 'TILE'
-  });
-  // console.log(tilelyrs);
-
-  for (l of tilelyrs) {
-    if (l.state_.visible) {
-      firstLyr = l.getSource().params_.LAYERS;
-      legendImg.src = legendSrc + firstLyr;
-    }
-  }
-
+updateLegend = function (l) {
+  firstLyr = l.getSource().params_.LAYERS;
+  legendImg.src = legendSrc + firstLyr;
 };
 
 function testtoggle() {
@@ -985,8 +969,9 @@ targetLayer.onchange = function () {
 
   nonselectedLyr.forEach(l => l.setVisible(false));
   selectedLyr[0].getLayersArray()[0].setVisible(true);
+  updateLegend(selectedLyr[0]);
   // selectedLyr[0].getLayersArray()[0].getSource().getFeatureInfoUrl()
-  
+
 
   console.log(this.value);
   check.innerHTML = '';

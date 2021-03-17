@@ -121,30 +121,6 @@ var map = new ol.Map({
             basemap,
 
             countyvector
-            // new ol.layer.Vector({
-            //   source: new ol.source.Vector({
-            //     renderMode: 'image', // Vector layers are rendered as images. Better performance. Default is 'vector'.
-            //     format: new ol.format.GeoJSON(),
-            //     url: function (extent) {
-            //       return 'http://hera1.oasis.unc.edu:8080/geoserver/hera/wfs?service=WFS' +
-            //         '&version=1.0.0&request=GetFeature' +
-            //         '&typeName=hera:tl_nc_county' +
-            //         '&outputFormat=application/json&srsname=EPSG:4326'
-            //       // '&CQL_FILTER=stusps=%27NC%27'
-            //     },
-            //     strategy: ol.loadingstrategy.bbox,
-            //   }),
-            //   style: new ol.style.Style({
-            //     fill: new ol.style.Fill({
-            //       color: [255, 255, 255, 0],
-            //     }),
-            //     stroke: new ol.style.Stroke({
-            //       color: '#867E77',
-            //       width: 0.1
-            //     })
-            //   }),
-            // })
-
           ]
         }),
       ]
@@ -169,10 +145,10 @@ var map = new ol.Map({
         // }),
 
         new ol.layer.Tile({
-          // title: "NC Winter Weather ",
           title: "Winter Weather ",
           visible: false,
-          source: WMSsource_oasis('hera:nc_ww_sql')
+          // source: WMSsource_oasis('hera:nc_ww_sql')
+          source: WMSsource_oasis('hera:ww_sql', "state:nc")
         }),
 
         new ol.layer.Tile({
@@ -180,29 +156,30 @@ var map = new ol.Map({
           title: "Floods ",
           visible: false,
           // source: WMSsource_oasis('hera:nc_floods_sql')
-          source: WMSsource_oasis('hera:nc_floods_sql_2')
+          // source: WMSsource_oasis('hera:nc_floods_sql_2')
+          source: WMSsource_oasis('hera:floods_sql', "state:nc")
           // layers: createGroupedLyrs('hera:nc_floods_sql', "minYear:2010-01-01;maxYear:2018-12-31;sublist:'FA'\\,'CF'")
         }),
 
         new ol.layer.Tile({
-          // title: "NC High Winds ",
           title: "High Winds ",
           visible: true,
-          source: WMSsource_oasis('hera:nc_hw_sql')
+          // source: WMSsource_oasis('hera:nc_hw_sql')
+          source: WMSsource_oasis('hera:hw_sql', "state:nc")
         }),
 
         new ol.layer.Tile({
-          // title: "NC Heat ",
           title: "Heat ",
           visible: false,
-          source: WMSsource_oasis('hera:nc_heats_sql')
+          // source: WMSsource_oasis('hera:nc_heats_sql')
+          source: WMSsource_oasis('hera:heats_sql', "state:nc")
         }),
 
         new ol.layer.Tile({
-          // title: "NC Hails ",
           title: "Hails ",
           visible: false,
-          source: WMSsource_oasis('hera:nc_hl_sql')
+          // source: WMSsource_oasis('hera:nc_hl_sql')
+          source: WMSsource_oasis('hera:hl_sql', "state:nc")
         }),
 
       ]
@@ -456,7 +433,6 @@ $(document).keyup(function (event) {
   shiftPressed = false;
 });
 
-// var selected = [];
 var selected = {};
 
 map.on('singleclick', function (evt) {
@@ -851,7 +827,7 @@ $(function () {
 let legendBtn = document.getElementById("updateLegend");
 let legendImg = document.getElementById("legend");
 let legendSrc = "http://hera1.oasis.unc.edu:8080/geoserver/hera/wms?&REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER="
-let firstLyr = 'hera:nc_hw_sql';
+let firstLyr = 'hera:hw_sql';
 legendImg.src = legendSrc + firstLyr;
 // legendImg.src = legendSrc + 'hera:ncsc_isa_lyr';
 
@@ -960,36 +936,22 @@ function refreshSource(lyrname, params, l) {
   l.setSource(newsource);
 }
 
-let lyrObject = {
-  'NC Floods ': 'hera:nc_floods_sql_2',
-  "NC Heat ": 'hera:nc_heats_sql',
-  "NC Winter Weather ": 'hera:nc_ww_sql',
-  "NC High Winds ": 'hera:nc_hw_sql',
-  "NC Hails ": 'hera:nc_hl_sql'
-};
-
 updateMapBtn.onclick = function () {
   overlay.setPosition(undefined);
+  let selectedState = form.querySelector('#state-picker').value;
   let selectedLayer = form.querySelector('#target-layer').value;
   let minYear = form.querySelector('.slider-time').innerHTML.replace(/\//g, "-");
   let maxYear = form.querySelector('.slider-time2').innerHTML.replace(/\//g, "-");
   let categories = [];
-  let params;
+  let params = "state:" + selectedState + ";";
 
-  let testlayer = new ol.layer.Tile({
-    title: selectedLayer,
-    visible: false,
-    source: WMSsource_oasis(lyrObject[selectedLayer])
-  });
-
-  // map.addLayer(testlayer);
 
   form.querySelectorAll('input[type="checkbox"]:checked').forEach(i => categories.push("'" + i.name + "'"));
   // let params = "minYear:" + minYear + ";maxYear:" + maxYear + ";sublist:" + "'CF'\\,'FA'";
   if (categories.length > 0) {
-    params = "minYear:" + minYear + ";maxYear:" + maxYear + ";sublist:" + categories.join("\\,");
+    params += "minYear:" + minYear + ";maxYear:" + maxYear + ";sublist:" + categories.join("\\,");
   } else {
-    params = "minYear:" + minYear + ";maxYear:" + maxYear;
+    params += "minYear:" + minYear + ";maxYear:" + maxYear;
   }
   // let params = "sublist:" + categories.join("\\,");
   console.log(params);
@@ -1000,19 +962,11 @@ updateMapBtn.onclick = function () {
   let lyrGroups = lyrs.getLayers().getArray();
   let selectedLyr = lyrGroups.filter(l => l.get('title') == selectedLayer);
   console.log(selectedLyr);
-  // added to test non selected layers
-  // let nonselectedLyr = lyrGroups.filter(l => l.get('title') != selectedLayer);
-  // // console.log(selectedLyr[0].getLayersArray());
-  // let lyrname = selectedLyr[0].getLayersArray()[0].getSource().getParams()['LAYERS'];
 
   // Update WMS layer
   selectedLyr[0].getLayersArray()[0].getSource().updateParams({
     'viewparams': params
   });
-
-  // // test lyr visibility
-  // nonselectedLyr.forEach(l => l.setVisible(false));
-  // selectedLyr[0].getLayersArray()[0].setVisible(true);
 
   // Update WFS layer
   // let wfsl = selectedLyr[0].getLayersArray()[1];
@@ -1028,6 +982,7 @@ targetLayer.onchange = function () {
   let lyrGroups = lyrs.getLayers().getArray();
   let selectedLyr = lyrGroups.filter(l => l.get('title') == selectedLayer);
   let nonselectedLyr = lyrGroups.filter(l => l.get('title') != selectedLayer);
+
   nonselectedLyr.forEach(l => l.setVisible(false));
   selectedLyr[0].getLayersArray()[0].setVisible(true);
   // selectedLyr[0].getLayersArray()[0].getSource().getFeatureInfoUrl()
@@ -1204,21 +1159,11 @@ statepicker.onchange = function (e) {
   })[0];
 
   let lyrsArray = lyrs.getLayersArray();
-  let newurl = 'http://152.7.99.155:8080/geoserver/hera/wfs?service=WFS' +
-    '&version=1.0.0&request=GetFeature' +
-    '&typeName=hera:tl_' + selstate + '_county' +
-    '&outputFormat=application/json&srsname=EPSG:4326' +
-    '&bbox=-84.321821,31.995954,-75.400119,36.588137';
 
   lyrsArray.forEach(function (l) {
-    let newlstring = l.getSource().getParams()['LAYERS'].split('_');
-    if (newlstring[0] != selstate){
-      newlstring[0] = selstate
-    };
-    let newl = newlstring.join('_');
-    // newl = l.getSource().getParams()['LAYERS'].replace('nc', 'sc');
     l.getSource().updateParams({
-      LAYERS: newl
+      // LAYERS: newl
+      'viewparams': 'state:' + selstate
     })
   });
 

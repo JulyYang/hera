@@ -60,29 +60,20 @@ var basemap = new ol.layer.Tile({
   source: new ol.source.OSM()
 });
 
-var countyvector = new ol.layer.Vector({
-  source: new ol.source.Vector({
+var boundarySource = function (state) {
+  return new ol.source.Vector({
     renderMode: 'image', // Vector layers are rendered as images. Better performance. Default is 'vector'.
     format: new ol.format.GeoJSON(),
     url: function (extent) {
       return 'http://hera1.oasis.unc.edu:8080/geoserver/hera/wfs?service=WFS' +
         '&version=1.0.0&request=GetFeature' +
-        '&typeName=hera:tl_nc_county' +
+        '&typeName=hera:tl_' + state + '_county' +
         '&outputFormat=application/json&srsname=EPSG:4326'
       // '&CQL_FILTER=stusps=%27NC%27'
     },
     strategy: ol.loadingstrategy.bbox,
-  }),
-  style: new ol.style.Style({
-    fill: new ol.style.Fill({
-      color: [255, 255, 255, 0],
-    }),
-    stroke: new ol.style.Stroke({
-      color: '#867E77',
-      width: 0.1
-    })
-  }),
-});
+  });
+};
 
 var view = new ol.View({
   // projection: 'EPSG:3857',
@@ -120,7 +111,19 @@ var map = new ol.Map({
           layers: [
             basemap,
 
-            countyvector
+            new ol.layer.Vector({
+              source: boundarySource('nc'),
+              style: new ol.style.Style({
+                fill: new ol.style.Fill({
+                  color: [255, 255, 255, 0],
+                }),
+                stroke: new ol.style.Stroke({
+                  color: '#867E77',
+                  width: 0.1
+                })
+              }),
+            }),
+
           ]
         }),
       ]
@@ -1126,17 +1129,8 @@ statepicker.onchange = function (e) {
 
   let statelyr = baselyrs.getLayersArray().filter(l => l.type == 'VECTOR')[0];
 
-  let newsource = new ol.source.Vector({
-    renderMode: 'image', // Vector layers are rendered as images. Better performance. Default is 'vector'.
-    format: new ol.format.GeoJSON(),
-    url: function (extent) {
-      return 'http://hera1.oasis.unc.edu:8080/geoserver/hera/wfs?service=WFS' +
-        '&version=1.0.0&request=GetFeature' +
-        '&typeName=hera:tl_' + selstate + '_county' +
-        '&outputFormat=application/json&srsname=EPSG:4326'
-    },
-    strategy: ol.loadingstrategy.bbox,
-  });
+  let newsource = boundarySource(selstate);
+
   statelyr.setSource(newsource);
 
   let lyrs = map.getLayerGroup().getLayers().array_.filter(e => {

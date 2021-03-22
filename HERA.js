@@ -249,152 +249,17 @@ map.on('pointermove', function (e) {
 });
 
 
-// let createContent = function (lyr, features) {
-//   var counties = '';
-//   var total = 0;
-//   var probaArray = [];
-//   var probability = 0;
-//   let startyear = parseInt($('.slider-time').html());
-//   let endyear = parseInt($('.slider-time2').html());
-//   switch (lyr) {
-//     case 'ncsc_population_lyr':
-//       for (f of features) {
-//         counties += f.get('county') + ', ';
-//         total += f.get('population');
-//       }
-//       averagePopulation = Math.round((total / features.length));
-//       content.innerHTML = '<h5>Selected County: ' + counties + '</h5><br><p>2017 Population: ' + averagePopulation + '</p>';
-//       break;
-//     case 'ncsc_isa_lyr':
-//       for (f of features) {
-//         counties += f.get('county') + ', ';
-//         total += f.get('percent_isa');
-//       }
-//       averageIsa = (total / features.length * 100).toFixed(2);
-//       content.innerHTML = '<h5>Selected County: ' + counties + '</h5><br><p>2015 ISA: ' + averageIsa + '</p>';
-//       break;
-//     case 'nc_floods_sql':
-//       for (f of features) {
-//         counties += f.get('county') + ', ';
-//         total += f.get('count');
-//         features[0].getKeys().filter(i =>
-//           endyear >= parseInt(i.slice(1)) && parseInt(i.slice(1)) >= startyear && f.get(i) != null
-//         ).forEach(i => {
-//           if (!probaArray.includes(i)) {
-//             probaArray.push(i)
-//           }
-//         });
-//       }
-//       // Create an array of the year headers based on the year range, e.g. 'y2006',...,'y2019'
-//       // var newarray = [...Array(2019-2006+1).keys()].map(i => 'y' + (i+2006).toString()) 
-//       // var testarray = features[0].getKeys().filter(i => newarray.includes(i)&& features[0].get(i) != null);
-
-//       // var testarray = features[0].getKeys().filter(i =>
-//       //   endyear >= parseInt(i.slice(1)) && parseInt(i.slice(1)) >= startyear && features[0].get(i) != null
-//       // );
-
-//       // console.log(probaArray);
-//       probability = (probaArray.length / (endyear - startyear + 1) * 100).toFixed(2) + '%';
-
-//       console.log(startyear, endyear);
-//       average = (total / features.length).toFixed(2);
-//       content.innerHTML = '<b>Layer: </b>Floods<br>' + '<h5>Selected County: ' + counties + '</h5><br><p>Year: 2006-2019</p><br><p>Total count: ' +
-//         total + '</p><br><p>Probability: ' + probability + '</p><br><p>Average count: ' + average + '</p>';
-//       // content.innerHTML = 'Number of records: ' + total;
-//       break;
-//     case 'nc_ww_sql':
-//       for (f of features) {
-//         counties += f.get('county') + ', ';
-//         total += f.get('count');
-//         features[0].getKeys().filter(i =>
-//           endyear >= parseInt(i.slice(1)) && parseInt(i.slice(1)) >= startyear && f.get(i) != null
-//         ).forEach(i => {
-//           if (!probaArray.includes(i)) {
-//             probaArray.push(i)
-//           }
-//         });
-//       };
-//       probability = (probaArray.length / (endyear - startyear + 1) * 100).toFixed(2) + '%';
-//       average = (total / features.length).toFixed(2);
-//       content.innerHTML = '<b>Layer: </b>Winter Weather<br>' + '<h5>Selected County: ' + counties + '</h5><br><p>Year: 2006-2019</p><br><p>Total count: ' +
-//         total + '</p><br><p>Probability: ' + probability + '</p><br><p>Average count: ' + average + '</p>';
-//       // content.innerHTML = 'Number of records: ' + total;
-//       break;
-//     case 'nc_hw_sql':
-//       for (f of features) {
-//         counties += f.get('county') + ', ';
-//         total += f.get('count');
-//         features[0].getKeys().filter(i =>
-//           endyear >= parseInt(i.slice(1)) && parseInt(i.slice(1)) >= startyear && f.get(i) != null
-//         ).forEach(i => {
-//           if (!probaArray.includes(i)) {
-//             probaArray.push(i)
-//           }
-//         });
-//       };
-//       // console.log(endyear, startyear)
-//       // endyear = 2018;
-//       // startyear = 1989;
-//       probability = (probaArray.length / (endyear - startyear + 1) * 100).toFixed(2) + '%';
-//       average = (total / features.length).toFixed(2);
-//       content.innerHTML = '<b>Layer: </b>High Winds<br>' + '<h5>Selected County: ' + counties + '</h5><br><p>Year: 1989-2018</p><br><p>Total count: ' +
-//         total + '</p><br><p>Probability: ' + probability + '</p><br><p>Average count: ' + average + '</p>';
-//       // content.innerHTML = 'Number of records: ' + total;
-//       break;
-//     case 'nc_hl_sql':
-//       for (f of features) {
-//         counties += f.get('county') + ', ';
-//         total += f.get('count');
-//         features[0].getKeys().filter(i =>
-//           endyear >= parseInt(i.slice(1)) && parseInt(i.slice(1)) >= startyear && f.get(i) != null
-//         ).forEach(i => {
-//           if (!probaArray.includes(i)) {
-//             probaArray.push(i)
-//           }
-//         });
-//       };
-//       // console.log(endyear, startyear)
-//       // endyear = 2018;
-//       // startyear = 1989;
-//       probability = (probaArray.length / (endyear - startyear + 1) * 100).toFixed(2) + '%';
-//       average = (total / features.length).toFixed(2);
-//       content.innerHTML = '<b>Layer: </b>Hails<br>' + '<h5>Selected County: ' + counties + '</h5><br><p>Year: 1989-2018</p><br><p>Total count: ' +
-//         total + '</p><br><p>Probability: ' + probability + '</p><br><p>Average count: ' + average + '</p>';
-//       // content.innerHTML = 'Number of records: ' + total;
-//       break;
-//     case 'nc_heats_sql':
-//       for (f of features) {
-//         counties += f.get('county') + ', ';
-//         total += f.get('count');
-//         features[0].getKeys().filter(i =>
-//           endyear >= parseInt(i.slice(1)) && parseInt(i.slice(1)) >= startyear && f.get(i) != null
-//         ).forEach(i => {
-//           if (!probaArray.includes(i)) {
-//             probaArray.push(i)
-//           }
-//         });
-//       };
-//       probability = (probaArray.length / (endyear - startyear + 1) * 100).toFixed(2) + '%';
-//       average = (total / features.length).toFixed(2);
-//       content.innerHTML = '<b>Layer: </b>Heat<br>' + '<h5>Selected County: ' + counties + '</h5><br><p>Year: 2006-2019</p><br><p>Total count: ' +
-//         total + '</p><br><p>Probability: ' + probability + '</p><br><p>Average count: ' + average + '</p>';
-//       // content.innerHTML = 'Number of records: ' + total;
-//       break;
-
-//   }
-// }
-
 let createContent = function (lyr, selected) {
   let counties = '';
   let total = 0;
   let flength = Object.keys(selected).length;
   let probaArray = [];
   let probability = 0;
-  // let startyear = parseInt($('.slider-time').html());
-  // let endyear = parseInt($('.slider-time2').html());
-  let startyear = selected[Object.keys(selected)[0]]['minyear'];
+  let startyear = parseInt($('.slider-time').html());
+  let endyear = parseInt($('.slider-time2').html());
+  // let startyear = selected[Object.keys(selected)[0]]['minyear'];
   console.log(startyear);
-  let endyear = selected[Object.keys(selected)[0]]['maxyear'];
+  // let endyear = selected[Object.keys(selected)[0]]['maxyear'];
 
 
   Object.keys(selected).forEach(function (key) {
@@ -440,6 +305,7 @@ var selected = {};
 
 map.on('singleclick', function (evt) {
   let coord = evt.coordinate;
+  console.log(coord);
   let resolution = map.getView().getResolution();
   let projection = map.getView().getProjection();
   let lyr;
@@ -848,14 +714,11 @@ function testtoggle() {
   }
 }
 
+$('.slider-time').html('1989'); // the years of time-slider when first loading, of high wind layer
+$('.slider-time2').html('2018');
 
-var dt_from = "2006/01/01";
-var dt_to = "2019/12/31";
-
-// $('.slider-time').html(dt_from);
-// $('.slider-time2').html(dt_to);
-$('.slider-time').html('2006');
-$('.slider-time2').html('2019');
+var dt_from = $('.slider-time').text() + '/01/01';
+var dt_to = $('.slider-time2').text() + '/12/31';
 var min_val = Date.parse(dt_from) / 1000;
 var max_val = Date.parse(dt_to) / 1000;
 
@@ -873,12 +736,11 @@ function formatDT(__dt) {
   return year;
 };
 
-
 $("#slider-range").slider({
   range: true,
   min: min_val,
   max: max_val,
-  step: 10,
+  // step: 10,
   values: [min_val, max_val],
   slide: function (e, ui) {
     var dt_cur_from = new Date(ui.values[0] * 1000); //.format("yyyy-mm-dd hh:ii:ss");
@@ -886,8 +748,9 @@ $("#slider-range").slider({
 
     var dt_cur_to = new Date(ui.values[1] * 1000); //.format("yyyy-mm-dd hh:ii:ss");                
     $('.slider-time2').html(formatDT(dt_cur_to));
-  }
+  },
 });
+
 
 let updateMapBtn = document.getElementById('updateMap');
 let targetLayer = document.getElementById('target-layer');
@@ -973,7 +836,43 @@ targetLayer.onchange = function () {
   nonselectedLyr.forEach(l => l.setVisible(false));
   selectedLyr[0].getLayersArray()[0].setVisible(true);
   updateLegend(selectedLyr[0]);
-  // selectedLyr[0].getLayersArray()[0].getSource().getFeatureInfoUrl()
+
+  // document.getElementsByClassName('ui-slider-handle ui-corner-all ui-state-default')[0].style.left = '0%';
+  // console.log(document.getElementsByClassName('ui-slider-handle ui-corner-all ui-state-default')[0].style.left);
+  // document.getElementsByClassName('ui-slider-handle ui-corner-all ui-state-default')[1].style.left = '100%';
+  // document.getElementsByClassName('ui-slider-range ui-corner-all ui-widget-header')[0].style.left = '0%';
+  // document.getElementsByClassName('ui-slider-range ui-corner-all ui-widget-header')[0].style.width = '100%';
+
+  // test to get the initial min year and max years from the layer
+  let selectedState = form.querySelector('#state-picker').value;
+  let testurl = selectedLyr[0].getLayersArray()[0].getSource().getGetFeatureInfoUrl(
+    ol.proj.transform(viewObject[selectedState], 'EPSG:4326', 'EPSG:3857'),
+    map.getView().getResolution(),
+    map.getView().getProjection(), {
+      'INFO_FORMAT': 'application/json',
+      'propertyName': 'minyear,maxyear',
+    }
+  );
+
+  fetch(testurl)
+    .then(function (response) {
+      return response.json();
+    })
+    .then(function (json) {
+      let currentf = json.features[0];
+      let currentp = currentf.properties;
+      let miny = currentp.minyear;
+      let maxy = currentp.maxyear;
+      // console.log(miny, ', max year: ', maxy)
+      $('.slider-time').html(miny);
+      $('.slider-time2').html(maxy);
+
+      $('#slider-range').slider({
+        min: Date.parse(miny + '/01/01') / 1000,
+        max: Date.parse(maxy + '/12/31') / 1000,
+        values: [Date.parse(miny + '/01/01') / 1000, Date.parse(maxy + '/12/31') / 1000]
+      })
+    });
 
 
   console.log(this.value);
@@ -982,29 +881,21 @@ targetLayer.onchange = function () {
   switch (this.value) {
     case 'Floods ':
       sub = ['FA', 'FL', 'FF', 'CF'];
-      $('.slider-time').html('2006');
-      $('.slider-time2').html('2019');
 
       break;
     case 'Winter Weather ':
       sub = ['BZ', 'WC', 'WW', 'HS', 'SN', 'ZR', 'IS', 'WS'];
-      $('.slider-time').html('2006');
-      $('.slider-time2').html('2019');
 
       break;
     case 'Heat ', 'Hails ':
       sub = [];
-      $('.slider-time').html('2006');
-      $('.slider-time2').html('2019');
       // check.style.visibility = 'hidden';
+
       break;
     case 'High Winds ':
       sub = ['Gale Force', 'Storm Force', 'Hurricane Force'];
-      $('.slider-time').html('1989');
-      $('.slider-time2').html('2018');
-      // dt_from = "1989/01/01";
-      // dt_to = "2018/12/31";
       // check.style.visibility = 'hidden';
+      
       break;
   }
 
@@ -1024,10 +915,11 @@ targetLayer.onchange = function () {
     // check.appendChild(document.createElement('br'));
   };
 
-  document.getElementsByClassName('ui-slider-handle ui-corner-all ui-state-default')[0].style.left = '0%';
-  document.getElementsByClassName('ui-slider-handle ui-corner-all ui-state-default')[1].style.left = '100%';
-  document.getElementsByClassName('ui-slider-range ui-corner-all ui-widget-header')[0].style.left = '0%';
-  document.getElementsByClassName('ui-slider-range ui-corner-all ui-widget-header')[0].style.width = '100%';
+  // document.getElementsByClassName('ui-slider-handle ui-corner-all ui-state-default')[0].style.left = '0%';
+  // console.log(document.getElementsByClassName('ui-slider-handle ui-corner-all ui-state-default')[0].style.left);
+  // document.getElementsByClassName('ui-slider-handle ui-corner-all ui-state-default')[1].style.left = '100%';
+  // document.getElementsByClassName('ui-slider-range ui-corner-all ui-widget-header')[0].style.left = '0%';
+  // document.getElementsByClassName('ui-slider-range ui-corner-all ui-widget-header')[0].style.width = '100%';
 
 }
 
@@ -1112,7 +1004,7 @@ function closeNav() {
   document.getElementById("map").style.marginBottom = "0";
 }
 
-
+// EPSG: 4326 for the map view
 let viewObject = {
   'nc': [-79.5, 34.9],
   'sc': [-80.98, 33]

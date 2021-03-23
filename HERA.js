@@ -315,7 +315,8 @@ map.on('singleclick', function (evt) {
       // return only layers with ol.source.TileWMS
       var source = layer.getSource();
       if (source instanceof ol.source.TileWMS) {
-        lyr = layer['values_']['source']['params_']['LAYERS'];
+        // lyr = layer['values_']['source']['params_']['LAYERS']; console.log('lyr: ', lyr);
+        lyr = source.params_.LAYERS; console.log(lyr);
         return source;
       }
     });
@@ -334,11 +335,7 @@ map.on('singleclick', function (evt) {
       })
       .then(function (json) {
         let featureid = json["features"][0]['id'];
-        // console.log(featureid);
-        // console.log(typeof(featureid));
         let properties = json["features"][0]["properties"];
-        // console.log(typeof(properties));
-        // let countyname = properties['county'];
         if (!shiftPressed) {
           console.log('if')
           selected = {};
@@ -354,8 +351,16 @@ map.on('singleclick', function (evt) {
         console.log(Object.keys(selected).length);
         // console.log(selected)
 
-
         createContent(lyr, selected);
+
+        let countyname = properties['county'];
+        let lyrtable = 'tl_'+ statepicker.value + '_' + lyr.replace('hera:', '').split('_')[0] + '_lyr'
+        let testtb = $('#attributeTb').DataTable();
+        testtb.ajax.url('http://hera1.oasis.unc.edu:8080/geoserver/hera/wfs?service=WFS' +
+        '&version=1.0.0&request=GetFeature' +
+        '&typeName=' + lyrtable +
+        '&outputFormat=application/json' +
+        '&CQL_FILTER=county=%27' + countyname + '%27').load();
 
       });
     overlay.setPosition(coord);
@@ -398,7 +403,8 @@ document.getElementById("tab-3").innerHTML = "NC floods";
 
 
 // Create attribute table using Jquery library DataTable
-function createTabTable(attributeTableID, layerID, properties) {
+// function createTabTable(attributeTableID, layerID, properties) {
+function createTabTable(attributeTableID, layerID, countyname, properties) {
   // Use the new 'DataTable' function rather than the older one 'dataTable'
   var table = $(attributeTableID).DataTable({
     responsive: 'true',
@@ -419,8 +425,10 @@ function createTabTable(attributeTableID, layerID, properties) {
       // Solved from Stackoverflow questions no.48147970
       "url": 'http://hera1.oasis.unc.edu:8080/geoserver/hera/wfs?service=WFS' +
         '&version=1.0.0&request=GetFeature' +
-        '&typeName=hera:' + layerID +
-        '&outputFormat=application/json',
+        // '&typeName=hera:' + layerID +
+        '&typeName=' + layerID +
+        '&outputFormat=application/json' +
+        '&CQL_FILTER=county=%27' + countyname + '%27',
       "dataSrc": "features"
     },
     "columns": properties,
@@ -429,57 +437,62 @@ function createTabTable(attributeTableID, layerID, properties) {
   return table;
 };
 
-createTabTable('#attributeTb', 'nc_ww_sql', [{
-    //   "title": "FIPS",
-    //   data: "properties.fips",
-    //   "class": "center"
-    // },
-    // {
+createTabTable('#attributeTb', 'tl_nc_floods_lyr', 'Wake', [{
+    "title": "FIPS",
+    data: "properties.fips",
+    "class": "center"
+  },
+  {
     "title": "County",
     data: "properties.county",
     "class": "center"
   },
   {
-    "title": "Count",
-    data: "properties.count",
-    "class": "center"
-  },
-], );
-
-createTabTable('#attributeTb2', 'nc_floods_sql', [{
-    //   "title": "FIPS",
-    //   data: "properties.fips",
-    //   "class": "center"
-    // },
-    // {
-    "title": "County",
-    data: "properties.county",
+    "title": "Date",
+    data: "properties.issued",
     "class": "center"
   },
   {
-    "title": "Count",
-    data: "properties.count",
+    "title": "Sub Group",
+    data: "properties.description",
     "class": "center"
   },
 ], );
 
-createTabTable('#attributeTb3', 'nc_hw_sql', [{
-    //   "title": "FIPS",
-    //   data: "properties.fips",
-    //   "class": "center"
-    // },
-    // {
-    "title": "County",
-    data: "properties.county",
-    "class": "center"
-  },
-  {
-    "title": "Count",
-    data: "properties.count",
-    "class": "center"
-  },
+// createTabTable('#attributeTb2', 'floods_sql', [{
+//     //   "title": "FIPS",
+//     //   data: "properties.fips",
+//     //   "class": "center"
+//     // },
+//     // {
+//     "title": "County",
+//     data: "properties.county",
+//     "class": "center"
+//   },
+//   {
+//     "title": "Count",
+//     data: "properties.count",
+//     "class": "center"
+//   },
+// ], );
 
-], );
+// createTabTable('#attributeTb3', 'nc_hw_sql', [{
+//     //   "title": "FIPS",
+//     //   data: "properties.fips",
+//     //   "class": "center"
+//     // },
+//     // {
+//     "title": "County",
+//     data: "properties.county",
+//     "class": "center"
+//   },
+//   {
+//     "title": "Count",
+//     data: "properties.count",
+//     "class": "center"
+//   },
+
+// ], );
 
 $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
   $.fn.dataTable.tables({
@@ -831,6 +844,7 @@ targetLayer.onchange = function () {
   })[0];
   let lyrGroups = lyrs.getLayers().getArray();
   let selectedLyr = lyrGroups.filter(l => l.get('title') == selectedLayer);
+  console.log(selectedLyr);
   let nonselectedLyr = lyrGroups.filter(l => l.get('title') != selectedLayer);
 
   nonselectedLyr.forEach(l => l.setVisible(false));
@@ -895,7 +909,7 @@ targetLayer.onchange = function () {
     case 'High Winds ':
       sub = ['Gale Force', 'Storm Force', 'Hurricane Force'];
       // check.style.visibility = 'hidden';
-      
+
       break;
   }
 
@@ -914,12 +928,6 @@ targetLayer.onchange = function () {
     check.appendChild(l);
     // check.appendChild(document.createElement('br'));
   };
-
-  // document.getElementsByClassName('ui-slider-handle ui-corner-all ui-state-default')[0].style.left = '0%';
-  // console.log(document.getElementsByClassName('ui-slider-handle ui-corner-all ui-state-default')[0].style.left);
-  // document.getElementsByClassName('ui-slider-handle ui-corner-all ui-state-default')[1].style.left = '100%';
-  // document.getElementsByClassName('ui-slider-range ui-corner-all ui-widget-header')[0].style.left = '0%';
-  // document.getElementsByClassName('ui-slider-range ui-corner-all ui-widget-header')[0].style.width = '100%';
 
 }
 
@@ -987,7 +995,7 @@ function showCheckboxes() {
 function toggleNav() {
   navSize = document.getElementById("tableSidenav").style.height;
   // If the height of table navigation bar equals to 250 px (the table is opened), close the table; otherwise, open it.
-  if (navSize == "50%") {
+  if (navSize == "35%") {
     console.log("close");
     return closeNav();
   }
@@ -995,8 +1003,8 @@ function toggleNav() {
 }
 
 function openNav() {
-  document.getElementById("tableSidenav").style.height = "50%";
-  document.getElementById("map").style.marginBottom = "50%";
+  document.getElementById("tableSidenav").style.height = "35%";
+  document.getElementById("map").style.marginBottom = "35%";
 }
 
 function closeNav() {

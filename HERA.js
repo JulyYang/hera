@@ -303,6 +303,9 @@ $(document).keyup(function (event) {
 
 var selected = {};
 
+let attributeDataUrl = 'http://hera1.oasis.unc.edu:8080/geoserver/hera/wfs?service=WFS' +
+  '&version=1.0.0&request=GetFeature' + '&outputFormat=application/json'
+
 map.on('singleclick', function (evt) {
   let coord = evt.coordinate;
   console.log(coord);
@@ -316,7 +319,7 @@ map.on('singleclick', function (evt) {
       var source = layer.getSource();
       if (source instanceof ol.source.TileWMS) {
         // lyr = layer['values_']['source']['params_']['LAYERS']; console.log('lyr: ', lyr);
-        lyr = source.params_.LAYERS; console.log(lyr);
+        lyr = source.params_.LAYERS;
         return source;
       }
     });
@@ -354,13 +357,10 @@ map.on('singleclick', function (evt) {
         createContent(lyr, selected);
 
         let countyname = properties['county'];
-        let lyrtable = 'tl_'+ statepicker.value + '_' + lyr.replace('hera:', '').split('_')[0] + '_lyr'
-        let testtb = $('#attributeTb').DataTable();
-        testtb.ajax.url('http://hera1.oasis.unc.edu:8080/geoserver/hera/wfs?service=WFS' +
-        '&version=1.0.0&request=GetFeature' +
-        '&typeName=' + lyrtable +
-        '&outputFormat=application/json' +
-        '&CQL_FILTER=county=%27' + countyname + '%27').load();
+        let lyrtable = 'tl_' + statepicker.value + '_' + lyr.replace('hera:', '').split('_')[0] + '_lyr';
+        let testtb = $('#attributeTb2').DataTable();
+        testtb.ajax.url(attributeDataUrl + '&typeName=' + lyrtable +
+          '&CQL_FILTER=county=%27' + countyname + '%27').load();
 
       });
     overlay.setPosition(coord);
@@ -368,6 +368,7 @@ map.on('singleclick', function (evt) {
     overlay.setPosition(undefined);
     selected.length = 0;
   }
+
 });
 
 // interactionSelect.on('select', function (e) {
@@ -394,9 +395,9 @@ map.on('singleclick', function (evt) {
 // ol.control.LayerSwitcher.renderPanel(map, toc);
 // map.addControl(sidebar);
 
-document.getElementById("tab-1").innerHTML = "2017 population";
-document.getElementById("tab-2").innerHTML = "2015 Impervious Surface Area";
-document.getElementById("tab-3").innerHTML = "NC floods";
+document.getElementById("tab-1").innerHTML = "Counts by County";
+document.getElementById("tab-2").innerHTML = "Data";
+document.getElementById("tab-3").innerHTML = "Highlight table";
 
 // document.getElementById("about-tab-1").innerHTML = "HERA Data Source";
 // document.getElementById("about-tab-2").innerHTML = "Contact Us";
@@ -437,29 +438,46 @@ function createTabTable(attributeTableID, layerID, countyname, properties) {
   return table;
 };
 
-createTabTable('#attributeTb', 'tl_nc_floods_lyr', 'Wake', [{
-    "title": "FIPS",
-    data: "properties.fips",
-    "class": "center"
-  },
-  {
-    "title": "County",
-    data: "properties.county",
-    "class": "center"
-  },
-  {
-    "title": "Date",
-    data: "properties.issued",
-    "class": "center"
-  },
-  {
-    "title": "Sub Group",
-    data: "properties.description",
-    "class": "center"
-  },
-], );
 
-// createTabTable('#attributeTb2', 'floods_sql', [{
+// let attributeDataUrl = 'http://hera1.oasis.unc.edu:8080/geoserver/hera/wfs?service=WFS' +
+//   '&version=1.0.0&request=GetFeature' + '&outputFormat=application/json'
+
+$('#attributeTb').DataTable({
+  responsive: 'true',
+  // dom: 'iBfrtlp',
+  "dom": '<"top"fB>rt<"bottom"lip>',
+  buttons: [
+    'csv',
+    {
+      extend: 'excelHtml5',
+      exportOptions: {
+        columns: ':visible'
+      }
+    }
+  ],
+  "scrollX": true,
+  "ajax": {
+    // Delete the limitation: maxFeatures=50
+    // Solved from Stackoverflow questions no.48147970
+    "url": attributeDataUrl + '&typeName=' + 'hera:hw_sql',
+    "dataSrc": "features"
+  },
+  "columns": [{
+      "title": "County",
+      data: "properties.county",
+      "class": "center"
+    },
+    {
+      "title": "Count",
+      data: "properties.count",
+      "class": "center"
+    }
+  ]
+
+});
+
+// needs to be fixed
+// createTabTable('#attributeTb', 'floods_sql', 'Wake', [{
 //     //   "title": "FIPS",
 //     //   data: "properties.fips",
 //     //   "class": "center"
@@ -476,22 +494,69 @@ createTabTable('#attributeTb', 'tl_nc_floods_lyr', 'Wake', [{
 //   },
 // ], );
 
-// createTabTable('#attributeTb3', 'nc_hw_sql', [{
-//     //   "title": "FIPS",
-//     //   data: "properties.fips",
-//     //   "class": "center"
-//     // },
-//     // {
+$('#attributeTb2').DataTable({
+  responsive: 'true',
+  "dom": '<"top"fB>rt<"bottom"lip>',
+  buttons: [
+    'csv',
+    {
+      extend: 'excelHtml5',
+      exportOptions: {
+        columns: ':visible'
+      }
+    }
+  ],
+  "scrollX": true,
+  "ajax": {
+    // Delete the limitation: maxFeatures=50
+    // Solved from Stackoverflow questions no.48147970
+    "url": attributeDataUrl + '&typeName=' + 'hera:hw_sql' +
+      '&CQL_FILTER=county=%27' + 'Wake' + '%27',
+    "dataSrc": "features"
+  },
+  "columns": [{
+        "title": "FIPS",
+        data: "properties.fips",
+        "class": "center"
+      },
+      {
+        "title": "County",
+        data: "properties.county",
+        "class": "center"
+      },
+      {
+        "title": "Date",
+        data: "properties.issued",
+        "class": "center"
+      },
+      {
+        "title": "Sub Group",
+        data: "properties.description",
+        "class": "center"
+      },
+    ]
+})
+
+// createTabTable('#attributeTb2', 'tl_nc_floods_lyr', 'Wake', [{
+//     "title": "FIPS",
+//     data: "properties.fips",
+//     "class": "center"
+//   },
+//   {
 //     "title": "County",
 //     data: "properties.county",
 //     "class": "center"
 //   },
 //   {
-//     "title": "Count",
-//     data: "properties.count",
+//     "title": "Date",
+//     data: "properties.issued",
 //     "class": "center"
 //   },
-
+//   {
+//     "title": "Sub Group",
+//     data: "properties.description",
+//     "class": "center"
+//   },
 // ], );
 
 $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
@@ -502,35 +567,35 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 });
 
 
-// var jsonSource = 'hera:floods_highlight'
+var jsonSource = 'hera:highlightTable_sql';
 // Create mock-up highlight table as tableau
-// let layerjson = (function (jsonSource) {
-//   var json;
-//   $.ajax({
-//     async: false,
-//     url: `http://152.7.99.155:8080/geoserver/hera/ows?service=WFS&version=1.0.0
-//         &request=GetFeature&typeName=hera:floods_highlight&outputFormat=json
-//         &format_options=callback:getJson`,
-//     dataType: 'json',
-//     jsonpCallback: 'getJson',
-//     // success: parsejson
-//     success: function (data) {
-//       json = data
-//     }
-//   });
-//   return json;
-// })();
+let layerjson = (function (jsonSource) {
+  var json;
+  $.ajax({
+    async: false,
+    url: `http://hera1.oasis.unc.edu:8080/geoserver/hera/ows?service=WFS&version=1.0.0
+        &request=GetFeature&typeName=hera:highlightTable_sql&outputFormat=json
+        &format_options=callback:getJson`,
+    dataType: 'json',
+    jsonpCallback: 'getJson',
+    // success: parsejson
+    success: function (data) {
+      json = data
+    }
+  });
+  return json;
+})();
 
 
 var dummy = [];
 
-// layerjson.features.forEach(
-//   function (i) {
-//     var yearlist = [];
-//     yearlist.push(i.properties['year_issued'], i.properties['jan'], i.properties['feb'], i.properties['mar'], i.properties['apr'], i.properties['may'],
-//       i.properties['jun'], i.properties['jul'], i.properties['aug'], i.properties['sep'], i.properties['oct'], i.properties['nov'], i.properties['dec']);
-//     dummy.push(yearlist);
-//   })
+layerjson.features.forEach(
+  function (i) {
+    var yearlist = [];
+    yearlist.push(i.properties['year_issued'], i.properties['jan'], i.properties['feb'], i.properties['mar'], i.properties['apr'], i.properties['may'],
+      i.properties['jun'], i.properties['jul'], i.properties['aug'], i.properties['sep'], i.properties['oct'], i.properties['nov'], i.properties['dec']);
+    dummy.push(yearlist);
+  })
 
 // function parsejson(data) {
 //   data.features.forEach(
@@ -545,12 +610,17 @@ var dummy = [];
 // };
 
 
-// var rowLabel = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-var rowLabel = ['', 'J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
+var rowLabel = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+// var rowLabel = ['', 'J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
 
 
 // Using RBG
 var colors = [{
+  // rgb(249 251 250 / 63%)
+  // r: 249,
+  // g: 251,
+  // b: 250,
+  // a: 63%
   r: 255,
   g: 255,
   b: 255
@@ -606,7 +676,8 @@ var colors = [{
 
 var alpha = d3.scaleLinear().domain([0, 100]).range([0, 1]);
 
-var d3table = d3.select("#chart").append("table");
+// var d3table = d3.select("#chart").append("table");
+var d3table = d3.select("#attributeTb3").append("table").attr("width", '100%');
 
 thead = d3table.append("thead");
 tbody = d3table.append("tbody")
@@ -617,6 +688,7 @@ thead.append("tr")
   .data(rowLabel)
   .enter()
   .append("th")
+  .attr("class", "highlight-header")
   .text(function (d) {
     return d;
   })
@@ -628,12 +700,13 @@ var rows = tbody.selectAll("tr")
 
 var cells = rows.selectAll("td")
   .data(function (d, i) {
-    //d.shift();
+    // d.shift();
     //d.unshift(rowLabel[i]);
     return d;
   })
   .enter()
   .append("td")
+  .attr("class", "highlight-td")
   .style('background-color', function (d, i) {
     return 'rgba(' + colors[i].r + ',' + colors[i].g + ',' + colors[i].b + ',' + alpha(d) + ')';
   })
@@ -641,53 +714,53 @@ var cells = rows.selectAll("td")
     return d;
   });
 
-var sourcedata = [{
-    "Dataset": "Local Storm Reports (LSR)",
-    "Years": "1989-2018",
-    "Hazards": "Hail, High Winds, Tornadoes",
-    "Description": "Local Storm Reports originate from National Weather Service (NWS) offices and are verified by the NWS Storm Prediction Center each spring. HERA displays LSR data for hail, high winds and tornadoes from 1989-2018. LSRs are generated from reports of severe weather in an area or county made by storm spotters (storm chasers, law enforcement officials, emergency management personnel, firefighters, EMTs, or public citizens). LSRs may also be issued by NWS Weather Forecast Offices (WFO) after a weather event has ended to inform media outlets and the public.",
-  },
-  {
-    "Dataset": "National Hurricane Center (NHC) Best Track Data (HURDAT2)",
-    "Years": "1950-2019",
-    "Hazards": "Hurricanes, Tropical Storms",
-    "Description": "The Atlantic hurricane database known as Atlantic HURDAT2 (1851-2019), has six-hourly information on the location, maximum winds, central pressure, and (beginning in 2004) size of all known tropical cyclones and subtropical cyclones. HERA displays hurricanes and tropical storms data from 1950-2019. The location of hurricane and tropical storm tracks every six hours was used to ascertain the proximity to county centroids. If hurricanes or tropical storms were found to be within 75 miles of a county centroid, they were counted for that county.",
-  },
-  {
-    "Dataset": "National Weather Service (NWS) Watches, Warnings and Advisories (WWA or WaWA)",
-    "Years": "2006-2019",
-    "Hazards": "Floods, Heat, Winter Weather",
-    "Description": `NWS WaWA data is used as a best-available proxy for occurrence of hazards in HERA related to floods, heat, and winter weather. The WaWA data is downloaded from the Iowa Environmental Mesonet (IEM) at <a href="https://mesonet.agron.iastate.edu/pickup/wwa/" target="_blank">WWA</a> for years 2006-2019. Only Warnings and Advisories are used as a proxy for the occurrence of hazards, because Advisories and Warnings are issued only when an event is imminent or occurring. However, users should be aware that the issuance of Advisories and Warnings may vary geographically, because they are issued by different Weather Forecast Offices (WFO) based on local criteria. The count of flood, heat, and winter weather Advisories and Warnings in HERA is made on a daily basis. So, multi-day events may be counted for each day an Advisory or Warning is in effect, if that Advisory or Warning is updated on a daily basis.`,
-  },
-];
+// var sourcedata = [{
+//     "Dataset": "Local Storm Reports (LSR)",
+//     "Years": "1989-2018",
+//     "Hazards": "Hail, High Winds, Tornadoes",
+//     "Description": "Local Storm Reports originate from National Weather Service (NWS) offices and are verified by the NWS Storm Prediction Center each spring. HERA displays LSR data for hail, high winds and tornadoes from 1989-2018. LSRs are generated from reports of severe weather in an area or county made by storm spotters (storm chasers, law enforcement officials, emergency management personnel, firefighters, EMTs, or public citizens). LSRs may also be issued by NWS Weather Forecast Offices (WFO) after a weather event has ended to inform media outlets and the public.",
+//   },
+//   {
+//     "Dataset": "National Hurricane Center (NHC) Best Track Data (HURDAT2)",
+//     "Years": "1950-2019",
+//     "Hazards": "Hurricanes, Tropical Storms",
+//     "Description": "The Atlantic hurricane database known as Atlantic HURDAT2 (1851-2019), has six-hourly information on the location, maximum winds, central pressure, and (beginning in 2004) size of all known tropical cyclones and subtropical cyclones. HERA displays hurricanes and tropical storms data from 1950-2019. The location of hurricane and tropical storm tracks every six hours was used to ascertain the proximity to county centroids. If hurricanes or tropical storms were found to be within 75 miles of a county centroid, they were counted for that county.",
+//   },
+//   {
+//     "Dataset": "National Weather Service (NWS) Watches, Warnings and Advisories (WWA or WaWA)",
+//     "Years": "2006-2019",
+//     "Hazards": "Floods, Heat, Winter Weather",
+//     "Description": `NWS WaWA data is used as a best-available proxy for occurrence of hazards in HERA related to floods, heat, and winter weather. The WaWA data is downloaded from the Iowa Environmental Mesonet (IEM) at <a href="https://mesonet.agron.iastate.edu/pickup/wwa/" target="_blank">WWA</a> for years 2006-2019. Only Warnings and Advisories are used as a proxy for the occurrence of hazards, because Advisories and Warnings are issued only when an event is imminent or occurring. However, users should be aware that the issuance of Advisories and Warnings may vary geographically, because they are issued by different Weather Forecast Offices (WFO) based on local criteria. The count of flood, heat, and winter weather Advisories and Warnings in HERA is made on a daily basis. So, multi-day events may be counted for each day an Advisory or Warning is in effect, if that Advisory or Warning is updated on a daily basis.`,
+//   },
+// ];
 
 
-$('#datasourceTb').DataTable({
-  responsive: 'true',
-  data: sourcedata,
-  // "dom": 'Brt<"bottom"l>',
-  "dom": 't',
-  columns: [{
-      data: 'Dataset'
-    },
-    {
-      data: 'Years'
-    },
-    {
-      data: 'Hazards'
-    },
-    {
-      data: 'Description'
-    }
-  ]
-});
+// $('#datasourceTb').DataTable({
+//   responsive: 'true',
+//   data: sourcedata,
+//   // "dom": 'Brt<"bottom"l>',
+//   "dom": 't',
+//   columns: [{
+//       data: 'Dataset'
+//     },
+//     {
+//       data: 'Years'
+//     },
+//     {
+//       data: 'Hazards'
+//     },
+//     {
+//       data: 'Description'
+//     }
+//   ]
+// });
 
 
-$('a[href="#about-tabpanel-2"]').click(function (e) {
-  e.preventDefault();
-  $(this).tab('show');
-  console.log('here');
-});
+// $('a[href="#about-tabpanel-2"]').click(function (e) {
+//   e.preventDefault();
+//   $(this).tab('show');
+//   console.log('here');
+// });
 
 
 $(function () {
@@ -929,6 +1002,11 @@ targetLayer.onchange = function () {
     // check.appendChild(document.createElement('br'));
   };
 
+  // reload data in attribute table 1 if layer switched
+  let tb2source = selectedLyr[0].getLayersArray()[0].getSource().params_.LAYERS;
+  let tb2 = $('#attributeTb').DataTable();
+  tb2.ajax.url(attributeDataUrl + '&typeName=' + tb2source).load();
+
 }
 
 var expanded = false;
@@ -995,7 +1073,7 @@ function showCheckboxes() {
 function toggleNav() {
   navSize = document.getElementById("tableSidenav").style.height;
   // If the height of table navigation bar equals to 250 px (the table is opened), close the table; otherwise, open it.
-  if (navSize == "35%") {
+  if (navSize == "40%") {
     console.log("close");
     return closeNav();
   }
@@ -1003,8 +1081,8 @@ function toggleNav() {
 }
 
 function openNav() {
-  document.getElementById("tableSidenav").style.height = "35%";
-  document.getElementById("map").style.marginBottom = "35%";
+  document.getElementById("tableSidenav").style.height = "40%";
+  document.getElementById("map").style.marginBottom = "40%";
 }
 
 function closeNav() {

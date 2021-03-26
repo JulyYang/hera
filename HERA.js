@@ -360,7 +360,7 @@ map.on('singleclick', function (evt) {
         // console.log(lyr.replace('hera:', '').split('_')[0]);
         // datatb.ajax.url(attributeDataUrl + '&typeName=' + lyrtable + '&CQL_FILTER=county=%27' + countyname + '%27').load();
         // datatb.ajax.url(attributeDataUrl + '&typeName=' + lyrtable + '&CQL_FILTER=county IN '+ '(%27' + countyname + '%27)').load();
-        datatb.ajax.url(attributeDataUrl + '&typeName=' + lyrtable + '&CQL_FILTER=county IN '+ countynames).load();
+        datatb.ajax.url(attributeDataUrl + '&typeName=' + lyrtable + '&CQL_FILTER=county IN ' + countynames).load();
 
       });
     overlay.setPosition(coord);
@@ -592,7 +592,7 @@ $('#attributeTb2').DataTable({
     //   // Solved from Stackoverflow questions no.48147970
     "url": attributeDataUrl + '&typeName=' + 'hera:tl_nc_hw_lyr' +
       '&CQL_FILTER=county=%27' + null + '%27',
-      // '&CQL_FILTER=county IN (%27' + 'Wake' + '%27, %27' + 'Durham' + '%27)',
+    // '&CQL_FILTER=county IN (%27' + 'Wake' + '%27, %27' + 'Durham' + '%27)',
     "dataSrc": "features"
   },
   "columns": [{
@@ -644,149 +644,179 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 
 var jsonSource = 'hera:highlightTable_sql';
 // Create mock-up highlight table as tableau
-let layerjson = (function (jsonSource) {
-  var json;
-  $.ajax({
-    async: false,
+// let layerjson = (function (jsonSource) {
+//   var json;
+//   $.ajax({
+//     async: false, // set acync to false is bad for browser performance
+//     url: `http://hera1.oasis.unc.edu:8080/geoserver/hera/ows?service=WFS&version=1.0.0
+//         &request=GetFeature&typeName=`+ 'hera:highlightTable_sql' +`&outputFormat=json
+//         &format_options=callback:getJson`,
+//     dataType: 'json',
+//     jsonpCallback: 'getJson',
+//     // success: parsejson
+//     success: function (data) {
+//       json = data
+//     }
+//   });
+//   return json;
+// })();
+
+// var layerjson;
+
+function ajaxcall(jsonSource) {
+  // var json;
+  // var layerjson;
+  return $.ajax({
+    // async: false, // set acync to false is bad for browser performance
     url: `http://hera1.oasis.unc.edu:8080/geoserver/hera/ows?service=WFS&version=1.0.0
-        &request=GetFeature&typeName=hera:highlightTable_sql&outputFormat=json
+        &request=GetFeature&typeName=` + 'hera:highlightTable_sql' + `&outputFormat=json
         &format_options=callback:getJson`,
     dataType: 'json',
     jsonpCallback: 'getJson',
     // success: parsejson
-    success: function (data) {
-      json = data
-    }
+    // done: function (data) {
+    //   layerjson = data;
+    //   return layerjson;
+    // }
   });
-  return json;
-})();
+};
 
 
-var dummy = [];
 
-layerjson.features.forEach(
-  function (i) {
-    var yearlist = [];
-    yearlist.push(i.properties['year_issued'], i.properties['jan'], i.properties['feb'], i.properties['mar'], i.properties['apr'], i.properties['may'],
-      i.properties['jun'], i.properties['jul'], i.properties['aug'], i.properties['sep'], i.properties['oct'], i.properties['nov'], i.properties['dec']);
-    dummy.push(yearlist);
-  })
-
-// function parsejson(data) {
-//   data.features.forEach(
+// function testjquery() {
+//   layerjson.features.forEach(
 //     function (i) {
 //       var yearlist = [];
 //       yearlist.push(i.properties['year_issued'], i.properties['jan'], i.properties['feb'], i.properties['mar'], i.properties['apr'], i.properties['may'],
 //         i.properties['jun'], i.properties['jul'], i.properties['aug'], i.properties['sep'], i.properties['oct'], i.properties['nov'], i.properties['dec']);
 //       dummy.push(yearlist);
-//     }
-//   )
-//   /*   console.log(data.features); */
-// };
+//     })
+// }
+
+// ajaxcall(jsonSource).then(function (response) {
+//   console.log(response)
+// });
+
+ajaxcall(jsonSource).then(function (layerjson) {
+  var dummy = [];
+
+  layerjson.features.forEach(
+    function (i) {
+      var yearlist = [];
+      yearlist.push(i.properties['year_issued'], i.properties['jan'], i.properties['feb'], i.properties['mar'], i.properties['apr'], i.properties['may'],
+        i.properties['jun'], i.properties['jul'], i.properties['aug'], i.properties['sep'], i.properties['oct'], i.properties['nov'], i.properties['dec']);
+      dummy.push(yearlist);
+    });
+  console.log(dummy);
+  createhighlight(dummy);
+});
 
 
-var rowLabel = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-// var rowLabel = ['', 'J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
+function createhighlight(dummy) {
+  var rowLabel = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  // var rowLabel = ['', 'J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
 
 
-// Using RBG
-var colors = [{
-  // rgb(249 251 250 / 63%)
-  // r: 249,
-  // g: 251,
-  // b: 250,
-  // a: 63%
-  r: 255,
-  g: 255,
-  b: 255
-}, {
-  r: 59,
-  g: 115,
-  b: 143
-}, {
-  r: 59,
-  g: 115,
-  b: 143
-}, {
-  r: 59,
-  g: 115,
-  b: 143
-}, {
-  r: 59,
-  g: 115,
-  b: 143
-}, {
-  r: 59,
-  g: 115,
-  b: 143
-}, {
-  r: 59,
-  g: 115,
-  b: 143
-}, {
-  r: 59,
-  g: 115,
-  b: 143
-}, {
-  r: 59,
-  g: 115,
-  b: 143
-}, {
-  r: 59,
-  g: 115,
-  b: 143
-}, {
-  r: 59,
-  g: 115,
-  b: 143
-}, {
-  r: 59,
-  g: 115,
-  b: 143
-}, {
-  r: 59,
-  g: 115,
-  b: 143
-}];
+  // Using RBG
+  var colors = [{
+    // rgb(249 251 250 / 63%)
+    // r: 249,
+    // g: 251,
+    // b: 250,
+    // a: 63%
+    r: 255,
+    g: 255,
+    b: 255
+  }, {
+    r: 59,
+    g: 115,
+    b: 143
+  }, {
+    r: 59,
+    g: 115,
+    b: 143
+  }, {
+    r: 59,
+    g: 115,
+    b: 143
+  }, {
+    r: 59,
+    g: 115,
+    b: 143
+  }, {
+    r: 59,
+    g: 115,
+    b: 143
+  }, {
+    r: 59,
+    g: 115,
+    b: 143
+  }, {
+    r: 59,
+    g: 115,
+    b: 143
+  }, {
+    r: 59,
+    g: 115,
+    b: 143
+  }, {
+    r: 59,
+    g: 115,
+    b: 143
+  }, {
+    r: 59,
+    g: 115,
+    b: 143
+  }, {
+    r: 59,
+    g: 115,
+    b: 143
+  }, {
+    r: 59,
+    g: 115,
+    b: 143
+  }];
 
-var alpha = d3.scaleLinear().domain([0, 100]).range([0, 1]);
+  var alpha = d3.scaleLinear().domain([0, 100]).range([0, 1]);
 
-var d3table = d3.select("#attributeTb3").append("table").attr("width", '100%');
+  var d3table = d3.select("#attributeTb3").append("table").attr("width", '100%');
 
-thead = d3table.append("thead");
-tbody = d3table.append("tbody")
+  thead = d3table.append("thead");
+  tbody = d3table.append("tbody")
 
 
-thead.append("tr")
-  .selectAll("th")
-  .data(rowLabel)
-  .enter()
-  .append("th")
-  .attr("class", "highlight-header")
-  .text(function (d) {
-    return d;
-  })
+  thead.append("tr")
+    .selectAll("th")
+    .data(rowLabel)
+    .enter()
+    .append("th")
+    .attr("class", "highlight-header")
+    .text(function (d) {
+      return d;
+    })
 
-var rows = tbody.selectAll("tr")
-  .data(dummy)
-  .enter()
-  .append("tr");
+  var rows = tbody.selectAll("tr")
+    .data(dummy)
+    .enter()
+    .append("tr");
 
-var cells = rows.selectAll("td")
-  .data(function (d, i) {
-    // d.shift();
-    //d.unshift(rowLabel[i]);
-    return d;
-  })
-  .enter()
-  .append("td")
-  .attr("class", "highlight-td")
-  .style('background-color', function (d, i) {
-    return 'rgba(' + colors[i].r + ',' + colors[i].g + ',' + colors[i].b + ',' + alpha(d) + ')';
-  })
-  .text(function (d) {
-    return d;
-  });
+  var cells = rows.selectAll("td")
+    .data(function (d, i) {
+      // d.shift();
+      //d.unshift(rowLabel[i]);
+      return d;
+    })
+    .enter()
+    .append("td")
+    .attr("class", "highlight-td")
+    .style('background-color', function (d, i) {
+      return 'rgba(' + colors[i].r + ',' + colors[i].g + ',' + colors[i].b + ',' + alpha(d) + ')';
+    })
+    .text(function (d) {
+      return d;
+    });
+}
+
 
 // var sourcedata = [{
 //     "Dataset": "Local Storm Reports (LSR)",

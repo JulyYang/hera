@@ -350,11 +350,17 @@ map.on('singleclick', function (evt) {
 
         createContent(lyr, selected);
 
-        let countyname = properties['county'];
+
+        let countynameArray = Object.keys(selected).map(k => selected[k]['county']);
+        console.log(countynameArray);
+        let countynames = '(%27' + countynameArray.join('%27, %27') + '%27)'
+        // let countyname = properties['county'];
         let lyrtable = 'tl_' + statepicker.value + '_' + lyr.replace('hera:', '').split('_')[0] + '_lyr';
         let datatb = $('#attributeTb2').DataTable();
         // console.log(lyr.replace('hera:', '').split('_')[0]);
-        datatb.ajax.url(attributeDataUrl + '&typeName=' + lyrtable + '&CQL_FILTER=county=%27' + countyname + '%27').load();
+        // datatb.ajax.url(attributeDataUrl + '&typeName=' + lyrtable + '&CQL_FILTER=county=%27' + countyname + '%27').load();
+        // datatb.ajax.url(attributeDataUrl + '&typeName=' + lyrtable + '&CQL_FILTER=county IN '+ '(%27' + countyname + '%27)').load();
+        datatb.ajax.url(attributeDataUrl + '&typeName=' + lyrtable + '&CQL_FILTER=county IN '+ countynames).load();
 
       });
     overlay.setPosition(coord);
@@ -521,7 +527,8 @@ function createTabTable(attributeTableID, layerID, countyname, properties) {
         // '&typeName=hera:' + layerID +
         '&typeName=' + layerID +
         // '&outputFormat=application/json' +
-        '&CQL_FILTER=county=%27' + countyname + '%27',
+        // '&CQL_FILTER=county=%27' + countyname + '%27',
+        '&CQL_FILTER=county IN (%27' + countyname + '%27)',
       "dataSrc": "features"
     },
     "columns": properties,
@@ -585,6 +592,7 @@ $('#attributeTb2').DataTable({
     //   // Solved from Stackoverflow questions no.48147970
     "url": attributeDataUrl + '&typeName=' + 'hera:tl_nc_hw_lyr' +
       '&CQL_FILTER=county=%27' + null + '%27',
+      // '&CQL_FILTER=county IN (%27' + 'Wake' + '%27, %27' + 'Durham' + '%27)',
     "dataSrc": "features"
   },
   "columns": [{

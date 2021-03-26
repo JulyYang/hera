@@ -77,7 +77,7 @@ var boundarySource = function (state) {
 
 var view = new ol.View({
   // projection: 'EPSG:3857',
-  center: ol.proj.fromLonLat([-79.5, 34.9]),
+  center: ol.proj.fromLonLat([-79.5, 35.1]),
   zoom: 8
 
 });
@@ -359,6 +359,9 @@ map.on('singleclick', function (evt) {
         let countyname = properties['county'];
         let lyrtable = 'tl_' + statepicker.value + '_' + lyr.replace('hera:', '').split('_')[0] + '_lyr';
         let testtb = $('#attributeTb2').DataTable();
+        console.log(lyr.replace('hera:', '').split('_')[0]);
+
+        // testtb.ajax.dataSrc = 'features';
         testtb.ajax.url(attributeDataUrl + '&typeName=' + lyrtable +
           '&CQL_FILTER=county=%27' + countyname + '%27').load();
 
@@ -371,6 +374,111 @@ map.on('singleclick', function (evt) {
 
 });
 
+let recreateDataTable = function (lyr) {
+  let dataColumns;
+  $('#attributeTb2').DataTable().destroy();
+  $('#attributeTb2').empty();
+
+  let lyrtable = 'tl_' + statepicker.value + '_' + lyr.replace('hera:', '').split('_')[0] + '_lyr';
+  switch (lyr.replace('hera:', '').split('_')[0]) {
+    case 'hw':
+      dataColumns = [{
+          "title": "FIPS",
+          data: "properties.fips",
+          "class": "center"
+        },
+        {
+          "title": "County",
+          data: "properties.county",
+          "class": "center"
+        },
+        {
+          "title": "Date",
+          data: "properties.observ_time",
+          "class": "center"
+        },
+        {
+          "title": "Wind Speed (knots)",
+          data: "properties.wspeed_knots",
+          "class": "center"
+        },
+        {
+          "title": "Wind Speed (mph)",
+          data: "properties.wspeed_mph",
+          "class": "center"
+        },
+        {
+          "title": "Wind Speed (ms)",
+          data: "properties.wspeed_ms",
+          "class": "center"
+        },
+        {
+          "title": "Sub Group",
+          data: "properties.wspeed_rating_mph",
+          "class": "center"
+        },
+      ];
+      break;
+    case 'hl':
+      dataColumns = [{
+          "title": "FIPS",
+          data: "properties.fips",
+          "class": "center"
+        },
+        {
+          "title": "County",
+          data: "properties.county",
+          "class": "center"
+        },
+        {
+          "title": "Date",
+          data: "properties.observ_time",
+          "class": "center"
+        },
+        {
+          "title": "Diameter (inch)",
+          data: "properties.diameter_inch",
+          "class": "center"
+        },
+        {
+          "title": "Diameter (cm)",
+          data: "properties.diameter_cm",
+          "class": "center"
+        },
+        {
+          "title": "Diameter (mm)",
+          data: "properties.diameter_mm",
+          "class": "center"
+        },
+      ];
+      break;
+    default:
+      dataColumns = [{
+          "title": "FIPS",
+          data: "properties.fips",
+          "class": "center"
+        },
+        {
+          "title": "County",
+          data: "properties.county",
+          "class": "center"
+        },
+        {
+          "title": "Date",
+          data: "properties.issued",
+          "class": "center"
+        },
+        {
+          "title": "Sub Group",
+          data: "properties.description",
+          "class": "center"
+        },
+      ]
+  }
+
+  createTabTable('#attributeTb2', lyrtable, null, dataColumns)
+
+};
 // interactionSelect.on('select', function (e) {
 // var coord = e.mapBrowserEvent.coordinate;
 // var features = e.target.getFeatures().getArray();
@@ -406,6 +514,7 @@ document.getElementById("tab-3").innerHTML = "Highlight table";
 // Create attribute table using Jquery library DataTable
 // function createTabTable(attributeTableID, layerID, properties) {
 function createTabTable(attributeTableID, layerID, countyname, properties) {
+  // function createTabTable(attributeTableID, properties) {
   // Use the new 'DataTable' function rather than the older one 'dataTable'
   var table = $(attributeTableID).DataTable({
     responsive: 'true',
@@ -495,6 +604,7 @@ $('#attributeTb').DataTable({
 // ], );
 
 $('#attributeTb2').DataTable({
+  "autoWidth": 'true',
   responsive: 'true',
   "dom": '<"top"fB>rt<"bottom"lip>',
   buttons: [
@@ -508,33 +618,48 @@ $('#attributeTb2').DataTable({
   ],
   "scrollX": true,
   "ajax": {
-    // Delete the limitation: maxFeatures=50
-    // Solved from Stackoverflow questions no.48147970
-    "url": attributeDataUrl + '&typeName=' + 'hera:hw_sql' +
-      '&CQL_FILTER=county=%27' + 'Wake' + '%27',
+    //   // Delete the limitation: maxFeatures=50
+    //   // Solved from Stackoverflow questions no.48147970
+    "url": attributeDataUrl + '&typeName=' + 'hera:tl_nc_hw_lyr' +
+      '&CQL_FILTER=county=%27' + null + '%27',
     "dataSrc": "features"
   },
   "columns": [{
-        "title": "FIPS",
-        data: "properties.fips",
-        "class": "center"
-      },
-      {
-        "title": "County",
-        data: "properties.county",
-        "class": "center"
-      },
-      {
-        "title": "Date",
-        data: "properties.issued",
-        "class": "center"
-      },
-      {
-        "title": "Sub Group",
-        data: "properties.description",
-        "class": "center"
-      },
-    ]
+      "title": "FIPS",
+      data: "properties.fips",
+      "class": "center"
+    },
+    {
+      "title": "County",
+      data: "properties.county",
+      "class": "center"
+    },
+    {
+      "title": "Date",
+      data: "properties.observ_time",
+      "class": "center"
+    },
+    {
+      "title": "Wind Speed (knots)",
+      data: "properties.wspeed_knots",
+      "class": "center"
+    },
+    {
+      "title": "Wind Speed (mph)",
+      data: "properties.wspeed_mph",
+      "class": "center"
+    },
+    {
+      "title": "Wind Speed (ms)",
+      data: "properties.wspeed_ms",
+      "class": "center"
+    },
+    {
+      "title": "Sub Group",
+      data: "properties.wspeed_rating_mph",
+      "class": "center"
+    },
+  ]
 })
 
 // createTabTable('#attributeTb2', 'tl_nc_floods_lyr', 'Wake', [{
@@ -765,7 +890,7 @@ var cells = rows.selectAll("td")
 
 $(function () {
   $("#dialog").dialog({
-    autoOpen: true,
+    autoOpen: false,
     modal: false,
     minHeight: 300,
     // width: 'auto',
@@ -1007,6 +1132,10 @@ targetLayer.onchange = function () {
   let tb2 = $('#attributeTb').DataTable();
   tb2.ajax.url(attributeDataUrl + '&typeName=' + tb2source).load();
 
+  // let lyrtable = 'tl_' + statepicker.value + '_' + tb2source.replace('hera:', '').split('_')[0] + '_lyr';
+
+  recreateDataTable(tb2source);
+
 }
 
 var expanded = false;
@@ -1092,8 +1221,8 @@ function closeNav() {
 
 // EPSG: 4326 for the map view
 let viewObject = {
-  'nc': [-79.5, 34.9],
-  'sc': [-80.98, 33]
+  'nc': [-79.5, 35.1],
+  'sc': [-80.98, 33.5]
 }
 
 var statepicker = document.getElementById('state-picker');

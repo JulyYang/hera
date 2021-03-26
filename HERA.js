@@ -76,8 +76,7 @@ var boundarySource = function (state) {
 };
 
 var view = new ol.View({
-  // projection: 'EPSG:3857',
-  center: ol.proj.fromLonLat([-79.5, 35.1]),
+  center: ol.proj.fromLonLat([-79.5, 35.1]), // projection: 'EPSG:3857',
   zoom: 8
 
 });
@@ -150,7 +149,6 @@ var map = new ol.Map({
         new ol.layer.Tile({
           title: "Winter Weather ",
           visible: false,
-          // source: WMSsource_oasis('hera:nc_ww_sql')
           source: WMSsource_oasis('hera:ww_sql', "state:nc")
         }),
 
@@ -159,7 +157,6 @@ var map = new ol.Map({
           title: "Floods ",
           visible: false,
           // source: WMSsource_oasis('hera:nc_floods_sql')
-          // source: WMSsource_oasis('hera:nc_floods_sql_2')
           source: WMSsource_oasis('hera:floods_sql', "state:nc")
           // layers: createGroupedLyrs('hera:nc_floods_sql', "minYear:2010-01-01;maxYear:2018-12-31;sublist:'FA'\\,'CF'")
         }),
@@ -167,21 +164,18 @@ var map = new ol.Map({
         new ol.layer.Tile({
           title: "High Winds ",
           visible: true,
-          // source: WMSsource_oasis('hera:nc_hw_sql')
           source: WMSsource_oasis('hera:hw_sql', "state:nc")
         }),
 
         new ol.layer.Tile({
           title: "Heat ",
           visible: false,
-          // source: WMSsource_oasis('hera:nc_heats_sql')
           source: WMSsource_oasis('hera:heats_sql', "state:nc")
         }),
 
         new ol.layer.Tile({
           title: "Hails ",
           visible: false,
-          // source: WMSsource_oasis('hera:nc_hl_sql')
           source: WMSsource_oasis('hera:hl_sql', "state:nc")
         }),
 
@@ -258,8 +252,7 @@ let createContent = function (lyr, selected) {
   let startyear = parseInt($('.slider-time').html());
   let endyear = parseInt($('.slider-time2').html());
   // let startyear = selected[Object.keys(selected)[0]]['minyear'];
-  console.log(startyear);
-  // let endyear = selected[Object.keys(selected)[0]]['maxyear'];
+  // console.log(startyear);
 
 
   Object.keys(selected).forEach(function (key) {
@@ -274,11 +267,12 @@ let createContent = function (lyr, selected) {
         total += selected[key]['count'];
     }
 
-    console.log('counties: ', counties += selected[key]['county'] + ', ');
-    console.log('total: ', total);
-    console.log('average: ', total / flength);
+    counties += selected[key]['county'] + ', ';
+    // console.log('counties: ', counties += selected[key]['county'] + ', ');
+    // console.log('total: ', total);
+    // console.log('average: ', total / flength);
 
-    console.log(Object.keys(selected[key]));
+    // console.log(Object.keys(selected[key]));
     Object.keys(selected[key]).filter(i =>
       endyear >= parseInt(i.slice(1)) && parseInt(i.slice(1)) >= startyear && selected[key][i] != null
     ).forEach(i => {
@@ -287,7 +281,7 @@ let createContent = function (lyr, selected) {
       }
     });
     probability = (probaArray.length / (endyear - startyear + 1) * 100).toFixed(2) + '%';
-    console.log(probability);
+    // console.log(probability);
     content.innerHTML = '<h5>Selected County: ' + counties + '</h5><br><p>Year: ' + startyear + '-' + endyear + '</p><br><p>Total count: ' +
       total + '</p><br><p>Probability: ' + probability + '</p>';
   })
@@ -308,7 +302,7 @@ let attributeDataUrl = 'http://hera1.oasis.unc.edu:8080/geoserver/hera/wfs?servi
 
 map.on('singleclick', function (evt) {
   let coord = evt.coordinate;
-  console.log(coord);
+  // console.log(coord);
   let resolution = map.getView().getResolution();
   let projection = map.getView().getProjection();
   let lyr;
@@ -340,30 +334,27 @@ map.on('singleclick', function (evt) {
         let featureid = json["features"][0]['id'];
         let properties = json["features"][0]["properties"];
         if (!shiftPressed) {
-          console.log('if')
           selected = {};
           selected[featureid] = properties;
+          console.log('if', selected);
         } else if (featureid in selected) {
-          console.log('else if');
           delete selected[featureid];
+          console.log('else if', selected);
         } else {
-          console.log('else');
           selected[featureid] = properties;
+          console.log('else');
+          console.log(selected)
         };
 
         console.log(Object.keys(selected).length);
-        // console.log(selected)
 
         createContent(lyr, selected);
 
         let countyname = properties['county'];
         let lyrtable = 'tl_' + statepicker.value + '_' + lyr.replace('hera:', '').split('_')[0] + '_lyr';
-        let testtb = $('#attributeTb2').DataTable();
-        console.log(lyr.replace('hera:', '').split('_')[0]);
-
-        // testtb.ajax.dataSrc = 'features';
-        testtb.ajax.url(attributeDataUrl + '&typeName=' + lyrtable +
-          '&CQL_FILTER=county=%27' + countyname + '%27').load();
+        let datatb = $('#attributeTb2').DataTable();
+        // console.log(lyr.replace('hera:', '').split('_')[0]);
+        datatb.ajax.url(attributeDataUrl + '&typeName=' + lyrtable + '&CQL_FILTER=county=%27' + countyname + '%27').load();
 
       });
     overlay.setPosition(coord);
@@ -495,14 +486,6 @@ let recreateDataTable = function (lyr) {
 // });
 
 
-// var sidebar = new ol.control.Sidebar({
-//   element: 'sidebar',
-//   position: 'right'
-// });
-// var toc = document.getElementById("layers");
-// ol.control.LayerSwitcher.renderPanel(map, toc);
-// map.addControl(sidebar);
-
 document.getElementById("tab-1").innerHTML = "Counts by County";
 document.getElementById("tab-2").innerHTML = "Data";
 document.getElementById("tab-3").innerHTML = "Highlight table";
@@ -514,7 +497,6 @@ document.getElementById("tab-3").innerHTML = "Highlight table";
 // Create attribute table using Jquery library DataTable
 // function createTabTable(attributeTableID, layerID, properties) {
 function createTabTable(attributeTableID, layerID, countyname, properties) {
-  // function createTabTable(attributeTableID, properties) {
   // Use the new 'DataTable' function rather than the older one 'dataTable'
   var table = $(attributeTableID).DataTable({
     responsive: 'true',
@@ -533,11 +515,12 @@ function createTabTable(attributeTableID, layerID, countyname, properties) {
     "ajax": {
       // Delete the limitation: maxFeatures=50
       // Solved from Stackoverflow questions no.48147970
-      "url": 'http://hera1.oasis.unc.edu:8080/geoserver/hera/wfs?service=WFS' +
-        '&version=1.0.0&request=GetFeature' +
+      "url": attributeDataUrl +
+        // 'http://hera1.oasis.unc.edu:8080/geoserver/hera/wfs?service=WFS' +
+        // '&version=1.0.0&request=GetFeature' +
         // '&typeName=hera:' + layerID +
         '&typeName=' + layerID +
-        '&outputFormat=application/json' +
+        // '&outputFormat=application/json' +
         '&CQL_FILTER=county=%27' + countyname + '%27',
       "dataSrc": "features"
     },
@@ -547,9 +530,6 @@ function createTabTable(attributeTableID, layerID, countyname, properties) {
   return table;
 };
 
-
-// let attributeDataUrl = 'http://hera1.oasis.unc.edu:8080/geoserver/hera/wfs?service=WFS' +
-//   '&version=1.0.0&request=GetFeature' + '&outputFormat=application/json'
 
 $('#attributeTb').DataTable({
   responsive: 'true',
@@ -585,23 +565,6 @@ $('#attributeTb').DataTable({
 
 });
 
-// needs to be fixed
-// createTabTable('#attributeTb', 'floods_sql', 'Wake', [{
-//     //   "title": "FIPS",
-//     //   data: "properties.fips",
-//     //   "class": "center"
-//     // },
-//     // {
-//     "title": "County",
-//     data: "properties.county",
-//     "class": "center"
-//   },
-//   {
-//     "title": "Count",
-//     data: "properties.count",
-//     "class": "center"
-//   },
-// ], );
 
 $('#attributeTb2').DataTable({
   "autoWidth": 'true',
@@ -662,27 +625,6 @@ $('#attributeTb2').DataTable({
   ]
 })
 
-// createTabTable('#attributeTb2', 'tl_nc_floods_lyr', 'Wake', [{
-//     "title": "FIPS",
-//     data: "properties.fips",
-//     "class": "center"
-//   },
-//   {
-//     "title": "County",
-//     data: "properties.county",
-//     "class": "center"
-//   },
-//   {
-//     "title": "Date",
-//     data: "properties.issued",
-//     "class": "center"
-//   },
-//   {
-//     "title": "Sub Group",
-//     data: "properties.description",
-//     "class": "center"
-//   },
-// ], );
 
 $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
   $.fn.dataTable.tables({
@@ -801,7 +743,6 @@ var colors = [{
 
 var alpha = d3.scaleLinear().domain([0, 100]).range([0, 1]);
 
-// var d3table = d3.select("#chart").append("table");
 var d3table = d3.select("#attributeTb3").append("table").attr("width", '100%');
 
 thead = d3table.append("thead");
@@ -918,10 +859,10 @@ function testtoggle() {
   let toggleon = document.getElementById('toggle').checked;
   if (toggleon) {
     $("#dialog").dialog("open");
-    console.log("toggle on")
+    // console.log("toggle on")
   } else {
     $("#dialog").dialog("close");
-    console.log("toggle off")
+    // console.log("toggle off")
   }
 }
 
@@ -1015,14 +956,14 @@ updateMapBtn.onclick = function () {
     params += "minYear:" + minYear + ";maxYear:" + maxYear;
   }
   // let params = "sublist:" + categories.join("\\,");
-  console.log(params);
+  // console.log(params);
 
   let lyrs = map.getLayerGroup().getLayers().array_.filter(e => {
     return e.values_.title == 'Layers'
   })[0];
   let lyrGroups = lyrs.getLayers().getArray();
   let selectedLyr = lyrGroups.filter(l => l.get('title') == selectedLayer);
-  console.log(selectedLyr);
+  // console.log(selectedLyr);
 
   // Update WMS layer
   selectedLyr[0].getLayersArray()[0].getSource().updateParams({
@@ -1042,22 +983,17 @@ targetLayer.onchange = function () {
   })[0];
   let lyrGroups = lyrs.getLayers().getArray();
   let selectedLyr = lyrGroups.filter(l => l.get('title') == selectedLayer);
-  console.log(selectedLyr);
+  // console.log(selectedLyr);
   let nonselectedLyr = lyrGroups.filter(l => l.get('title') != selectedLayer);
 
   nonselectedLyr.forEach(l => l.setVisible(false));
   selectedLyr[0].getLayersArray()[0].setVisible(true);
   updateLegend(selectedLyr[0]);
 
-  // document.getElementsByClassName('ui-slider-handle ui-corner-all ui-state-default')[0].style.left = '0%';
-  // console.log(document.getElementsByClassName('ui-slider-handle ui-corner-all ui-state-default')[0].style.left);
-  // document.getElementsByClassName('ui-slider-handle ui-corner-all ui-state-default')[1].style.left = '100%';
-  // document.getElementsByClassName('ui-slider-range ui-corner-all ui-widget-header')[0].style.left = '0%';
-  // document.getElementsByClassName('ui-slider-range ui-corner-all ui-widget-header')[0].style.width = '100%';
 
-  // test to get the initial min year and max years from the layer
+  // get the initial min year and max years from the layer, and assign to the time slider
   let selectedState = form.querySelector('#state-picker').value;
-  let testurl = selectedLyr[0].getLayersArray()[0].getSource().getGetFeatureInfoUrl(
+  let featureInfoUrl = selectedLyr[0].getLayersArray()[0].getSource().getGetFeatureInfoUrl(
     ol.proj.transform(viewObject[selectedState], 'EPSG:4326', 'EPSG:3857'),
     map.getView().getResolution(),
     map.getView().getProjection(), {
@@ -1066,7 +1002,7 @@ targetLayer.onchange = function () {
     }
   );
 
-  fetch(testurl)
+  fetch(featureInfoUrl)
     .then(function (response) {
       return response.json();
     })
@@ -1075,7 +1011,7 @@ targetLayer.onchange = function () {
       let currentp = currentf.properties;
       let miny = currentp.minyear;
       let maxy = currentp.maxyear;
-      // console.log(miny, ', max year: ', maxy)
+
       $('.slider-time').html(miny);
       $('.slider-time2').html(maxy);
 
@@ -1087,7 +1023,7 @@ targetLayer.onchange = function () {
     });
 
 
-  console.log(this.value);
+  // console.log(this.value);
   check.innerHTML = '';
   // subCategory.options.length = 0;
   switch (this.value) {
@@ -1128,14 +1064,11 @@ targetLayer.onchange = function () {
   };
 
   // reload data in attribute table 1 if layer switched
-  let tb2source = selectedLyr[0].getLayersArray()[0].getSource().params_.LAYERS;
-  let tb2 = $('#attributeTb').DataTable();
-  tb2.ajax.url(attributeDataUrl + '&typeName=' + tb2source).load();
+  let countTbSrc = selectedLyr[0].getLayersArray()[0].getSource().params_.LAYERS;
+  let countTb = $('#attributeTb').DataTable();
+  countTb.ajax.url(attributeDataUrl + '&typeName=' + countTbSrc).load();
 
-  // let lyrtable = 'tl_' + statepicker.value + '_' + tb2source.replace('hera:', '').split('_')[0] + '_lyr';
-
-  recreateDataTable(tb2source);
-
+  recreateDataTable(countTbSrc);
 }
 
 var expanded = false;
@@ -1203,7 +1136,7 @@ function toggleNav() {
   navSize = document.getElementById("tableSidenav").style.height;
   // If the height of table navigation bar equals to 250 px (the table is opened), close the table; otherwise, open it.
   if (navSize == "40%") {
-    console.log("close");
+    // console.log("close");
     return closeNav();
   }
   return openNav();
@@ -1232,12 +1165,9 @@ statepicker.onchange = function (e) {
   let baselyrs = map.getLayerGroup().getLayers().array_.filter(e => {
     return e.values_.title == 'Base maps'
   })[0];
-
-
-  let statelyr = baselyrs.getLayersArray().filter(l => l.type == 'VECTOR')[0];
-
   let newsource = boundarySource(selstate);
 
+  let statelyr = baselyrs.getLayersArray().filter(l => l.type == 'VECTOR')[0];
   statelyr.setSource(newsource);
 
   let lyrs = map.getLayerGroup().getLayers().array_.filter(e => {
@@ -1245,7 +1175,6 @@ statepicker.onchange = function (e) {
   })[0];
 
   let lyrsArray = lyrs.getLayersArray();
-
   lyrsArray.forEach(function (l) {
     l.getSource().updateParams({
       // LAYERS: newl
@@ -1253,10 +1182,10 @@ statepicker.onchange = function (e) {
     })
   });
 
-
   let newView = new ol.View({
     center: ol.proj.fromLonLat(viewObject[selstate]),
     zoom: 8
   });
+
   map.setView(newView);
 }

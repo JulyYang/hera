@@ -350,7 +350,7 @@ map.on('singleclick', function (evt) {
 
         createContent(lyr, selected);
 
-
+        // Load the data of the selected county to the datatable
         let countynameArray = Object.keys(selected).map(k => selected[k]['county']);
         console.log(countynameArray);
         let countynames = '(%27' + countynameArray.join('%27, %27') + '%27)'
@@ -360,7 +360,52 @@ map.on('singleclick', function (evt) {
         // console.log(lyr.replace('hera:', '').split('_')[0]);
         // datatb.ajax.url(attributeDataUrl + '&typeName=' + lyrtable + '&CQL_FILTER=county=%27' + countyname + '%27').load();
         // datatb.ajax.url(attributeDataUrl + '&typeName=' + lyrtable + '&CQL_FILTER=county IN '+ '(%27' + countyname + '%27)').load();
-        datatb.ajax.url(attributeDataUrl + '&typeName=' + lyrtable + '&CQL_FILTER=county IN ' + countynames).load();
+
+
+        // Get the current params on the map
+        // let minYear = form.querySelector('.slider-time').innerHTML.replace(/\//g, "-"); 
+        // let maxYear = form.querySelector('.slider-time2').innerHTML.replace(/\//g, "-"); 
+        let minYear = form.querySelector('.slider-time').innerHTML + '-01-01';
+        let maxYear = form.querySelector('.slider-time2').innerHTML + '-12-31';
+        let categories = [];
+        // let params = "state:" + selectedState + ";";
+        // let params = 'AND issued BETWEEN '+ minYear + ' AND ' + maxYear;
+        let params = 'BETWEEN '+ minYear + ' AND ' + maxYear;
+        console.log(lyr.replace('hera:', '').split('_')[0], '_here');
+
+        switch (lyr.replace('hera:', '').split('_')[0]){
+          case 'hw':
+          case 'hl':
+            params = 'AND observ_time ' + params;
+            console.log(params);
+            break;
+          default:
+            params = 'AND issued ' + params;
+            console.log(params, ' test');
+        }
+      
+        form.querySelectorAll('input[type="checkbox"]:checked').forEach(i => categories.push("'" + i.name + "'"));
+        // let params = "minYear:" + minYear + ";maxYear:" + maxYear + ";sublist:" + "'CF'\\,'FA'";
+        if (categories.length > 0) {
+          switch (lyr.replace('hera:', '').split('_')[0]){
+            case 'hw':
+              params += "AND wspeed_rating_mph IN ("+ categories.join(",") + ")";
+              break;
+            default:
+              params += "AND phenom_subgroup IN ("+ categories.join(",") + ")";
+          }
+          // params += "AND phenom_subgroup IN ("+ categories.join(",") + ")";
+          // params += "AND phenom_subgroup IN ("+ categories.join("\\,") + ")";
+          // params += "AND phenom_subgroup IN ("+ categories.join("\\,") + ")" +"minYear:" + minYear + ";maxYear:" + maxYear + ";sublist:" + categories.join("\\,");
+        // } else {
+        //   params += "minYear:" + minYear + ";maxYear:" + maxYear;
+        }
+
+        // datatb.ajax.url(attributeDataUrl + '&typeName=' + lyrtable + '&CQL_FILTER=county IN ' + countynames).load();
+        console.log(attributeDataUrl + '&typeName=' + lyrtable + '&CQL_FILTER=county IN ' + countynames + params);
+        datatb.ajax.url(attributeDataUrl + '&typeName=' + lyrtable + '&CQL_FILTER=county IN ' + countynames + params).load();
+
+        
 
       });
     overlay.setPosition(coord);
@@ -473,7 +518,7 @@ let recreateDataTable = function (lyr) {
       ]
   }
 
-  createTabTable('#attributeTb2', lyrtable, null, dataColumns)
+  createTabTable('#attributeTb2', lyrtable, null, null, dataColumns)
 
 };
 // interactionSelect.on('select', function (e) {
@@ -502,7 +547,7 @@ document.getElementById("tab-3").innerHTML = "Highlight table";
 
 // Create attribute table using Jquery library DataTable
 // function createTabTable(attributeTableID, layerID, properties) {
-function createTabTable(attributeTableID, layerID, countyname, properties) {
+function createTabTable(attributeTableID, layerID, countyname, params ,properties) {
   // Use the new 'DataTable' function rather than the older one 'dataTable'
   var table = $(attributeTableID).DataTable({
     responsive: 'true',
@@ -522,13 +567,11 @@ function createTabTable(attributeTableID, layerID, countyname, properties) {
       // Delete the limitation: maxFeatures=50
       // Solved from Stackoverflow questions no.48147970
       "url": attributeDataUrl +
-        // 'http://hera1.oasis.unc.edu:8080/geoserver/hera/wfs?service=WFS' +
-        // '&version=1.0.0&request=GetFeature' +
-        // '&typeName=hera:' + layerID +
         '&typeName=' + layerID +
-        // '&outputFormat=application/json' +
-        // '&CQL_FILTER=county=%27' + countyname + '%27',
-        '&CQL_FILTER=county IN (%27' + countyname + '%27)',
+        '&CQL_FILTER=county IN (%27' + countyname + '%27)' +
+        '&viewparams=' + params,
+        // '&CQL_FILTER=county IN (%27' + countyname + '%27)' + 'AND wspeed_rating_mph IN (%27'+ sub + '%27)' + 'AND observ_time BETWEEN' + starttime +  'AND' + endtime,
+        // county IN ('Hyde') AND wspeed_rating_mph IN ('Gale Force', 'Hurricane Force') AND observ_time BETWEEN '2006-01-01T00:00:00' AND '2010-12-31T00:00:00'
       "dataSrc": "features"
     },
     "columns": properties,
@@ -1011,6 +1054,19 @@ updateMapBtn.onclick = function () {
   // Update WFS layer
   // let wfsl = selectedLyr[0].getLayersArray()[1];
   // refreshSource(lyrname, params, wfsl);
+
+  // Update Count table
+  let countTbSrc = selectedLyr[0].getLayersArray()[0].getSource().params_.LAYERS;
+  let countTb = $('#attributeTb').DataTable();
+  console.log(params);
+  console.log(params.replaceAll('\\', '%5C'));
+  params = params.replaceAll('\\', '%5C');
+  countTb.ajax.url(attributeDataUrl + '&typeName=' + countTbSrc + '&viewparams=' + params).load();
+  // countTb.ajax.url(attributeDataUrl + '&typeName=' + countTbSrc + '&viewparams=state:' + selectedState).load();
+  // countTb.ajax.url("http://hera1.oasis.unc.edu:8080/geoserver/hera/wfs?service=WFS&version=1.0.0&request=GetFeature&outputFormat=application/json&typeName=hera:floods_sql&viewparams=minYear:2010;maxYear:2018;sublist:%27CF%27%5C,%27FA%27").load();
+
+  // recreateDataTable(countTbSrc);
+  
 }
 
 targetLayer.onchange = function () {
@@ -1101,10 +1157,10 @@ targetLayer.onchange = function () {
     // check.appendChild(document.createElement('br'));
   };
 
-  // reload data in attribute table 1 if layer switched
+  // reload data in Count Table if layer switched
   let countTbSrc = selectedLyr[0].getLayersArray()[0].getSource().params_.LAYERS;
   let countTb = $('#attributeTb').DataTable();
-  countTb.ajax.url(attributeDataUrl + '&typeName=' + countTbSrc).load();
+  countTb.ajax.url(attributeDataUrl + '&typeName=' + countTbSrc + '&viewparams=state:' + selectedState).load();
 
   recreateDataTable(countTbSrc);
 }
@@ -1226,4 +1282,14 @@ statepicker.onchange = function (e) {
   });
 
   map.setView(newView);
+
+  let selectedLayer = form.querySelector('#target-layer').value;
+  let selectedLyr = lyrsArray.filter(l => l.get('title') == selectedLayer); console.log(selectedLyr);
+  let countTbSrc = selectedLyr[0].getLayersArray()[0].getSource().params_.LAYERS;
+  console.log(countTbSrc);
+  // Update the count table
+  $('#attributeTb').DataTable().ajax.url(attributeDataUrl + '&typeName=' + countTbSrc + '&viewparams=state:' + selstate).load();
+
+  // Delete the current data table and reinitialize the table
+  recreateDataTable(countTbSrc);
 }

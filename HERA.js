@@ -110,6 +110,13 @@ var map = new ol.Map({
           layers: [
             basemap,
 
+            new ol.layer.Tile({
+              // title: "2017 population",
+              // visible: false,
+              // source: WMSsource('hera:ncsc_population_lyr', null, "stusps = 'NC'")
+              source: WMSsource_oasis('hera:tl_2019_us_state')
+            }),
+
             new ol.layer.Vector({
               source: boundarySource('nc'),
               style: new ol.style.Style({
@@ -710,10 +717,16 @@ function ajaxcall(jsonSource) {
   // var json;
   // var layerjson;
   return $.ajax({
-    // async: false, // set acync to false is bad for browser performance
-    url: `http://hera1.oasis.unc.edu:8080/geoserver/hera/ows?service=WFS&version=1.0.0
-        &request=GetFeature&typeName=` + 'hera:highlightTable_sql' + `&outputFormat=json
-        &format_options=callback:getJson`,
+    // async: false, // set acync to false is BAD for browser performance!!
+    // url: `http://hera1.oasis.unc.edu:8080/geoserver/hera/ows?service=WFS&version=1.0.0
+    url: 'http://hera1.oasis.unc.edu:8080/geoserver/hera/wfs?service=WFS&version=1.0.0' +
+        '&request=GetFeature' + '&outputFormat=application/json' + //seems like both json & application/json work
+    // url: attributeDataUrl + 
+        '&typeName=hera:highlightTable_sql' +
+        // '&typeName=hera:test_highlight' +
+        // '&viewparams=' + 'minYear:'+ '2017' +
+        '&format_options=callback:getJson'
+        + '&viewparams=' + 'state:nc' + ';lyr:ww' +';minYear:'+ '2010'+ ";sublist:%27WW%27%5C,%27BZ%27", 
     dataType: 'json',
     jsonpCallback: 'getJson',
     // success: parsejson
@@ -723,18 +736,6 @@ function ajaxcall(jsonSource) {
     // }
   });
 };
-
-
-
-// function testjquery() {
-//   layerjson.features.forEach(
-//     function (i) {
-//       var yearlist = [];
-//       yearlist.push(i.properties['year_issued'], i.properties['jan'], i.properties['feb'], i.properties['mar'], i.properties['apr'], i.properties['may'],
-//         i.properties['jun'], i.properties['jul'], i.properties['aug'], i.properties['sep'], i.properties['oct'], i.properties['nov'], i.properties['dec']);
-//       dummy.push(yearlist);
-//     })
-// }
 
 // ajaxcall(jsonSource).then(function (response) {
 //   console.log(response)
@@ -1122,26 +1123,30 @@ targetLayer.onchange = function () {
   // subCategory.options.length = 0;
   switch (this.value) {
     case 'Floods ':
-      sub = ['FA', 'FL', 'FF', 'CF'];
+      // sub = ['FA', 'FL', 'FF', 'CF'];
+      sub = {'FA': 'Areal Flood', 'FL': 'River Flood', 'FF': 'Flash Flood', 'CF': 'Coastal Flood'};
 
       break;
     case 'Winter Weather ':
-      sub = ['BZ', 'WC', 'WW', 'HS', 'SN', 'ZR', 'IS', 'WS'];
+      // sub = ['BZ', 'WC', 'WW', 'HS', 'SN', 'ZR', 'IS', 'WS'];
+      sub = {'BZ': 'Blizzard', 'WC': 'Wind Chill', 'WW': 'Winter Weather', 'HS': 'Heavy Snow', 'SN': 'Snow', 'ZR': 'Freezing Rain', 'IS': 'Ice Snow', 'WS': 'Winter Storm'};
 
       break;
-    case 'Heat ', 'Hails ':
-      sub = [];
+    case 'Heat ':
+    case 'Hails ':
+      sub = {};
       // check.style.visibility = 'hidden';
 
       break;
     case 'High Winds ':
-      sub = ['Gale Force', 'Storm Force', 'Hurricane Force'];
+      sub = {'Gale Force':'Gale Force', 'Storm Force': 'Storm Force', 'Hurricane Force': 'Hurricane Force'};
       // check.style.visibility = 'hidden';
 
       break;
   }
 
-  for (s of sub) {
+  // for (s of sub) {
+  for (s of Object.keys(sub)) {
     var l = document.createElement('label');
     var input = document.createElement('input');
     input.value = s;
@@ -1150,7 +1155,8 @@ targetLayer.onchange = function () {
     input.type = 'checkbox';
     l.setAttribute('for', s);
     l.appendChild(input);
-    l.innerHTML = l.innerHTML + s;
+    // l.innerHTML = l.innerHTML + s;
+    l.innerHTML = l.innerHTML + sub[s];
 
     // check.appendChild(input);
     check.appendChild(l);

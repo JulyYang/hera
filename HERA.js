@@ -321,10 +321,11 @@ map.on('singleclick', function (evt) {
       if (source instanceof ol.source.TileWMS) {
         // lyr = layer['values_']['source']['params_']['LAYERS']; console.log('lyr: ', lyr);
         lyr = source.params_.LAYERS;
+        // console.log(source);
         return source;
       }
     });
-  if (wmslayerSource) {
+  if (wmslayerSource && wmslayerSource.params_.LAYERS != 'hera:tl_2019_us_state') {
     var url = wmslayerSource.getGetFeatureInfoUrl(
       coord, resolution, projection, {
         'INFO_FORMAT': 'application/json',
@@ -1255,7 +1256,14 @@ function closeNav() {
 // EPSG: 4326 for the map view
 let viewObject = {
   'nc': [-79.5, 35.1],
-  'sc': [-80.98, 33.5]
+  'sc': [-80.98, 33.5],
+  'al': [-86.76009837890047, 32.9443670582841],
+  'fl':[-81.46534257518124, 28.027774701069074],
+  'ga':[-83.26866621236242, 32.68590204823714],
+  'ky':[-84.88053210957419, 37.55755431646804],
+  'ms':[-89.65917980802011, 32.92082460541776],
+  'tn':[-86.36542223336966, 35.82748848339025],
+  'va':[-78.63208332413177, 37.39087233427526]
 }
 
 var statepicker = document.getElementById('state-picker');

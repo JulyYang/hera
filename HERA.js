@@ -294,6 +294,10 @@ let createContent = function (lyr, selected) {
   })
 };
 
+// let createContentHtml = function(){
+//   contentHtml = 
+// };
+
 var shiftPressed = false;
 $(document).keydown(function (event) {
   shiftPressed = event.keyCode == 16;
@@ -378,10 +382,10 @@ map.on('singleclick', function (evt) {
         let categories = [];
         // let params = "state:" + selectedState + ";";
         // let params = 'AND issued BETWEEN '+ minYear + ' AND ' + maxYear;
-        let params = 'BETWEEN '+ minYear + ' AND ' + maxYear;
+        let params = 'BETWEEN ' + minYear + ' AND ' + maxYear;
         console.log(lyr.replace('hera:', '').split('_')[0], '_here');
 
-        switch (lyr.replace('hera:', '').split('_')[0]){
+        switch (lyr.replace('hera:', '').split('_')[0]) {
           case 'hw':
           case 'hl':
             params = 'AND observ_time ' + params;
@@ -391,29 +395,29 @@ map.on('singleclick', function (evt) {
             params = 'AND issued ' + params;
             console.log(params, ' test');
         }
-      
+
         form.querySelectorAll('input[type="checkbox"]:checked').forEach(i => categories.push("'" + i.name + "'"));
         // let params = "minYear:" + minYear + ";maxYear:" + maxYear + ";sublist:" + "'CF'\\,'FA'";
         if (categories.length > 0) {
-          switch (lyr.replace('hera:', '').split('_')[0]){
+          switch (lyr.replace('hera:', '').split('_')[0]) {
             case 'hw':
-              params += "AND wspeed_rating_mph IN ("+ categories.join(",") + ")";
+              params += "AND wspeed_rating_mph IN (" + categories.join(",") + ")";
               break;
             default:
-              params += "AND phenom_subgroup IN ("+ categories.join(",") + ")";
+              params += "AND phenom_subgroup IN (" + categories.join(",") + ")";
           }
           // params += "AND phenom_subgroup IN ("+ categories.join(",") + ")";
           // params += "AND phenom_subgroup IN ("+ categories.join("\\,") + ")";
           // params += "AND phenom_subgroup IN ("+ categories.join("\\,") + ")" +"minYear:" + minYear + ";maxYear:" + maxYear + ";sublist:" + categories.join("\\,");
-        // } else {
-        //   params += "minYear:" + minYear + ";maxYear:" + maxYear;
+          // } else {
+          //   params += "minYear:" + minYear + ";maxYear:" + maxYear;
         }
 
         // datatb.ajax.url(attributeDataUrl + '&typeName=' + lyrtable + '&CQL_FILTER=county IN ' + countynames).load();
         console.log(attributeDataUrl + '&typeName=' + lyrtable + '&CQL_FILTER=county IN ' + countynames + params);
         datatb.ajax.url(attributeDataUrl + '&typeName=' + lyrtable + '&CQL_FILTER=county IN ' + countynames + params).load();
 
-        
+
 
       });
     overlay.setPosition(coord);
@@ -555,7 +559,7 @@ document.getElementById("tab-3").innerHTML = "Highlight table";
 
 // Create attribute table using Jquery library DataTable
 // function createTabTable(attributeTableID, layerID, properties) {
-function createTabTable(attributeTableID, layerID, countyname, params ,properties) {
+function createTabTable(attributeTableID, layerID, countyname, params, properties) {
   // Use the new 'DataTable' function rather than the older one 'dataTable'
   var table = $(attributeTableID).DataTable({
     responsive: 'true',
@@ -578,8 +582,8 @@ function createTabTable(attributeTableID, layerID, countyname, params ,propertie
         '&typeName=' + layerID +
         '&CQL_FILTER=county IN (%27' + countyname + '%27)' +
         '&viewparams=' + params,
-        // '&CQL_FILTER=county IN (%27' + countyname + '%27)' + 'AND wspeed_rating_mph IN (%27'+ sub + '%27)' + 'AND observ_time BETWEEN' + starttime +  'AND' + endtime,
-        // county IN ('Hyde') AND wspeed_rating_mph IN ('Gale Force', 'Hurricane Force') AND observ_time BETWEEN '2006-01-01T00:00:00' AND '2010-12-31T00:00:00'
+      // '&CQL_FILTER=county IN (%27' + countyname + '%27)' + 'AND wspeed_rating_mph IN (%27'+ sub + '%27)' + 'AND observ_time BETWEEN' + starttime +  'AND' + endtime,
+      // county IN ('Hyde') AND wspeed_rating_mph IN ('Gale Force', 'Hurricane Force') AND observ_time BETWEEN '2006-01-01T00:00:00' AND '2010-12-31T00:00:00'
       "dataSrc": "features"
     },
     "columns": properties,
@@ -714,20 +718,27 @@ var jsonSource = 'hera:highlightTable_sql';
 
 // var layerjson;
 
-function ajaxcall(jsonSource) {
+function ajaxcall(state, layer, sublist) {
   // var json;
   // var layerjson;
+  console.log('http://hera1.oasis.unc.edu:8080/geoserver/hera/ows?service=WFS&version=1.0.0' +
+    '&request=GetFeature' + '&outputFormat=application/json' + 
+    '&typeName=hera:highlightTable_sql' +
+    '&format_options=callback:getJson' +
+    '&viewparams=' + 'state:'+ state + ';lyr:'+ layer+ ";sublist:" + sublist);
   return $.ajax({
     // async: false, // set acync to false is BAD for browser performance!!
-    // url: `http://hera1.oasis.unc.edu:8080/geoserver/hera/ows?service=WFS&version=1.0.0
-    url: 'http://hera1.oasis.unc.edu:8080/geoserver/hera/wfs?service=WFS&version=1.0.0' +
-        '&request=GetFeature' + '&outputFormat=application/json' + //seems like both json & application/json work
-    // url: attributeDataUrl + 
-        '&typeName=hera:highlightTable_sql' +
-        // '&typeName=hera:test_highlight' +
-        // '&viewparams=' + 'minYear:'+ '2017' +
-        '&format_options=callback:getJson'
-        + '&viewparams=' + 'state:nc' + ';lyr:ww' +';minYear:'+ '2010'+ ";sublist:%27WW%27%5C,%27BZ%27", 
+    url: 'http://hera1.oasis.unc.edu:8080/geoserver/hera/ows?service=WFS&version=1.0.0' +
+    // url: 'http://hera1.oasis.unc.edu:8080/geoserver/hera/wfs?service=WFS&version=1.0.0' +
+      '&request=GetFeature' + '&outputFormat=application/json' + //seems like both json & application/json work
+      // url: attributeDataUrl + 
+      '&typeName=hera:highlightTable_sql' +
+      // '&typeName=hera:test_highlight' +
+      // '&viewparams=' + 'minYear:'+ '2017' +
+      '&format_options=callback:getJson' +
+      // '&viewparams=' + 'state:nc' + ';lyr:ww' + ';minYear:' + '2010' + ";sublist:%27WW%27%5C,%27BZ%27",
+      // '&viewparams=' + 'state:'+'nc' + ';lyr:'+ 'floods',
+      '&viewparams=' + 'state:'+ state + ';lyr:'+ layer+ ";sublist:" + sublist,
     dataType: 'json',
     jsonpCallback: 'getJson',
     // success: parsejson
@@ -742,7 +753,7 @@ function ajaxcall(jsonSource) {
 //   console.log(response)
 // });
 
-ajaxcall(jsonSource).then(function (layerjson) {
+ajaxcall('nc', 'ww', '%27WW%27%5C,%27BZ%27').then(function (layerjson) {
   var dummy = [];
 
   layerjson.features.forEach(
@@ -771,55 +782,55 @@ function createhighlight(dummy) {
     // a: 63%
     r: 255,
     g: 255,
-    b: 255
+    b: 255,
   }, {
     r: 59,
     g: 115,
     b: 143
-  }, {
-    r: 59,
-    g: 115,
-    b: 143
-  }, {
-    r: 59,
-    g: 115,
-    b: 143
-  }, {
-    r: 59,
-    g: 115,
-    b: 143
-  }, {
-    r: 59,
-    g: 115,
-    b: 143
-  }, {
-    r: 59,
-    g: 115,
-    b: 143
-  }, {
-    r: 59,
-    g: 115,
-    b: 143
-  }, {
-    r: 59,
-    g: 115,
-    b: 143
-  }, {
-    r: 59,
-    g: 115,
-    b: 143
-  }, {
-    r: 59,
-    g: 115,
-    b: 143
-  }, {
-    r: 59,
-    g: 115,
-    b: 143
-  }, {
-    r: 59,
-    g: 115,
-    b: 143
+  // }, {
+  //   r: 59,
+  //   g: 115,
+  //   b: 143
+  // }, {
+  //   r: 59,
+  //   g: 115,
+  //   b: 143
+  // }, {
+  //   r: 59,
+  //   g: 115,
+  //   b: 143
+  // }, {
+  //   r: 59,
+  //   g: 115,
+  //   b: 143
+  // }, {
+  //   r: 59,
+  //   g: 115,
+  //   b: 143
+  // }, {
+  //   r: 59,
+  //   g: 115,
+  //   b: 143
+  // }, {
+  //   r: 59,
+  //   g: 115,
+  //   b: 143
+  // }, {
+  //   r: 59,
+  //   g: 115,
+  //   b: 143
+  // }, {
+  //   r: 59,
+  //   g: 115,
+  //   b: 143
+  // }, {
+  //   r: 59,
+  //   g: 115,
+  //   b: 143
+  // }, {
+  //   r: 59,
+  //   g: 115,
+  //   b: 143
   }];
 
   var alpha = d3.scaleLinear().domain([0, 100]).range([0, 1]);
@@ -855,7 +866,12 @@ function createhighlight(dummy) {
     .append("td")
     .attr("class", "highlight-td")
     .style('background-color', function (d, i) {
-      return 'rgba(' + colors[i].r + ',' + colors[i].g + ',' + colors[i].b + ',' + alpha(d) + ')';
+      if (i == 0) {
+        return 'rgba(' + colors[i].r + ',' + colors[i].g + ',' + colors[i].b + ',' + alpha(d) + ')';
+      } else {
+        return 'rgba(' + colors[1].r + ',' + colors[1].g + ',' + colors[1].b + ',' + alpha(d) + ')';
+      }
+      // return 'rgba(' + colors[i].r + ',' + colors[i].g + ',' + colors[i].b + ',' + alpha(d) + ')';
     })
     .text(function (d) {
       return d;
@@ -1063,12 +1079,13 @@ updateMapBtn.onclick = function () {
   console.log(params);
   console.log(params.replaceAll('\\', '%5C'));
   params = params.replaceAll('\\', '%5C');
+  params = params.replaceAll(' ', '%20');
   countTb.ajax.url(attributeDataUrl + '&typeName=' + countTbSrc + '&viewparams=' + params).load();
   // countTb.ajax.url(attributeDataUrl + '&typeName=' + countTbSrc + '&viewparams=state:' + selectedState).load();
   // countTb.ajax.url("http://hera1.oasis.unc.edu:8080/geoserver/hera/wfs?service=WFS&version=1.0.0&request=GetFeature&outputFormat=application/json&typeName=hera:floods_sql&viewparams=minYear:2010;maxYear:2018;sublist:%27CF%27%5C,%27FA%27").load();
 
   // recreateDataTable(countTbSrc);
-  
+
 }
 
 targetLayer.onchange = function () {
@@ -1125,12 +1142,26 @@ targetLayer.onchange = function () {
   switch (this.value) {
     case 'Floods ':
       // sub = ['FA', 'FL', 'FF', 'CF'];
-      sub = {'FA': 'Areal Flood', 'FL': 'River Flood', 'FF': 'Flash Flood', 'CF': 'Coastal Flood'};
+      sub = {
+        'FA': 'Areal Flood',
+        'FL': 'River Flood',
+        'FF': 'Flash Flood',
+        'CF': 'Coastal Flood'
+      };
 
       break;
     case 'Winter Weather ':
       // sub = ['BZ', 'WC', 'WW', 'HS', 'SN', 'ZR', 'IS', 'WS'];
-      sub = {'BZ': 'Blizzard', 'WC': 'Wind Chill', 'WW': 'Winter Weather', 'HS': 'Heavy Snow', 'SN': 'Snow', 'ZR': 'Freezing Rain', 'IS': 'Ice Snow', 'WS': 'Winter Storm'};
+      sub = {
+        'BZ': 'Blizzard',
+        'WC': 'Wind Chill',
+        'WW': 'Winter Weather',
+        'HS': 'Heavy Snow',
+        'SN': 'Snow',
+        'ZR': 'Freezing Rain',
+        'IS': 'Ice Snow',
+        'WS': 'Winter Storm'
+      };
 
       break;
     case 'Heat ':
@@ -1140,7 +1171,11 @@ targetLayer.onchange = function () {
 
       break;
     case 'High Winds ':
-      sub = {'Gale Force':'Gale Force', 'Storm Force': 'Storm Force', 'Hurricane Force': 'Hurricane Force'};
+      sub = {
+        'Gale Force': 'Gale Force',
+        'Storm Force': 'Storm Force',
+        'Hurricane Force': 'Hurricane Force'
+      };
       // check.style.visibility = 'hidden';
 
       break;
@@ -1170,6 +1205,32 @@ targetLayer.onchange = function () {
   countTb.ajax.url(attributeDataUrl + '&typeName=' + countTbSrc + '&viewparams=state:' + selectedState).load();
 
   recreateDataTable(countTbSrc);
+
+  // change highlight table params
+  // $('#attributeTb3 tr').remove();
+  lyrid = countTbSrc.replace('hera:', '').split('_')[0];
+  list = '';
+  for (s of Object.keys(sub)){
+    list += '%27' + s + '%27%5C,' 
+  };
+  list = list.slice(0, -4);
+  ajaxcall(selectedState, lyrid, list).then(function (layerjson) {
+  // // ajaxcall('nc', 'floods').then(function (layerjson) {
+    $('#attributeTb3 table').remove();
+    var dummy = [];
+    // console.log(layerjson)
+  
+    layerjson.features.forEach(
+      function (i) {
+        var yearlist = [];
+        yearlist.push(i.properties['year_issued'], i.properties['jan'], i.properties['feb'], i.properties['mar'], i.properties['apr'], i.properties['may'],
+          i.properties['jun'], i.properties['jul'], i.properties['aug'], i.properties['sep'], i.properties['oct'], i.properties['nov'], i.properties['dec']);
+        dummy.push(yearlist);
+      });
+    console.log(dummy);
+    createhighlight(dummy);
+  });
+  
 }
 
 var expanded = false;
@@ -1258,12 +1319,12 @@ let viewObject = {
   'nc': [-79.5, 35.1],
   'sc': [-80.98, 33.5],
   'al': [-86.76009837890047, 32.9443670582841],
-  'fl':[-81.46534257518124, 28.027774701069074],
-  'ga':[-83.26866621236242, 32.68590204823714],
-  'ky':[-84.88053210957419, 37.55755431646804],
-  'ms':[-89.65917980802011, 32.92082460541776],
-  'tn':[-86.36542223336966, 35.82748848339025],
-  'va':[-78.63208332413177, 37.39087233427526]
+  'fl': [-81.46534257518124, 28.027774701069074],
+  'ga': [-83.26866621236242, 32.68590204823714],
+  'ky': [-84.88053210957419, 37.55755431646804],
+  'ms': [-89.65917980802011, 32.92082460541776],
+  'tn': [-86.36542223336966, 35.82748848339025],
+  'va': [-78.63208332413177, 37.39087233427526]
 }
 
 var statepicker = document.getElementById('state-picker');
@@ -1298,7 +1359,8 @@ statepicker.onchange = function (e) {
   map.setView(newView);
 
   let selectedLayer = form.querySelector('#target-layer').value;
-  let selectedLyr = lyrsArray.filter(l => l.get('title') == selectedLayer); console.log(selectedLyr);
+  let selectedLyr = lyrsArray.filter(l => l.get('title') == selectedLayer);
+  console.log(selectedLyr);
   let countTbSrc = selectedLyr[0].getLayersArray()[0].getSource().params_.LAYERS;
   console.log(countTbSrc);
   // Update the count table

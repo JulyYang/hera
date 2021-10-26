@@ -365,7 +365,7 @@ map.on('singleclick', function (evt) {
         // Load the data of the selected county to the datatable
         let countynameArray = Object.keys(selected).map(k => selected[k]['county']);
         console.log(countynameArray);
-        let countynames = '(%27' + countynameArray.join('%27, %27') + '%27)'
+        let countynames = '(%27' + countynameArray.join('%27,%27') + '%27)'
         // let countyname = properties['county'];
         let lyrtable = 'tl_' + statepicker.value + '_' + lyr.replace('hera:', '').split('_')[0] + '_lyr';
         let datatb = $('#attributeTb2').DataTable();
@@ -397,7 +397,8 @@ map.on('singleclick', function (evt) {
             console.log(params, ' test');
         }
 
-        form.querySelectorAll('input[type="checkbox"]:checked').forEach(i => categories.push("'" + i.name + "'"));
+        // form.querySelectorAll('input[type="checkbox"]:checked').forEach(i => categories.push("'" + i.name + "'"));
+        form.querySelectorAll('input[type="checkbox"]:checked').forEach(i => categories.push("%27" + i.name + "%27"));
         // let params = "minYear:" + minYear + ";maxYear:" + maxYear + ";sublist:" + "'CF'\\,'FA'";
         if (categories.length > 0) {
           switch (lyr.replace('hera:', '').split('_')[0]) {
@@ -421,16 +422,17 @@ map.on('singleclick', function (evt) {
         let newlyrname = lyr.replace('hera:', '').split('_')[0];
         let newminYear = form.querySelector('.slider-time').innerHTML;
         let newmaxYear = form.querySelector('.slider-time2').innerHTML;
-        let newcountynames = countynames.replace('(', '').replace(')', '');
+        let newcountynames = countynames.replaceAll('(', '').replaceAll(')', '').replaceAll(",", "%5C,").replaceAll(' ', '%20');
         
         console.log('statepicker.value: ', statepicker.value);
         console.log('newcountynames: ', newcountynames);
         console.log('newminYear: ', newminYear);
         console.log('newmaxYear: ', newmaxYear);
         console.log('params: ', params);
-        console.log('categories: ', categories.join(","));
+        let categoriesString = categories.length == 0? lyrSubgroup[newlyrname]: categories.join("%5C,");
+        console.log(categoriesString);
 
-        ajaxcall(statepicker.value, newlyrname, lyrSubgroup[newlyrname], categories.join("%5C,"), newminYear, newmaxYear, newcountynames).then(function (layerjson) {
+        ajaxcall(statepicker.value, newlyrname, lyrSubgroup[newlyrname], categoriesString, newminYear, newmaxYear, newcountynames).then(function (layerjson) {
             $('#attributeTb3 table').remove();
             var dummy = [];
             // console.log(layerjson)
@@ -756,6 +758,7 @@ var jsonSource = 'hera:highlightTable_sql';
 // var layerjson;
 
 // function ajaxcall(state, layer, sublist) {
+// function ajaxcall(state, layer, subheader, sublist) {
 function ajaxcall(state, layer, subheader ,sublist, minyear='1989', maxyear='2021', county='county') {
   // var json;
   // var layerjson;

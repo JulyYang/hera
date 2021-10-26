@@ -373,6 +373,7 @@ map.on('singleclick', function (evt) {
         // datatb.ajax.url(attributeDataUrl + '&typeName=' + lyrtable + '&CQL_FILTER=county=%27' + countyname + '%27').load();
         // datatb.ajax.url(attributeDataUrl + '&typeName=' + lyrtable + '&CQL_FILTER=county IN '+ '(%27' + countyname + '%27)').load();
 
+        // let highlighttb = $('#attributrTb3').DataTable();
 
         // Get the current params on the map
         // let minYear = form.querySelector('.slider-time').innerHTML.replace(/\//g, "-"); 
@@ -416,7 +417,34 @@ map.on('singleclick', function (evt) {
         // datatb.ajax.url(attributeDataUrl + '&typeName=' + lyrtable + '&CQL_FILTER=county IN ' + countynames).load();
         console.log(attributeDataUrl + '&typeName=' + lyrtable + '&CQL_FILTER=county IN ' + countynames + params);
         datatb.ajax.url(attributeDataUrl + '&typeName=' + lyrtable + '&CQL_FILTER=county IN ' + countynames + params).load();
+        
+        let newlyrname = lyr.replace('hera:', '').split('_')[0];
+        let newminYear = form.querySelector('.slider-time').innerHTML;
+        let newmaxYear = form.querySelector('.slider-time2').innerHTML;
+        let newcountynames = countynames.replace('(', '').replace(')', '');
+        
+        console.log('statepicker.value: ', statepicker.value);
+        console.log('newcountynames: ', newcountynames);
+        console.log('newminYear: ', newminYear);
+        console.log('newmaxYear: ', newmaxYear);
+        console.log('params: ', params);
+        console.log('categories: ', categories.join(","));
 
+        ajaxcall(statepicker.value, newlyrname, lyrSubgroup[newlyrname], categories.join("%5C,"), newminYear, newmaxYear, newcountynames).then(function (layerjson) {
+            $('#attributeTb3 table').remove();
+            var dummy = [];
+            // console.log(layerjson)
+          
+            layerjson.features.forEach(
+              function (i) {
+                var yearlist = [];
+                yearlist.push(i.properties['year_issued'], i.properties['jan'], i.properties['feb'], i.properties['mar'], i.properties['apr'], i.properties['may'],
+                  i.properties['jun'], i.properties['jul'], i.properties['aug'], i.properties['sep'], i.properties['oct'], i.properties['nov'], i.properties['dec']);
+                dummy.push(yearlist);
+              });
+            console.log(dummy);
+            createhighlight(dummy);
+          });
 
 
       });
@@ -697,6 +725,15 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 });
 
 
+var lyrSubgroup = {
+  'floods':'phenom_subgroup',
+  'heats':'phenom_subgroup',
+  'ww':'phenom_subgroup',
+  'hw':'wspeed_rating_mph',
+  'tornado':'max_category'
+}
+
+
 var jsonSource = 'hera:highlightTable_sql';
 // Create mock-up highlight table as tableau
 // let layerjson = (function (jsonSource) {
@@ -718,27 +755,33 @@ var jsonSource = 'hera:highlightTable_sql';
 
 // var layerjson;
 
-function ajaxcall(state, layer, sublist) {
+// function ajaxcall(state, layer, sublist) {
+function ajaxcall(state, layer, subheader ,sublist, minyear='1989', maxyear='2021', county='county') {
   // var json;
   // var layerjson;
-  console.log('http://hera1.oasis.unc.edu:8080/geoserver/hera/ows?service=WFS&version=1.0.0' +
-    '&request=GetFeature' + '&outputFormat=application/json' + 
-    '&typeName=hera:highlightTable_sql' +
-    '&format_options=callback:getJson' +
-    '&viewparams=' + 'state:'+ state + ';lyr:'+ layer+ ";sublist:" + sublist);
+  let highlighttb_url = 'http://hera1.oasis.unc.edu:8080/geoserver/hera/ows?service=WFS&version=1.0.0' +
+  '&request=GetFeature' + '&outputFormat=application/json' + 
+  '&typeName=hera:highlightTable_sql' +
+  '&format_options=callback:getJson' +
+  '&viewparams=' + 'state:'+ state + ';lyr:'+ layer+ ";subheader:" + subheader +";sublist:" + sublist
+  + ";minYear:"+ minyear+ ";maxYear:"+ maxyear + ";county:"+ county;
+  // '&viewparams=' + 'state:'+ state + ';lyr:'+ layer+ ";subheader:" + subheader +";sublist:" + sublist;
+  console.log(highlighttb_url);
   return $.ajax({
     // async: false, // set acync to false is BAD for browser performance!!
-    url: 'http://hera1.oasis.unc.edu:8080/geoserver/hera/ows?service=WFS&version=1.0.0' +
-    // url: 'http://hera1.oasis.unc.edu:8080/geoserver/hera/wfs?service=WFS&version=1.0.0' +
-      '&request=GetFeature' + '&outputFormat=application/json' + //seems like both json & application/json work
-      // url: attributeDataUrl + 
-      '&typeName=hera:highlightTable_sql' +
-      // '&typeName=hera:test_highlight' +
-      // '&viewparams=' + 'minYear:'+ '2017' +
-      '&format_options=callback:getJson' +
-      // '&viewparams=' + 'state:nc' + ';lyr:ww' + ';minYear:' + '2010' + ";sublist:%27WW%27%5C,%27BZ%27",
-      // '&viewparams=' + 'state:'+'nc' + ';lyr:'+ 'floods',
-      '&viewparams=' + 'state:'+ state + ';lyr:'+ layer+ ";sublist:" + sublist,
+    url: highlighttb_url,
+    // url: 'http://hera1.oasis.unc.edu:8080/geoserver/hera/ows?service=WFS&version=1.0.0' +
+    // // url: 'http://hera1.oasis.unc.edu:8080/geoserver/hera/wfs?service=WFS&version=1.0.0' +
+    //   '&request=GetFeature' + '&outputFormat=application/json' + //seems like both json & application/json work
+    //   // url: attributeDataUrl + 
+    //   '&typeName=hera:highlightTable_sql' +
+    //   // '&typeName=hera:test_highlight' +
+    //   // '&viewparams=' + 'minYear:'+ '2017' +
+    //   '&format_options=callback:getJson' +
+    //   // '&viewparams=' + 'state:nc' + ';lyr:ww' + ';minYear:' + '2010' + ";sublist:%27WW%27%5C,%27BZ%27",
+    //   // '&viewparams=' + 'state:'+'nc' + ';lyr:'+ 'floods',
+    //   // '&viewparams=' + 'state:'+ state + ';lyr:'+ layer+ ";sublist:" + sublist,
+    //   '&viewparams=' + 'state:'+ state + ';lyr:'+ layer+ ";subheader:" + subheader +";sublist:" + sublist,
     dataType: 'json',
     jsonpCallback: 'getJson',
     // success: parsejson
@@ -753,7 +796,9 @@ function ajaxcall(state, layer, sublist) {
 //   console.log(response)
 // });
 
-ajaxcall('nc', 'ww', '%27WW%27%5C,%27BZ%27').then(function (layerjson) {
+// ajaxcall('nc', 'ww', '%27WW%27%5C,%27BZ%27').then(function (layerjson) {
+// ajaxcall('nc', 'ww', 'phenom_subgroup' ,'%27WW%27%5C,%27BZ%27').then(function (layerjson) {
+ajaxcall('nc', 'hw', lyrSubgroup['hw'] , lyrSubgroup['hw']).then(function (layerjson) {
   var dummy = [];
 
   layerjson.features.forEach(
@@ -1214,7 +1259,11 @@ targetLayer.onchange = function () {
     list += '%27' + s + '%27%5C,' 
   };
   list = list.slice(0, -4);
-  ajaxcall(selectedState, lyrid, list).then(function (layerjson) {
+  console.log(lyrSubgroup[lyrid]);
+  console.log(list);
+  ajaxcall(selectedState, lyrid, lyrSubgroup[lyrid], lyrSubgroup[lyrid]).then(function (layerjson) {
+  // ajaxcall(selectedState, lyrid, lyrSubgroup[lyrid], list).then(function (layerjson) {
+  // ajaxcall(selectedState, lyrid, list).then(function (layerjson) {
   // // ajaxcall('nc', 'floods').then(function (layerjson) {
     $('#attributeTb3 table').remove();
     var dummy = [];

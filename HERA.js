@@ -881,6 +881,42 @@ function createhighlight(dummy) {
   //   b: 143
   }];
 
+  const tooltip = d3.select("#attributeTb3")
+  .append("div")
+  .style("opacity", 0)
+  .attr("class", "tooltip")
+  .style("background-color", "white")
+  .style("border", "solid")
+  .style("border-width", "2px")
+  .style("border-radius", "5px")
+  .style("padding", "5px");
+
+  const mouseover = function(event,d) {
+    tooltip
+      .style("opacity", 1)
+    d3.select(this)
+    .style("stroke", "black")
+    .style("opacity", 1)
+  };
+  const mousemove = function(event,d) {
+    // console.log('event.x: ', event.x);
+    // console.log('event.y: ', event.y);
+    tooltip
+      .html("The exact value of<br>this cell is: " + d)
+      // .html("The left of<br>this cell is: " + event.x + "<br>and the top is: " + event.y)
+      .style("left", (event.x) + "px")
+      .style("top", (event.y)/2 + "px")
+  };
+  const mouseleave = function(d) {
+    tooltip
+      .style("opacity", 0)
+    d3.select(this)
+      .style("stroke", "none")
+  };
+
+
+
+
   var alpha = d3.scaleLinear().domain([0, 100]).range([0, 1]);
 
   var d3table = d3.select("#attributeTb3").append("table").attr("width", '100%');
@@ -923,7 +959,11 @@ function createhighlight(dummy) {
     })
     .text(function (d) {
       return d;
-    });
+    })
+    .on("mouseover", mouseover)
+    .on("mousemove", mousemove)
+    .on("mouseleave", mouseleave)
+    ;
 }
 
 

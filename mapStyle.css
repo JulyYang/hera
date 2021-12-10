@@ -63,6 +63,7 @@ body {
   bottom: 12px;
   left: -50px;
   min-width: 280px;
+  /* opacity: 0.8; */
 }
 
 .ol-popup:after,

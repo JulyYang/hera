@@ -161,7 +161,7 @@ var map = new ol.Map({
 
         new ol.layer.Tile({
           // title: "NC Floods ",
-          title: "Floods ",
+          title: "Flooding ",
           visible: false,
           // source: WMSsource_oasis('hera:nc_floods_sql')
           source: WMSsource_oasis('hera:floods_sql', "state:nc")
@@ -169,7 +169,7 @@ var map = new ol.Map({
         }),
 
         new ol.layer.Tile({
-          title: "High Winds ",
+          title: "High Wind ",
           visible: true,
           source: WMSsource_oasis('hera:hw_sql', "state:nc")
         }),
@@ -181,7 +181,7 @@ var map = new ol.Map({
         }),
 
         new ol.layer.Tile({
-          title: "Hails ",
+          title: "Hail ",
           visible: false,
           source: WMSsource_oasis('hera:hl_sql', "state:nc")
         }),
@@ -289,8 +289,8 @@ let createContent = function (lyr, selected) {
     });
     probability = (probaArray.length / (endyear - startyear + 1) * 100).toFixed(2) + '%';
     // console.log(probability);
-    content.innerHTML = '<h5>Selected County: ' + counties + '</h5><br><p>Year: ' + startyear + '-' + endyear + '</p><br><p>Total count: ' +
-      total + '</p><br><p>Probability: ' + probability + '</p>';
+    content.innerHTML = '<h5>Selected County: ' + counties + '</h5><br><p>Year: ' + startyear + '-' + endyear + 
+    '</p><br><p>Total count: ' + total + '</p><br><p>Probability: ' + probability + '</p>';
   })
 };
 
@@ -1228,7 +1228,7 @@ targetLayer.onchange = function () {
   check.innerHTML = '';
   // subCategory.options.length = 0;
   switch (this.value) {
-    case 'Floods ':
+    case 'Flooding ':
       // sub = ['FA', 'FL', 'FF', 'CF'];
       sub = {
         'FA': 'Areal Flood',
@@ -1253,12 +1253,12 @@ targetLayer.onchange = function () {
 
       break;
     case 'Heat ':
-    case 'Hails ':
+    case 'Hail ':
       sub = {};
       // check.style.visibility = 'hidden';
 
       break;
-    case 'High Winds ':
+    case 'High Wind ':
       sub = {
         'Gale Force': 'Gale Force',
         'Storm Force': 'Storm Force',

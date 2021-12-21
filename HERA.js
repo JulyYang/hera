@@ -259,7 +259,7 @@ let createContent = function (lyr, selected) {
   let startyear = parseInt($('.slider-time').html());
   let endyear = parseInt($('.slider-time2').html());
   // let startyear = selected[Object.keys(selected)[0]]['minyear'];
-  // console.log(startyear);
+  // console.log(selected);
 
 
   Object.keys(selected).forEach(function (key) {
@@ -288,9 +288,11 @@ let createContent = function (lyr, selected) {
       }
     });
     probability = (probaArray.length / (endyear - startyear + 1) * 100).toFixed(2) + '%';
+    averageCount = (total / (endyear - startyear + 1)).toFixed(2);
+
     // console.log(probability);
     content.innerHTML = '<h5>Selected County: ' + counties + '</h5><br><p>Year: ' + startyear + '-' + endyear + 
-    '</p><br><p>Total count: ' + total + '</p><br><p>Probability: ' + probability + '</p>';
+    '</p><br><p>Total count: ' + total + '</p><br><p>Probability per year: ' + probability + '</p><br><p>Frequency per year: ' + averageCount;
   })
 };
 
@@ -1277,6 +1279,7 @@ targetLayer.onchange = function () {
     input.id = s;
     input.name = s;
     input.type = 'checkbox';
+    input.setAttribute('checked', true);
     l.setAttribute('for', s);
     l.appendChild(input);
     // l.innerHTML = l.innerHTML + s;
@@ -1328,17 +1331,50 @@ targetLayer.onchange = function () {
 var expanded = false;
 
 function showCheckboxes() {
-  var checkboxes = document.getElementById("checkboxes");
+  let checkboxes = document.getElementById("checkboxes");
+  let checkall = document.getElementById("checkalldiv");
   if (!expanded) {
-    checkboxes.style.display = "block";
+    // checkboxes.style.display = "block";
+    // checkall.style.display = "block";
     expanded = true;
+    let subcategories = form.querySelectorAll('input[type="checkbox"]:not(#checkall)');
+    // let selectallOptions = document.getElementById('selectAllOptions');
+    console.log(subcategories);
+    console.log(subcategories.length);
+    if (subcategories.length > 0){
+      checkall.style.display = "block";
+      checkboxes.style.display = "block";
+    }
+    // if (subcategories.length > 0 && selectallOptions == null){
+    //   let l = document.createElement('label');
+    //   let input = document.createElement('input');
+    //   input.id = "selectallOptions";
+    //   input.type = 'checkbox';
+    //   input.setAttribute('checked', true);
+    //   l.setAttribute('for', 'selectallOptions');
+    //   l.appendChild(input);
+    //   l.innerHTML += "Select All";
+    //   checkboxes.appendChild(l);
+    // }
   } else {
     checkboxes.style.display = "none";
+    checkall.style.display = "none";
     expanded = false;
 
   }
 }
 
+function checkAll(e){
+  console.log(e);
+  let checkboxes = document.getElementById("checkboxes");
+  if (e.checked == true){
+    form.querySelectorAll('input[type="checkbox"]:not(#checkall)').forEach(i => i.checked = true);
+  } else{
+    form.querySelectorAll('input[type="checkbox"]:not(#checkall)').forEach(i => i.checked = false);
+  }
+  checkboxes.style.display = "block";
+  console.log('select all');
+}
 
 
 // (function loadingIndicator() {

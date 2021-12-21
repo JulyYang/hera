@@ -346,6 +346,13 @@ body {
   bottom: 0;
 }
 
+#transparentdiv {
+  position: relative;
+  width: 200px; 
+  height: 28px; 
+  margin-right:0px;
+}
+
 #checkboxes {
   border: 1px #dadada solid;
   z-index: 6000;
@@ -357,21 +364,36 @@ body {
   border-width: 1px;
   border-style: solid;
   border-color: rgb(118, 118, 118);
+  border-top: none;
 }
 
-#checkboxes label {
+#checkboxes label, #checkalldiv label {
   /* display: inline-block; */
   display: block;
   font-weight: 300;
 }
 
-#checkboxes label:hover {
+#checkboxes label:hover, #checkalldiv label:hover {
   background-color: #1e90ff;
   color: white;
   /* left: 0;
   right: 0;
   top: 0;
   bottom: 0; */
+}
+
+#checkalldiv {
+  font-family: monospace;
+  font-weight: 300;
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgb(118, 118, 118);
+  width: 200px;
+  background-color: #eee;
+  border-bottom-width: 1px;
+  border-bottom-style: dotted;
+  border-bottom-color: rgb(118, 118, 118);
+  position: absolute;
 }
 
 #ajaxSpinnerContainer {

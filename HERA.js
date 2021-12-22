@@ -400,7 +400,7 @@ map.on('singleclick', function (evt) {
         }
 
         // form.querySelectorAll('input[type="checkbox"]:checked').forEach(i => categories.push("'" + i.name + "'"));
-        form.querySelectorAll('input[type="checkbox"]:checked').forEach(i => categories.push("%27" + i.name + "%27"));
+        form.querySelectorAll('input[type="checkbox"]:checked:not(#checkall)').forEach(i => categories.push("%27" + i.name + "%27"));
         // let params = "minYear:" + minYear + ";maxYear:" + maxYear + ";sublist:" + "'CF'\\,'FA'";
         if (categories.length > 0) {
           switch (lyr.replace('hera:', '').split('_')[0]) {
@@ -1137,7 +1137,7 @@ updateMapBtn.onclick = function () {
   let params = "state:" + selectedState + ";";
 
 
-  form.querySelectorAll('input[type="checkbox"]:checked').forEach(i => categories.push("'" + i.name + "'"));
+  form.querySelectorAll('input[type="checkbox"]:checked:not(#checkall)').forEach(i => categories.push("'" + i.name + "'"));
   // let params = "minYear:" + minYear + ";maxYear:" + maxYear + ";sublist:" + "'CF'\\,'FA'";
   if (categories.length > 0) {
     params += "minYear:" + minYear + ";maxYear:" + maxYear + ";sublist:" + categories.join("\\,");
@@ -1271,6 +1271,8 @@ targetLayer.onchange = function () {
       break;
   }
 
+  createSelectAllbtn(Object.values(sub));
+
   // for (s of sub) {
   for (s of Object.keys(sub)) {
     var l = document.createElement('label');
@@ -1332,7 +1334,7 @@ var expanded = false;
 
 function showCheckboxes() {
   let checkboxes = document.getElementById("checkboxes");
-  let checkall = document.getElementById("checkalldiv");
+  // let checkall = document.getElementById("checkalldiv");
   if (!expanded) {
     // checkboxes.style.display = "block";
     // checkall.style.display = "block";
@@ -1342,7 +1344,7 @@ function showCheckboxes() {
     console.log(subcategories);
     console.log(subcategories.length);
     if (subcategories.length > 0){
-      checkall.style.display = "block";
+      // checkall.style.display = "block";
       checkboxes.style.display = "block";
     }
     // if (subcategories.length > 0 && selectallOptions == null){
@@ -1358,9 +1360,34 @@ function showCheckboxes() {
     // }
   } else {
     checkboxes.style.display = "none";
-    checkall.style.display = "none";
+    // checkall.style.display = "none";
     expanded = false;
 
+  }
+}
+
+function createSelectAllbtn(subArray){
+  let checkboxes = document.getElementById("checkboxes");
+  let checkall = document.getElementById('checkall');
+  if (subArray.length > 0 && checkall == null){
+    let checkalldiv = document.createElement('div');
+    let l = document.createElement('label');
+    let input = document.createElement('input');
+    let overselect = document.createElement('div');
+    checkalldiv.setAttribute('id', 'checkalldiv');
+    input.id = "checkall";
+    input.name = "checkall";
+    input.type = 'checkbox';
+    input.setAttribute('checked', true);
+    input.setAttribute('onclick', 'checkAll(this)');
+    l.setAttribute('for', 'checkall');
+    l.appendChild(input);
+    l.innerHTML += "Select All";
+    overselect.setAttribute('class', 'overSelect');
+    overselect.setAttribute('id', 'transparentdiv');
+    checkalldiv.appendChild(l);
+    checkboxes.appendChild(checkalldiv);
+    checkboxes.appendChild(overselect);
   }
 }
 

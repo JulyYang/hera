@@ -427,6 +427,8 @@ map.on('singleclick', function (evt) {
         let newcountynames = countynames.replaceAll('(', '').replaceAll(')', '').replaceAll(",", "%5C,").replaceAll(' ', '%20');
         
         console.log('statepicker.value: ', statepicker.value);
+        console.log('newlyrname: ', newlyrname);
+        console.log(lyrSubgroup[newlyrname]);
         console.log('newcountynames: ', newcountynames);
         console.log('newminYear: ', newminYear);
         console.log('newmaxYear: ', newmaxYear);
@@ -734,7 +736,8 @@ var lyrSubgroup = {
   'heats':'phenom_subgroup',
   'ww':'phenom_subgroup',
   'hw':'wspeed_rating_mph',
-  'tornado':'max_category'
+  'tornado':'max_category',
+  'hl':'diameter_inch'
 }
 
 
@@ -764,11 +767,12 @@ var jsonSource = 'hera:highlightTable_sql';
 function ajaxcall(state, layer, subheader ,sublist, minyear='1989', maxyear='2021', county='county') {
   // var json;
   // var layerjson;
+  let lyr = layer == 'hl'? 'hails': layer;
   let highlighttb_url = 'http://hera1.oasis.unc.edu:8080/geoserver/hera/ows?service=WFS&version=1.0.0' +
   '&request=GetFeature' + '&outputFormat=application/json' + 
   '&typeName=hera:highlightTable_sql' +
   '&format_options=callback:getJson' +
-  '&viewparams=' + 'state:'+ state + ';lyr:'+ layer+ ";subheader:" + subheader +";sublist:" + sublist
+  '&viewparams=' + 'state:'+ state + ';lyr:'+ lyr+ ";subheader:" + subheader +";sublist:" + sublist
   + ";minYear:"+ minyear+ ";maxYear:"+ maxyear + ";county:"+ county;
   // '&viewparams=' + 'state:'+ state + ';lyr:'+ layer+ ";subheader:" + subheader +";sublist:" + sublist;
   console.log(highlighttb_url);
@@ -1176,6 +1180,29 @@ updateMapBtn.onclick = function () {
 
   // recreateDataTable(countTbSrc);
 
+  let lyrid = countTbSrc.replace('hera:', '').split('_')[0];
+  let categoriesString = categories.length == 0? lyrSubgroup[lyrid]: categories.join("%5C,");
+  categoriesString = categoriesString.replaceAll('\\', '%5C').replaceAll(' ', '%20').replaceAll("'", '%27');
+  console.log(lyrid);
+  console.log(lyrSubgroup[lyrid]);
+  console.log(categoriesString);
+  console.log(minYear);
+  console.log(maxYear);
+  ajaxcall(selectedState, lyrid, lyrSubgroup[lyrid], categoriesString, minYear, maxYear).then(function (layerjson) {
+      $('#attributeTb3 table').remove();
+      var dummy = [];
+      console.log(layerjson)
+    
+      layerjson.features.forEach(
+        function (i) {
+          var yearlist = [];
+          yearlist.push(i.properties['year_issued'], i.properties['jan'], i.properties['feb'], i.properties['mar'], i.properties['apr'], i.properties['may'],
+            i.properties['jun'], i.properties['jul'], i.properties['aug'], i.properties['sep'], i.properties['oct'], i.properties['nov'], i.properties['dec']);
+          dummy.push(yearlist);
+        });
+      console.log(dummy);
+      createhighlight(dummy);
+    });
 }
 
 targetLayer.onchange = function () {

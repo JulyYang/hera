@@ -185,6 +185,12 @@ var map = new ol.Map({
           visible: false,
           source: WMSsource_oasis('hera:hl_sql', "state:nc")
         }),
+        
+        new ol.layer.Tile({
+          title: "Tornado ",
+          visible: false,
+          source: WMSsource_oasis('hera:tornado_sql', "state:nc")
+        }),
 
       ]
     }),
@@ -391,6 +397,7 @@ map.on('singleclick', function (evt) {
         switch (lyr.replace('hera:', '').split('_')[0]) {
           case 'hw':
           case 'hl':
+          case 'tornado':
             params = 'AND observ_time ' + params;
             console.log(params);
             break;
@@ -406,6 +413,9 @@ map.on('singleclick', function (evt) {
           switch (lyr.replace('hera:', '').split('_')[0]) {
             case 'hw':
               params += "AND wspeed_rating_mph IN (" + categories.join(",") + ")";
+              break;
+            case 'tornado':
+              params += "AND max_category IN (" + categories.join(",") + ")";
               break;
             default:
               params += "AND phenom_subgroup IN (" + categories.join(",") + ")";
@@ -469,6 +479,54 @@ let recreateDataTable = function (lyr) {
 
   let lyrtable = 'tl_' + statepicker.value + '_' + lyr.replace('hera:', '').split('_')[0] + '_lyr';
   switch (lyr.replace('hera:', '').split('_')[0]) {
+    case 'tornado':
+      dataColumns = [{
+          "title": "FIPS",
+          data: "properties.fips",
+          "class": "center"
+        },
+        {
+          "title": "County",
+          data: "properties.county",
+          "class": "center"
+        },     
+        {
+          "title": "Date",
+          data: "properties.observ_time",
+          "class": "center"
+        },
+        {
+          "title": "Max Category",
+          data: "properties.max_category",
+          "class": "center"
+        },
+        {
+          "title": "Path Length (mi)",
+          data: "properties.pathlength_mi",
+          "class": "center"
+        },
+        {
+          "title": "Path Width (ya)",
+          data: "properties.pathwidth_ya",
+          "class": "center"
+        },
+        {
+          "title": "Injuries",
+          data: "properties.injuries",
+          "class": "center"
+        },
+        {
+          "title": "Fatalities",
+          data: "properties.fatalities",
+          "class": "center"
+        },
+        {
+          "title": "Monetary Loss",
+          data: "properties.monetary_loss",
+          "class": "center"
+        },
+      ];
+      break;
     case 'hw':
       dataColumns = [{
           "title": "FIPS",
@@ -1292,6 +1350,22 @@ targetLayer.onchange = function () {
         'Gale Force': 'Gale Force',
         'Storm Force': 'Storm Force',
         'Hurricane Force': 'Hurricane Force'
+      };
+      // check.style.visibility = 'hidden';
+
+      break;
+    case 'Tornado ':
+      sub = {
+        'F-0': 'F-0',
+        'F-1': 'F-1',
+        'F-2': 'F-2',
+        'F-3': 'F-3',
+        'F-4': 'F-4',
+        'EF-0': 'EF-0',
+        'EF-1': 'EF-1',
+        'EF-2': 'EF-2',
+        'EF-3': 'EF-3',
+        'EF-4': 'EF-4',
       };
       // check.style.visibility = 'hidden';
 

@@ -1261,6 +1261,8 @@ updateMapBtn.onclick = function () {
       console.log(dummy);
       createhighlight(dummy);
     });
+
+  showSelectedTypes();
 }
 
 targetLayer.onchange = function () {
@@ -1428,6 +1430,8 @@ targetLayer.onchange = function () {
     console.log(dummy);
     createhighlight(dummy);
   });
+
+  currentInnertext = document.getElementById('subcategory').selectedOptions[0].innerText = 'All Types';
   
 }
 
@@ -1504,6 +1508,22 @@ function checkAll(e){
   console.log('select all');
 }
 
+function showSelectedTypes(){
+  let currentInnertext = document.getElementById('subcategory').selectedOptions[0];
+  let currentOptions = form.querySelectorAll('input[type="checkbox"]:checked:not(#checkall)');
+  let allOptions = form.querySelectorAll('input[type="checkbox"]:not(#checkall)');
+  if (currentOptions.length == allOptions.length){
+    console.log('All Types');
+    currentInnertext.innerText = 'All Types';
+  } else if (currentOptions.length > 1){
+    console.log('Multiple Types Selected');
+    currentInnertext.innerText = 'Multiple Types Selected';
+  } else{
+    console.log(currentOptions[0].labels[0].innerText);
+    currentInnertext.innerText = currentOptions[0].labels[0].innerText;
+  }
+
+}
 
 // (function loadingIndicator() {
 //   let allLyrs = map.getLayerGroup().getLayers().array_;
@@ -1624,4 +1644,35 @@ statepicker.onchange = function (e) {
 
   // Delete the current data table and reinitialize the table
   recreateDataTable(countTbSrc);
+
+  let featureInfoUrl = selectedLyr[0].getLayersArray()[0].getSource().getGetFeatureInfoUrl(
+    ol.proj.transform(viewObject[selstate], 'EPSG:4326', 'EPSG:3857'),
+    map.getView().getResolution(),
+    map.getView().getProjection(), {
+      'INFO_FORMAT': 'application/json',
+      'propertyName': 'minyear,maxyear',
+    }
+  );
+  fetch(featureInfoUrl)
+  .then(function (response) {
+    return response.json();
+  })
+  .then(function (json) {
+    let currentf = json.features[0];
+    let currentp = currentf.properties;
+    let miny = currentp.minyear;
+    let maxy = currentp.maxyear;
+
+    $('.slider-time').html(miny);
+    $('.slider-time2').html(maxy);
+
+    $('#slider-range').slider({
+      min: Date.parse(miny + '/01/01') / 1000,
+      max: Date.parse(maxy + '/12/31') / 1000,
+      values: [Date.parse(miny + '/01/01') / 1000, Date.parse(maxy + '/12/31') / 1000]
+    })
+  });
+
+  currentInnertext = document.getElementById('subcategory').selectedOptions[0].innerText = 'All Types';
+  form.querySelectorAll('input[type="checkbox"]').forEach(i => i.checked = true);
 }

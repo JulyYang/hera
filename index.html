@@ -43,6 +43,8 @@
   <script src="https://d3js.org/d3.v6.min.js"></script>
   <!-- <script src="SSRT_highwinds.geojson.js"></script> -->
 
+  <!-- Library that enables to save html elements to images -->
+  <script src="src/html2canvas.min.js"></script>
 
 </head>
 
@@ -51,7 +53,18 @@
     <h1 id="header">HERA</h1>
     <p id='subheader'>Hazardous Extremes for Risk Assessment Tool</p>
     <!-- <h1 id="header">Hazardous Extremes for Risk Assessment (HERA) Tool</h1> -->
-
+    <button id="info" onclick="toggleInfo()" title="Information">
+      <i class="fa fa-info-circle fa-lg" aria-hidden="true"></i>
+    </button>
+    <button id="print" onclick="exportToImage('#map')" title="Save Map to File">
+      <i class="fa fa-print fa-lg" aria-hidden="true"></i>
+    </button>
+    <button id="btnTable" onclick="toggleNav()" title="Data Table">
+      <i class="fa fa-table fa-lg" aria-hidden="true"></i>
+    </button>
+    <!-- <button id="btnTable" onclick="toggleNav()">
+      <i class="fa fa-table"></i>
+    </button> -->
   </div>
 
   <!-- START OF SIDEBAR DIV -->
@@ -190,10 +203,12 @@
       </div>
     </div>
 
+    <div id="infoPage"></div>
+
   </div>
-  <button id="btnTable" onclick="toggleNav()">
+  <!-- <button id="btnTable" onclick="toggleNav()">
     <i class="fa fa-table"></i>
-  </button>
+  </button> -->
 
   <div id="tableSidenav">
     <!-- Nav tabs -->
@@ -220,7 +235,7 @@
       <div role="tabpanel" class="tab-pane fade" id="tabpanel-3">
         <table id="attributeTb3" class="table table-striped table-bordered table-condensed" cellspacing="0"
           width="100%">
-          <button>test export button</button>
+          <button onclick="exportToImage('#attributeTb3')">Export to Image</button>
         </table>
       </div>
     </div>
@@ -229,7 +244,7 @@
     <a href="#" id="popup-closer" class="ol-popup-closer"></a>
     <div id="popup-content" class="ol-popup-content"></div>
   </div>
-  <script src="https://rawgit.com/Turbo87/sidebar-v2/master/js/ol3-sidebar.js"></script>
+  <!-- <script src="https://rawgit.com/Turbo87/sidebar-v2/master/js/ol3-sidebar.js"></script> -->
   <script src="functions.js" style="text/javascript"></script>
   <!-- <script src="ol-layerswitcher/dist/ol-layerswitcher.js"></script> -->
   <script src="HERA.js" style="text/javascript"></script>

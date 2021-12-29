@@ -123,7 +123,7 @@ body {
   -webkit-animation: spin 2s linear infinite;
   /* Safari */
   animation: spin 2s linear infinite;
-  z-index: 80000;
+  z-index: 8000;
 }
 
 /* Safari */
@@ -156,7 +156,7 @@ body {
 
 #legend {
   position: absolute;
-  z-index: 100000;
+  z-index: 10000;
 }
 
 #cisa-logo {
@@ -356,7 +356,7 @@ body {
 
 #checkboxes {
   border: 1px #dadada solid;
-  z-index: 6000;
+  z-index: 4000;
   position: absolute;
   width: 200px;
   background-color: #eee;
@@ -467,14 +467,36 @@ body {
   display: inline-block;
 }
 
+#info, #btnTable, #print {
+  background-color: rgb(18 63 90 / 0%);
+  color:whitesmoke;
+  float: right;
+  margin: 6px;
+  border-radius: 5px;
+}
 
-#btnTable {
+#infoPage {
+  position: absolute; /* Sit on top of the page content */
+  display: none; /* Hidden by default */
+  width: 50%; /* Full width (cover the whole page) */
+  height: 50%; /* Full height (cover the whole page) */
+  top: 50%;
+  left: 50%;
+  background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+  z-index: 3000; /* Specify a stack order in case you're using a different order for other elements */
+  cursor: pointer; /* Add a pointer on hover */
+  transform: translate(-50%, -50%);
+  min-width: 300px;
+}
+
+/* #btnTable {
   position: absolute;
   top: 40px;
   right: 20px;
-  /* color: white; */
   background-color: yellow;
-}
+  z-index: 2000;
+  border-radius: 15px;
+} */
 
 #tableSidenav {
   height: 0;

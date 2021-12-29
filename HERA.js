@@ -1525,6 +1525,33 @@ function showSelectedTypes(){
 
 }
 
+function exportToImage(divId){
+  const captureElement = document.querySelector(divId);
+  html2canvas(captureElement)
+    .then(function(canvas) {
+      canvas.style.display = "none";
+      document.body.appendChild(canvas);
+      return canvas
+    })
+    .then(function(canvas){
+      const image = canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
+      const a = document.createElement('a');
+      a.setAttribute('download', 'highlight_table.png');
+      a.setAttribute('href', image);
+      a.click();
+      canvas.remove();
+    })
+}
+
+function toggleInfo(){
+  const infoPage = document.getElementById('infoPage');
+  if (infoPage.style.display == 'none'){
+    infoPage.style.display = 'block';
+  } else {
+    infoPage.style.display = 'none';
+  }
+}
+
 // (function loadingIndicator() {
 //   let allLyrs = map.getLayerGroup().getLayers().array_;
 //   let lyrsArray = allLyrs.filter(e => {

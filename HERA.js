@@ -373,6 +373,9 @@ map.on('singleclick', function (evt) {
         // Load the data of the selected county to the datatable
         let countynameArray = Object.keys(selected).map(k => selected[k]['county']);
         console.log(countynameArray);
+        // Show selected county names as the subtitle of the table2
+        // document.getElementById('selectedCountyName').innerHTML = countynameArray.join(',');
+
         let countynames = '(%27' + countynameArray.join('%27,%27') + '%27)'
         // let countyname = properties['county'];
         let lyrtable = 'tl_' + statepicker.value + '_' + lyr.replace('hera:', '').split('_')[0] + '_lyr';
@@ -462,6 +465,7 @@ map.on('singleclick', function (evt) {
             createhighlight(dummy);
           });
 
+        document.getElementById("tab-3").innerHTML = "Highlight Table: <i>(" + countynameArray.join(',') + ") " + newminYear + "-" + newmaxYear + '</i>';
 
       });
     overlay.setPosition(coord);
@@ -641,9 +645,9 @@ let recreateDataTable = function (lyr) {
 // });
 
 
-document.getElementById("tab-1").innerHTML = "Counts by County";
+document.getElementById("tab-1").innerHTML = "Counts by County: <i>High Wind 2006-2020</i>";
 document.getElementById("tab-2").innerHTML = "Data";
-document.getElementById("tab-3").innerHTML = "Highlight table";
+document.getElementById("tab-3").innerHTML = "Highlight table: <i>High Wind (NC) 2006-2020</i>";
 
 // document.getElementById("about-tab-1").innerHTML = "HERA Data Source";
 // document.getElementById("about-tab-2").innerHTML = "Contact Us";
@@ -1233,6 +1237,8 @@ updateMapBtn.onclick = function () {
   params = params.replaceAll('\\', '%5C');
   params = params.replaceAll(' ', '%20');
   countTb.ajax.url(attributeDataUrl + '&typeName=' + countTbSrc + '&viewparams=' + params).load();
+
+  document.getElementById("tab-1").innerHTML = "Counts by County: <i>" + selectedLayer + " " + minYear + "-" + maxYear + '</i>';
   // countTb.ajax.url(attributeDataUrl + '&typeName=' + countTbSrc + '&viewparams=state:' + selectedState).load();
   // countTb.ajax.url("http://hera1.oasis.unc.edu:8080/geoserver/hera/wfs?service=WFS&version=1.0.0&request=GetFeature&outputFormat=application/json&typeName=hera:floods_sql&viewparams=minYear:2010;maxYear:2018;sublist:%27CF%27%5C,%27FA%27").load();
 
@@ -1262,6 +1268,7 @@ updateMapBtn.onclick = function () {
       createhighlight(dummy);
     });
 
+  document.getElementById("tab-3").innerHTML = "Highlight Table: <i>" + selectedLayer + " ("+ selectedState.toUpperCase() +") " + minYear + "-" + maxYear + '</i>';
   showSelectedTypes();
 }
 
@@ -1432,7 +1439,11 @@ targetLayer.onchange = function () {
   });
 
   currentInnertext = document.getElementById('subcategory').selectedOptions[0].innerText = 'All Types';
-  
+
+  let minYear = form.querySelector('.slider-time').innerHTML.replace(/\//g, "-");
+  let maxYear = form.querySelector('.slider-time2').innerHTML.replace(/\//g, "-");
+  document.getElementById("tab-1").innerHTML = "Counts by County: <i>" + selectedLayer + " " + minYear + "-" + maxYear + '</i>';
+  document.getElementById("tab-3").innerHTML = "Highlight Table: <i>" + selectedLayer + " ("+ selectedState.toUpperCase() +") " + minYear + "-" + maxYear + '</i>';
 }
 
 var expanded = false;
@@ -1702,4 +1713,9 @@ statepicker.onchange = function (e) {
 
   currentInnertext = document.getElementById('subcategory').selectedOptions[0].innerText = 'All Types';
   form.querySelectorAll('input[type="checkbox"]').forEach(i => i.checked = true);
+
+  let minYear = form.querySelector('.slider-time').innerHTML.replace(/\//g, "-");
+  let maxYear = form.querySelector('.slider-time2').innerHTML.replace(/\//g, "-");
+  document.getElementById("tab-1").innerHTML = "Counts by County: <i>" + selectedLayer + " " + minYear + "-" + maxYear + '</i>';
+
 }

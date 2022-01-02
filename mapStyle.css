@@ -510,9 +510,10 @@ body {
   overflow-x: hidden;
   transition: 0.5s;
   padding-left: 0px;
-  border-style: solid;
+  /* border-style: solid; */
   border-top-color: #31708f5c;
   border-top-width: thin;
+  border-top-style: solid;
 }
 
 #tableSidenav a {
@@ -526,6 +527,13 @@ body {
 
 #tableSidenav a:hover {
   color: #f1f1f1;
+}
+
+.nav-tabs>li>a {
+  margin-right: 2px;
+  line-height: 1.42857143;
+  border: 1px solid #31708f52;
+  border-radius: 4px 4px 0 0;
 }
 
 .highlight-header {

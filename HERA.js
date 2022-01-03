@@ -1536,8 +1536,17 @@ function showSelectedTypes(){
 
 }
 
-function exportToImage(divId){
+function exportToImage(divId, imgName){
+  let minYear = form.querySelector('.slider-time').innerHTML.replace(/\//g, "-");
+  let maxYear = form.querySelector('.slider-time2').innerHTML.replace(/\//g, "-");
+  let currentOptions = form.querySelectorAll('input[type="checkbox"]:checked:not(#checkall)');
+  let selectedLayer = form.querySelector('#target-layer').value;
+  let selectedState = form.querySelector('#state-picker').value;
   const captureElement = document.querySelector(divId);
+  let imginfo = document.createElement('h4');
+  imginfo.id = 'imginfo';
+  imginfo.innerHTML = selectedState.toUpperCase() + ' ' + selectedLayer + ' ' + minYear + ' to ' + maxYear;
+  captureElement.appendChild(imginfo);
   html2canvas(captureElement)
     .then(function(canvas) {
       canvas.style.display = "none";
@@ -1547,9 +1556,10 @@ function exportToImage(divId){
     .then(function(canvas){
       const image = canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
       const a = document.createElement('a');
-      a.setAttribute('download', 'highlight_table.png');
+      a.setAttribute('download', imgName+ '.png');
       a.setAttribute('href', image);
       a.click();
+      imginfo.remove();
       canvas.remove();
     })
 }

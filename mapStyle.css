@@ -544,3 +544,8 @@ body {
   padding: 2px;
   text-align: right;
 }
+
+#imginfo {
+  font-size: 30px;
+  font-family: monospace;
+}

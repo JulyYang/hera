@@ -477,16 +477,21 @@ body {
 
 #infoPage {
   position: absolute; /* Sit on top of the page content */
-  display: none; /* Hidden by default */
+  display: block; /* Hidden by default */
   width: 50%; /* Full width (cover the whole page) */
-  height: 50%; /* Full height (cover the whole page) */
+  /* height: 50%; Full height (cover the whole page) */
   top: 50%;
   left: 50%;
-  background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+  background-color: white; /* Black background with opacity */
   z-index: 3000; /* Specify a stack order in case you're using a different order for other elements */
   cursor: pointer; /* Add a pointer on hover */
   transform: translate(-50%, -50%);
   min-width: 300px;
+  padding: 10px;
+}
+
+#infoTitle {
+  color: #123f5a;
 }
 
 /* #btnTable {

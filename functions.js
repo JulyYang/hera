@@ -1,21 +1,27 @@
-var generateInfo = function (t) {
+let generateInfo = function (t) {
+  let layerInfoContent = document.getElementById('layerInfoContent');
+  let infoText = '';
   switch (t) {
-    case "2015 Impervious Surface Area ":
-      return `Blizzard Warning, Freezing Rain Advisory, Heavy Snow Warning, Ice Storm Warning, Snow Advisory, Wind Chill Advisory and Warning, Winter Storm Warning, Winter Weather Advisory`
+    case "Flooding ":
+      infoText = "Data from the National Weather Service (NWS) Advisories and Warnings are used as the best-available proxy for occurence of Areal, Coastal, Flash and River Floods."
       break;
-    case "2017 population ":
-      return "Data for Freezing Rain are obtained from the NWS WaWA Advisories. A Freezing Rain Advisory is issued for freezing rain, freezing drizzle, and/or light ice accumulation."
+    case "Winter Weather ":
+      infoText = "Data from the National Weather Service (NWS) Advisories and Warnings are used as the best-available proxy for occurrence of winter weather potentially resulting in human health impacts, property damage, and business disruption. Winter weather may be displayed in subcategories including: Blizzard, Freezing Rain, Heavy Snow, Ice Storm, Snow, Wind Chill, Winter Storm, and Winter Weather."
       break;
-    case "NC Floods ":
-      return "Data from the National Weather Service (NWS) Advisories and Warnings are used as the best-available proxy for occurence of Areal, Coastal, Flash and River Floods."
+    case "Heat ":
+      infoText = "Data from the National Weather Service (NWS) Advisories and Warnings are used as the best-available proxy for occurrence of heat events dangerous to human health: a heat index of equal to or greater than 105°F for at least 3 hours per day for one or more days, a heat index equal to or greater than 115°F for any period of time, and/or nighttime low equal to or greater than 80°F for consecutive days. Criteria for Heat Advisories and Excessive Heat Warnings may vary by location and be lower early in the heat season or during a multi-day heat wave."
       break;
-    case "NC Winter Weather ":
-      return "Blizzard Warning, Freezing Rain Advisory, Heavy Snow Warning, Ice Storm Warning, Snow Advisory, Wind Chill Advisory and Warning, Winter Storm Warning, Winter Weather Advisory"
+    case "High Wind ":
+      infoText = "Data for high winds are obtained from Local Storm Reports (LSR). High winds may be displayed in three subcategories: Gale Force (40-57 mph), Storm Force (58-73 mph), and Hurricane Force (74+ mph)."
       break;
-    case "NC Heat ":
-      return "Data for Heat are obtained from the NWS WaWA Advisories and Warnings as the best-available proxy for occurrence of heat dangerous to human health. A Heat Advisory is issued based on a heat index of 105°F but less than 115°F for less than 3 hours per day, or nighttime lows above 80°F for 2 consecutive days. An Excessive Heat Warning is issued based on a heat index of 105°F for more than 3 hours per day for 2 consecutive days, or a heat index more than 115°F for any period of time. Criteria for Heat Advisories and Excessive Heat Warnings may vary by location and be lower early in the heat season or during a multi-day heat wave."
+    case "Hail ":
+      infoText = "Data for hail equal to or greater than 1 inch are obtained from Local Storm Reports (LSR)."
+      break;
+    case "Tornado ":
+      infoText = "Data for tornadoes are obtained from Local Storm Reports (LSR). Tornadoes may be displayed in five subcategories based on the Enhanced Fujita scale (2007 onward) or the Fujita (before 2007) scale: E/F-0 (65-85 mph/<73 mph); E/F-1 (86-110 mph/73-112 mph); E/F-2 (111-135 mph/113-157 mph); E/F-3 (136-165 mph/158-206 mph); and E/F-4 (166-200 mph/207-260 mph)."
       break;
   }
+  layerInfoContent.innerText = infoText;
 };
 
 var clickInfo = function () {

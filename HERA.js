@@ -1084,20 +1084,20 @@ function createhighlight(dummy) {
 // });
 
 
-$(function () {
-  $("#dialog").dialog({
-    autoOpen: false,
-    modal: false,
-    minHeight: 300,
-    // width: 'auto',
-    minWidth: 180,
-    close: function (e, ui) {
-      $('#toggle').bootstrapToggle('off');
-      $(this).dialog("close");
-    },
-    // resizable: true
-  });
-});
+// $(function () {
+//   $("#dialog").dialog({
+//     autoOpen: false,
+//     modal: false,
+//     minHeight: 300,
+//     // width: 'auto',
+//     minWidth: 180,
+//     close: function (e, ui) {
+//       $('#toggle').bootstrapToggle('off');
+//       $(this).dialog("close");
+//     },
+//     // resizable: true
+//   });
+// });
 
 
 let legendImg = document.getElementById("legend");
@@ -1110,15 +1110,22 @@ updateLegend = function (l) {
   legendImg.src = legendSrc + firstLyr;
 };
 
-function testtoggle() {
-  let toggleon = document.getElementById('toggle').checked;
-  if (toggleon) {
-    $("#dialog").dialog("open");
-    // console.log("toggle on")
-  } else {
-    $("#dialog").dialog("close");
-    // console.log("toggle off")
+function toggleLayerInfo() {
+  let layerinfo = document.getElementById('layerInfoDiv');
+  let filterDiv = document.getElementById('filterDiv');
+  if (!filterDiv.contains(layerinfo)){
+    filterDiv.appendChild(layerinfo);
+  } else{
+    filterDiv.remove(layerinfo);
   }
+  // let toggleon = document.getElementById('toggle').checked;
+  // if (!toggleon) {
+  //   $("#dialog").dialog("open");
+  //   // console.log("toggle on")
+  // } else {
+  //   $("#dialog").dialog("close");
+  //   // console.log("toggle off")
+  // }
 }
 
 $('.slider-time').html('1989'); // the years of time-slider when first loading, of high wind layer
@@ -1444,6 +1451,8 @@ targetLayer.onchange = function () {
   let maxYear = form.querySelector('.slider-time2').innerHTML.replace(/\//g, "-");
   document.getElementById("tab-1").innerHTML = "Counts by County: <i>" + selectedLayer + " " + minYear + "-" + maxYear + '</i>';
   document.getElementById("tab-3").innerHTML = "Highlight Table: <i>" + selectedLayer + " ("+ selectedState.toUpperCase() +") " + minYear + "-" + maxYear + '</i>';
+
+  generateInfo(this.value);
 }
 
 var expanded = false;
@@ -1564,8 +1573,8 @@ function exportToImage(divId, imgName){
     })
 }
 
-function toggleInfo(){
-  const infoPage = document.getElementById('infoPage');
+function toggleInfo(divId){
+  const infoPage = document.getElementById(divId);
   if (infoPage.style.display == 'none'){
     infoPage.style.display = 'block';
   } else {

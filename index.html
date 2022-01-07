@@ -218,6 +218,7 @@
     <!-- </div> -->
 
     <div id="infoPage">
+      <div id="heraInfo">
       <a id="info-closer" class="ol-popup-closer" onclick="toggleInfo('infoPage')"></a>
         <h3 id="infoTitle">About HERA</h3>
         <p><b>W</b>elcome to the experimental version of the Hazardous Extremes for Risk Assessments (HERA) tool. HERA is a
@@ -236,23 +237,50 @@
             The tool uses historical data to provide information by county in the southeastern states. The original version of HERA based on Tableau can be found
             <a href="https://convergence.unc.edu/tools/hera/">here</a>.</p>
             
-            <p>To navigate through HERA, select State, Hazard and Subcategories from the drop-down menu, and adjust the years of interest via the time slider. To view a Count of the number of hazard events that have occurred and the Probability that at
-              least one event of that hazard will happen in a year, click on a county on the map. The default Count and
-              Probability are calculated for all years, but will change if the user changes the range of years on the sliding time
-              bar. All information on a page can be displayed for a particular county by clicking on a single county, or select multiple counties by holding down the Shift key.
+            <p>To navigate through HERA, select State, Hazard and Subcategories from the drop-down menu, and adjust the years of interest via the time slider. 
+              To view a Count of the number of hazard events that have occurred and the Probability that at least one event of that hazard will happen in a year, 
+              click on a county on the map. The default Count and Probability are calculated for all years, but will change if the user changes the range of years 
+              on the sliding time bar. All information on a page can be displayed for a particular county by clicking on a single county, or select multiple counties 
+              by holding down the Shift key.
             </p>
             
-            <p>HERA is a CISA-SERCC collaboration and a team effort led by Ferdouz Cochran and Chip Konrad. Other team
-              members include Montana Eck, Amanda Farris, Yates McConnell, Sandra Rayne, William Schmitz, Hunter
+            <p>HERA is a CISA-SERCC collaboration and a team effort led by Montana Eck and Chip Konrad. Other team
+              members include Ferdouz Cochran, Amanda Farris, Yates McConnell, Sandra Rayne, William Schmitz, Hunter
               Spitzer, and July Yang. </p>
-              <p>Questions may be addressed to: Ferdouz Cochran, Climate-Health Integration and Outreach Associate, NOAA’s
-                Carolinas Integrated Sciences and Assessments (CISA) Program, Email: <a
-                href="mailto: fvc@unc.edu">fvc@unc.edu</a></p>
+              <p>Questions may be addressed to: Montana A. Eck, Graduate Research Associate, Southeast Regional Climate Center
+                , Email: <a href="mailto: maeck@live.unc.edu">maeck@live.unc.edu</a></p>
                 
                 <a href="https://www.cisa.sc.edu/" target="_blank"><img id="cisa-logo" src="logos/CISAlogoTEXT.png"></a>
                 <a href="https://sercc.com/" target="_blank"><img id="sercc-logo" src="logos/SERCClogo.png"></a>
+                <a onclick="changeContent('heraInfo','dataSource')">Data Source</a>
+      </div>
+
+      <div id="dataSource" style="display: none;">
+        <a class="ol-popup-closer" onclick="toggleInfo('infoPage')"></a>
+          <h3 id="dataSrcTitle">Data Source</h3>
+          <p><b>Local Storm Reports (LSR)</b>: Local Storm Reports originate from National Weather Service (NWS) offices and are verified by the NWS Storm Prediction 
+            Center each spring. HERA displays LSR data for hail, high winds and tornadoes from 1989-2018.
+  
+          <br><b><a href="https://www.nhc.noaa.gov/data/">National Hurricane Center (NHC) Best Track Data (HURDAT2)</a></b>: The Atlantic hurricane database known as Atlantic HURDAT2 (1851-2019), has six-hourly 
+          information on the location, maximum winds, central pressure, and (beginning in 2004) size of all known tropical cyclones and subtropical cyclones. 
+          HERA displays hurricanes and tropical storms data from 1950-2019.
+          
+          <br><b><a href="https://mesonet.agron.iastate.edu/info/datasets/#vtec">National Weather Service (NWS) Watches, Warnings and Advisories (WWA or WaWA)</a></b>: NWS WaWA data is used as a proxy for occurrence of hazards in HERA 
+          related to fire weather, floods, heat, and winter weather. The WaWA data is downloaded from the Iowa Environmental Mesonet (IEM) at
+          <a>https://mesonet.agron.iastate.edu/pickup/wwa/</a> for years 2006-2019. Only Warnings and Advisories are used as a proxy for the occurrence of hazards, 
+          because Advisories and Warnings are issued only when an event is imminent or occurring.
+          </p>
+          <p><br><b>Probability: </b>The Probability of at least one event of a hazard occurring in a year is given based on the historical data. 
+            The default Probability is calculated over the available period of record or total years, but will change if the user changes the range of years. 
+          <br><b>Count: </b>A Count of hazard events in each county can be displayed in a HERA map through all available years or over a selection of years. 
+          A highlighted table below the map can display the County by months in any given year.
+          </p>
+                  
+          <a onclick="changeContent('dataSource', 'heraInfo')">About HERA</a>
+      </div>
 
     </div>
+
 
   </div>
   <!-- <button id="btnTable" onclick="toggleNav()">

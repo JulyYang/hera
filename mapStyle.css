@@ -490,12 +490,14 @@ body {
   cursor: pointer; /* Add a pointer on hover */
   transform: translate(-50%, -50%);
   min-width: 300px;
+  min-height: 510px;
   padding: 10px;
   border-radius: 10px;
   border: 0.5px solid #123f5a85;
 }
 
-#infoTitle {
+
+#infoTitle, #dataSrcTitle {
   color: #123f5a;
 }
 

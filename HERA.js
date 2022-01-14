@@ -497,6 +497,17 @@ let recreateDataTable = function (lyr) {
         {
           "title": "Date",
           data: "properties.observ_time",
+          render: function(d){
+            return moment(d).format('YYYY-MM-DD');
+            },
+          "class": "center"
+        },
+        {
+          "title": "Time",
+          data: "properties.observ_time",
+          render: function(d){
+            return moment(d).format('hh:mm A');
+            },
           "class": "center"
         },
         {
@@ -545,6 +556,17 @@ let recreateDataTable = function (lyr) {
         {
           "title": "Date",
           data: "properties.observ_time",
+          render: function(d){
+            return moment(d).format('YYYY-MM-DD');
+            },
+          "class": "center"
+        },
+        {
+          "title": "Time",
+          data: "properties.observ_time",
+          render: function(d){
+            return moment(d).format('hh:mm A');
+            },
           "class": "center"
         },
         {
@@ -583,6 +605,17 @@ let recreateDataTable = function (lyr) {
         {
           "title": "Date",
           data: "properties.observ_time",
+          render: function(d){
+            return moment(d).format('YYYY-MM-DD');
+            },
+          "class": "center"
+        },
+        {
+          "title": "Time",
+          data: "properties.observ_time",
+          render: function(d){
+            return moment(d).format('hh:mm A');
+            },
           "class": "center"
         },
         {
@@ -616,6 +649,17 @@ let recreateDataTable = function (lyr) {
         {
           "title": "Date",
           data: "properties.issued",
+          render: function(d){
+            return moment(d).format('YYYY-MM-DD');
+            },
+          "class": "center"
+        },
+        {
+          "title": "Time",
+          data: "properties.issued",
+          render: function(d){
+            return moment(d).format('hh:mm A');
+            },
           "class": "center"
         },
         {
@@ -645,9 +689,9 @@ let recreateDataTable = function (lyr) {
 // });
 
 
-document.getElementById("tab-1").innerHTML = "Counts by County: <i>High Wind 2006-2020</i>";
+document.getElementById("tab-1").innerHTML = "Counts by County: <i>High Wind 1998-2019</i>";
 document.getElementById("tab-2").innerHTML = "Data";
-document.getElementById("tab-3").innerHTML = "Highlight table: <i>High Wind (NC) 2006-2020</i>";
+document.getElementById("tab-3").innerHTML = "Highlight table: <i>High Wind (NC) 1998-2019</i>";
 
 // document.getElementById("about-tab-1").innerHTML = "HERA Data Source";
 // document.getElementById("about-tab-2").innerHTML = "Contact Us";
@@ -738,6 +782,10 @@ $('#attributeTb2').DataTable({
     }
   ],
   "scrollX": true,
+  // columnDefs: [{
+  //   targets: 3,
+  //   // render: $.fn.dataTable.render.moment( 'DD/MM/YYYY' )
+  // }],
   "ajax": {
     //   // Delete the limitation: maxFeatures=50
     //   // Solved from Stackoverflow questions no.48147970
@@ -758,7 +806,10 @@ $('#attributeTb2').DataTable({
     },
     {
       "title": "Date",
-      data: "properties.observ_time",
+      data: "properties.observ_time", 
+        render: function(d){
+          return moment(d).format('YYYY-MM-DD');
+          },
       "class": "center"
     },
     {
@@ -1323,7 +1374,10 @@ targetLayer.onchange = function () {
         min: Date.parse(miny + '/01/01') / 1000,
         max: Date.parse(maxy + '/12/31') / 1000,
         values: [Date.parse(miny + '/01/01') / 1000, Date.parse(maxy + '/12/31') / 1000]
-      })
+      });
+      document.getElementById("tab-1").innerHTML = "Counts by County: <i>" + selectedLayer + " " + miny + "-" + maxy + '</i>';
+      document.getElementById("tab-3").innerHTML = "Highlight Table: <i>" + selectedLayer + " ("+ selectedState.toUpperCase() +") " + miny + "-" + maxy + '</i>';
+
     });
 
 
@@ -1446,11 +1500,6 @@ targetLayer.onchange = function () {
   });
 
   currentInnertext = document.getElementById('subcategory').selectedOptions[0].innerText = 'All Types';
-
-  let minYear = form.querySelector('.slider-time').innerHTML.replace(/\//g, "-");
-  let maxYear = form.querySelector('.slider-time2').innerHTML.replace(/\//g, "-");
-  document.getElementById("tab-1").innerHTML = "Counts by County: <i>" + selectedLayer + " " + minYear + "-" + maxYear + '</i>';
-  document.getElementById("tab-3").innerHTML = "Highlight Table: <i>" + selectedLayer + " ("+ selectedState.toUpperCase() +") " + minYear + "-" + maxYear + '</i>';
 
   generateInfo(this.value);
 }
@@ -1728,13 +1777,11 @@ statepicker.onchange = function (e) {
       max: Date.parse(maxy + '/12/31') / 1000,
       values: [Date.parse(miny + '/01/01') / 1000, Date.parse(maxy + '/12/31') / 1000]
     })
+    document.getElementById("tab-1").innerHTML = "Counts by County: <i>" + selectedLayer + " " + miny + "-" + maxy + '</i>';
+
   });
 
   currentInnertext = document.getElementById('subcategory').selectedOptions[0].innerText = 'All Types';
   form.querySelectorAll('input[type="checkbox"]').forEach(i => i.checked = true);
-
-  let minYear = form.querySelector('.slider-time').innerHTML.replace(/\//g, "-");
-  let maxYear = form.querySelector('.slider-time2').innerHTML.replace(/\//g, "-");
-  document.getElementById("tab-1").innerHTML = "Counts by County: <i>" + selectedLayer + " " + minYear + "-" + maxYear + '</i>';
 
 }

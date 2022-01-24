@@ -296,10 +296,12 @@ let createContent = function (lyr, selected) {
     probability = (probaArray.length / (endyear - startyear + 1) * 100).toFixed(2) + '%';
     averageCount = (total / (endyear - startyear + 1)).toFixed(2);
 
-    // console.log(probability);
-    content.innerHTML = '<h5>Selected County: ' + counties + '</h5><br><p>Year: ' + startyear + '-' + endyear + 
-    '</p><br><p>Total count: ' + total + '</p><br><p>Probability per year: ' + probability + '</p><br><p>Frequency per year: ' + averageCount;
   })
+  counties = counties.slice(0, -2);
+  // console.log(counties);
+  content.innerHTML = '<p class="popup-field">Selected County: </p><p class="popup-value">' + counties + '</p><br><p class="popup-field">Year: </p><p class="popup-value">' + startyear + '-' + endyear + 
+  '</p><br><p class="popup-field">Total count: </p><p class="popup-value">' + total + '</p><br><p class="popup-field">Probability per year: </p><p class="popup-value">' + probability + 
+  '</p><br><p class="popup-field">Frequency per year: </p><p class="popup-value">' + averageCount + '</p>';
 };
 
 // let createContentHtml = function(){
@@ -356,23 +358,23 @@ map.on('singleclick', function (evt) {
         if (!shiftPressed) {
           selected = {};
           selected[featureid] = properties;
-          console.log('if', selected);
+          // console.log('if', selected);
         } else if (featureid in selected) {
           delete selected[featureid];
-          console.log('else if', selected);
+          // console.log('else if', selected);
         } else {
           selected[featureid] = properties;
-          console.log('else');
-          console.log(selected)
+          // console.log('else');
+          // console.log(selected)
         };
 
-        console.log(Object.keys(selected).length);
+        // console.log(Object.keys(selected).length);
 
         createContent(lyr, selected);
 
         // Load the data of the selected county to the datatable
         let countynameArray = Object.keys(selected).map(k => selected[k]['county']);
-        console.log(countynameArray);
+        // console.log(countynameArray);
         // Show selected county names as the subtitle of the table2
         // document.getElementById('selectedCountyName').innerHTML = countynameArray.join(',');
 
@@ -395,18 +397,18 @@ map.on('singleclick', function (evt) {
         // let params = "state:" + selectedState + ";";
         // let params = 'AND issued BETWEEN '+ minYear + ' AND ' + maxYear;
         let params = 'BETWEEN ' + minYear + ' AND ' + maxYear;
-        console.log(lyr.replace('hera:', '').split('_')[0], '_here');
+        // console.log(lyr.replace('hera:', '').split('_')[0], '_here');
 
         switch (lyr.replace('hera:', '').split('_')[0]) {
           case 'hw':
           case 'hl':
           case 'tornado':
             params = 'AND observ_time ' + params;
-            console.log(params);
+            // console.log(params);
             break;
           default:
             params = 'AND issued ' + params;
-            console.log(params, ' test');
+            // console.log(params, ' test');
         }
 
         // form.querySelectorAll('input[type="checkbox"]:checked').forEach(i => categories.push("'" + i.name + "'"));
@@ -431,7 +433,7 @@ map.on('singleclick', function (evt) {
         }
 
         // datatb.ajax.url(attributeDataUrl + '&typeName=' + lyrtable + '&CQL_FILTER=county IN ' + countynames).load();
-        console.log(attributeDataUrl + '&typeName=' + lyrtable + '&CQL_FILTER=county IN ' + countynames + params);
+        // console.log(attributeDataUrl + '&typeName=' + lyrtable + '&CQL_FILTER=county IN ' + countynames + params);
         datatb.ajax.url(attributeDataUrl + '&typeName=' + lyrtable + '&CQL_FILTER=county IN ' + countynames + params).load();
         
         let newlyrname = lyr.replace('hera:', '').split('_')[0];
@@ -439,15 +441,15 @@ map.on('singleclick', function (evt) {
         let newmaxYear = form.querySelector('.slider-time2').innerHTML;
         let newcountynames = countynames.replaceAll('(', '').replaceAll(')', '').replaceAll(",", "%5C,").replaceAll(' ', '%20');
         
-        console.log('statepicker.value: ', statepicker.value);
-        console.log('newlyrname: ', newlyrname);
-        console.log(lyrSubgroup[newlyrname]);
-        console.log('newcountynames: ', newcountynames);
-        console.log('newminYear: ', newminYear);
-        console.log('newmaxYear: ', newmaxYear);
-        console.log('params: ', params);
+        // console.log('statepicker.value: ', statepicker.value);
+        // console.log('newlyrname: ', newlyrname);
+        // console.log(lyrSubgroup[newlyrname]);
+        // console.log('newcountynames: ', newcountynames);
+        // console.log('newminYear: ', newminYear);
+        // console.log('newmaxYear: ', newmaxYear);
+        // console.log('params: ', params);
         let categoriesString = categories.length == 0? lyrSubgroup[newlyrname]: categories.join("%5C,");
-        console.log(categoriesString);
+        // console.log(categoriesString);
 
         ajaxcall(statepicker.value, newlyrname, lyrSubgroup[newlyrname], categoriesString, newminYear, newmaxYear, newcountynames).then(function (layerjson) {
             $('#attributeTb3 table').remove();
@@ -461,7 +463,7 @@ map.on('singleclick', function (evt) {
                   i.properties['jun'], i.properties['jul'], i.properties['aug'], i.properties['sep'], i.properties['oct'], i.properties['nov'], i.properties['dec']);
                 dummy.push(yearlist);
               });
-            console.log(dummy);
+            // console.log(dummy);
             createhighlight(dummy);
           });
 
@@ -888,7 +890,7 @@ function ajaxcall(state, layer, subheader ,sublist, minyear='1989', maxyear='202
   '&viewparams=' + 'state:'+ state + ';lyr:'+ lyr+ ";subheader:" + subheader +";sublist:" + sublist
   + ";minYear:"+ minyear+ ";maxYear:"+ maxyear + ";county:"+ county;
   // '&viewparams=' + 'state:'+ state + ';lyr:'+ layer+ ";subheader:" + subheader +";sublist:" + sublist;
-  console.log(highlighttb_url);
+  // console.log(highlighttb_url);
   return $.ajax({
     // async: false, // set acync to false is BAD for browser performance!!
     url: highlighttb_url,
@@ -930,7 +932,7 @@ ajaxcall('nc', 'hw', lyrSubgroup['hw'] , lyrSubgroup['hw']).then(function (layer
         i.properties['jun'], i.properties['jul'], i.properties['aug'], i.properties['sep'], i.properties['oct'], i.properties['nov'], i.properties['dec']);
       dummy.push(yearlist);
     });
-  console.log(dummy);
+  // console.log(dummy);
   createhighlight(dummy);
 });
 
@@ -1290,8 +1292,8 @@ updateMapBtn.onclick = function () {
   // Update Count table
   let countTbSrc = selectedLyr[0].getLayersArray()[0].getSource().params_.LAYERS;
   let countTb = $('#attributeTb').DataTable();
-  console.log(params);
-  console.log(params.replaceAll('\\', '%5C'));
+  // console.log(params);
+  // console.log(params.replaceAll('\\', '%5C'));
   params = params.replaceAll('\\', '%5C');
   params = params.replaceAll(' ', '%20');
   countTb.ajax.url(attributeDataUrl + '&typeName=' + countTbSrc + '&viewparams=' + params).load();
@@ -1305,11 +1307,11 @@ updateMapBtn.onclick = function () {
   let lyrid = countTbSrc.replace('hera:', '').split('_')[0];
   let categoriesString = categories.length == 0? lyrSubgroup[lyrid]: categories.join("%5C,");
   categoriesString = categoriesString.replaceAll('\\', '%5C').replaceAll(' ', '%20').replaceAll("'", '%27');
-  console.log(lyrid);
-  console.log(lyrSubgroup[lyrid]);
-  console.log(categoriesString);
-  console.log(minYear);
-  console.log(maxYear);
+  // console.log(lyrid);
+  // console.log(lyrSubgroup[lyrid]);
+  // console.log(categoriesString);
+  // console.log(minYear);
+  // console.log(maxYear);
   ajaxcall(selectedState, lyrid, lyrSubgroup[lyrid], categoriesString, minYear, maxYear).then(function (layerjson) {
       $('#attributeTb3 table').remove();
       var dummy = [];
@@ -1322,7 +1324,7 @@ updateMapBtn.onclick = function () {
             i.properties['jun'], i.properties['jul'], i.properties['aug'], i.properties['sep'], i.properties['oct'], i.properties['nov'], i.properties['dec']);
           dummy.push(yearlist);
         });
-      console.log(dummy);
+      // console.log(dummy);
       createhighlight(dummy);
     });
 
@@ -1478,8 +1480,8 @@ targetLayer.onchange = function () {
     list += '%27' + s + '%27%5C,' 
   };
   list = list.slice(0, -4);
-  console.log(lyrSubgroup[lyrid]);
-  console.log(list);
+  // console.log(lyrSubgroup[lyrid]);
+  // console.log(list);
   ajaxcall(selectedState, lyrid, lyrSubgroup[lyrid], lyrSubgroup[lyrid]).then(function (layerjson) {
   // ajaxcall(selectedState, lyrid, lyrSubgroup[lyrid], list).then(function (layerjson) {
   // ajaxcall(selectedState, lyrid, list).then(function (layerjson) {
@@ -1515,8 +1517,8 @@ function showCheckboxes() {
     expanded = true;
     let subcategories = form.querySelectorAll('input[type="checkbox"]:not(#checkall)');
     // let selectallOptions = document.getElementById('selectAllOptions');
-    console.log(subcategories);
-    console.log(subcategories.length);
+    // console.log(subcategories);
+    // console.log(subcategories.length);
     if (subcategories.length > 0){
       // checkall.style.display = "block";
       checkboxes.style.display = "block";
@@ -1566,7 +1568,7 @@ function createSelectAllbtn(subArray){
 }
 
 function checkAll(e){
-  console.log(e);
+  // console.log(e);
   let checkboxes = document.getElementById("checkboxes");
   if (e.checked == true){
     form.querySelectorAll('input[type="checkbox"]:not(#checkall)').forEach(i => i.checked = true);
@@ -1574,7 +1576,7 @@ function checkAll(e){
     form.querySelectorAll('input[type="checkbox"]:not(#checkall)').forEach(i => i.checked = false);
   }
   checkboxes.style.display = "block";
-  console.log('select all');
+  // console.log('select all');
 }
 
 function showSelectedTypes(){
@@ -1742,9 +1744,9 @@ statepicker.onchange = function (e) {
 
   let selectedLayer = form.querySelector('#target-layer').value;
   let selectedLyr = lyrsArray.filter(l => l.get('title') == selectedLayer);
-  console.log(selectedLyr);
+  // console.log(selectedLyr);
   let countTbSrc = selectedLyr[0].getLayersArray()[0].getSource().params_.LAYERS;
-  console.log(countTbSrc);
+  // console.log(countTbSrc);
   // Update the count table
   $('#attributeTb').DataTable().ajax.url(attributeDataUrl + '&typeName=' + countTbSrc + '&viewparams=state:' + selstate).load();
 

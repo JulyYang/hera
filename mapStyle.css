@@ -106,6 +106,16 @@ body {
   position: initial;
 }
 
+.popup-field, .popup-value {
+  font-size: 14px;
+	font-family: monospace;
+  display: inline-block;
+}
+
+.popup-field {
+  font-weight: bold;
+  color: #123f5a;
+}
 /* .ol-popup-content {
     color: black;
 	font-size: 14px;

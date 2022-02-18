@@ -192,6 +192,12 @@ var map = new ol.Map({
           source: WMSsource_oasis('hera:tornado_sql', "state:nc")
         }),
 
+        new ol.layer.Tile({
+          title: "Hurricane ",
+          visible: false,
+          source: WMSsource_oasis('hera:hu_sql', "state:nc")
+        }),
+
       ]
     }),
 
@@ -405,6 +411,9 @@ map.on('singleclick', function (evt) {
           case 'tornado':
             params = 'AND observ_time ' + params;
             // console.log(params);
+            break;
+          case 'hu':
+            params = 'AND date ' + params;
             break;
           default:
             params = 'AND issued ' + params;
@@ -637,6 +646,47 @@ let recreateDataTable = function (lyr) {
         },
       ];
       break;
+    case 'hu':
+      dataColumns = [{
+          "title": "FIPS",
+          data: "properties.fips",
+          "class": "center"
+        },
+        {
+          "title": "County",
+          data: "properties.county",
+          "class": "center"
+        },
+        {
+          "title": "Date",
+          data: "properties.date",
+          render: function(d){
+            return moment(d).format('YYYY-MM-DD');
+            },
+          "class": "center"
+        },
+        {
+          "title": "Hurricane Name",
+          data: "properties.hurricane_name",
+          "class": "center"
+        },
+        {
+          "title": "Time",
+          data: "properties.time",
+          "class": "center"
+        },
+        {
+          "title": "Sub Group",
+          data: "properties.phenom_subgroup",
+          "class": "center"
+        },
+        {
+          "title": "Max Wind",
+          data: "properties.max_wind",
+          "class": "center"
+        },
+      ];
+      break;
     default:
       dataColumns = [{
           "title": "FIPS",
@@ -850,6 +900,7 @@ var lyrSubgroup = {
   'floods':'phenom_subgroup',
   'heats':'phenom_subgroup',
   'ww':'phenom_subgroup',
+  'hu':'phenom_subgroup',
   'hw':'wspeed_rating_mph',
   'tornado':'max_category',
   'hl':'diameter_inch'
@@ -879,7 +930,7 @@ var jsonSource = 'hera:highlightTable_sql';
 
 // function ajaxcall(state, layer, sublist) {
 // function ajaxcall(state, layer, subheader, sublist) {
-function ajaxcall(state, layer, subheader ,sublist, minyear='1989', maxyear='2021', county='county') {
+function ajaxcall(state, layer, subheader ,sublist, minyear='1952', maxyear='2021', county='county') {
   // var json;
   // var layerjson;
   let lyr = layer == 'hl'? 'hails': layer;
@@ -1086,55 +1137,6 @@ function createhighlight(dummy) {
     .on("mouseleave", mouseleave)
     ;
 }
-
-
-// var sourcedata = [{
-//     "Dataset": "Local Storm Reports (LSR)",
-//     "Years": "1989-2018",
-//     "Hazards": "Hail, High Winds, Tornadoes",
-//     "Description": "Local Storm Reports originate from National Weather Service (NWS) offices and are verified by the NWS Storm Prediction Center each spring. HERA displays LSR data for hail, high winds and tornadoes from 1989-2018. LSRs are generated from reports of severe weather in an area or county made by storm spotters (storm chasers, law enforcement officials, emergency management personnel, firefighters, EMTs, or public citizens). LSRs may also be issued by NWS Weather Forecast Offices (WFO) after a weather event has ended to inform media outlets and the public.",
-//   },
-//   {
-//     "Dataset": "National Hurricane Center (NHC) Best Track Data (HURDAT2)",
-//     "Years": "1950-2019",
-//     "Hazards": "Hurricanes, Tropical Storms",
-//     "Description": "The Atlantic hurricane database known as Atlantic HURDAT2 (1851-2019), has six-hourly information on the location, maximum winds, central pressure, and (beginning in 2004) size of all known tropical cyclones and subtropical cyclones. HERA displays hurricanes and tropical storms data from 1950-2019. The location of hurricane and tropical storm tracks every six hours was used to ascertain the proximity to county centroids. If hurricanes or tropical storms were found to be within 75 miles of a county centroid, they were counted for that county.",
-//   },
-//   {
-//     "Dataset": "National Weather Service (NWS) Watches, Warnings and Advisories (WWA or WaWA)",
-//     "Years": "2006-2019",
-//     "Hazards": "Floods, Heat, Winter Weather",
-//     "Description": `NWS WaWA data is used as a best-available proxy for occurrence of hazards in HERA related to floods, heat, and winter weather. The WaWA data is downloaded from the Iowa Environmental Mesonet (IEM) at <a href="https://mesonet.agron.iastate.edu/pickup/wwa/" target="_blank">WWA</a> for years 2006-2019. Only Warnings and Advisories are used as a proxy for the occurrence of hazards, because Advisories and Warnings are issued only when an event is imminent or occurring. However, users should be aware that the issuance of Advisories and Warnings may vary geographically, because they are issued by different Weather Forecast Offices (WFO) based on local criteria. The count of flood, heat, and winter weather Advisories and Warnings in HERA is made on a daily basis. So, multi-day events may be counted for each day an Advisory or Warning is in effect, if that Advisory or Warning is updated on a daily basis.`,
-//   },
-// ];
-
-
-// $('#datasourceTb').DataTable({
-//   responsive: 'true',
-//   data: sourcedata,
-//   // "dom": 'Brt<"bottom"l>',
-//   "dom": 't',
-//   columns: [{
-//       data: 'Dataset'
-//     },
-//     {
-//       data: 'Years'
-//     },
-//     {
-//       data: 'Hazards'
-//     },
-//     {
-//       data: 'Description'
-//     }
-//   ]
-// });
-
-
-// $('a[href="#about-tabpanel-2"]').click(function (e) {
-//   e.preventDefault();
-//   $(this).tab('show');
-//   console.log('here');
-// });
 
 
 // $(function () {
@@ -1440,6 +1442,12 @@ targetLayer.onchange = function () {
         'EF-4': 'EF-4',
       };
       // check.style.visibility = 'hidden';
+
+      case 'Hurricane ':
+        sub = {
+          'HU': 'Hurricane',
+          'TS': 'Tropical Storm',
+        };
 
       break;
   }

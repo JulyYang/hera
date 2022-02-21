@@ -1512,7 +1512,21 @@ targetLayer.onchange = function () {
   currentInnertext = document.getElementById('subcategory').selectedOptions[0].innerText = 'All Types';
 
   generateInfo(this.value);
+  hideStates(this.value);
 }
+
+function hideStates(currentLyr){
+  if (currentLyr == 'Hurricane '){
+    let otherStates = form.querySelectorAll('#state-picker > option:not([value="nc"]):not([value="sc"])');
+    otherStates.forEach(s => s.style.display = "none");
+    // window.alert("The hurricane data for the states other than NC/SC are still in progress and not available at this time. We'll upload the layers once it's finished. Thank you for your patience. ");
+  } else{
+    let allStates = form.querySelectorAll('#state-picker > option');
+    allStates.forEach(s => s.style.display = "block");
+  }
+
+}
+
 
 var expanded = false;
 
@@ -1793,5 +1807,15 @@ statepicker.onchange = function (e) {
 
   currentInnertext = document.getElementById('subcategory').selectedOptions[0].innerText = 'All Types';
   form.querySelectorAll('input[type="checkbox"]').forEach(i => i.checked = true);
+  
+  hideHurricane(selstate);
+}
 
+function hideHurricane(state){
+  console.log(state, ':')
+  if (state != 'sc' && state != 'nc'){
+    form.querySelector('#target-layer > option[value="Hurricane "]').style.display = "none";
+  }else{
+    form.querySelector('#target-layer > option[value="Hurricane "]').style.display = "block";
+  }
 }

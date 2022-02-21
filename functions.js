@@ -28,6 +28,10 @@ let generateInfo = function (t) {
     case "Tornado ":
       infoText = "Data for tornadoes are obtained from Local Storm Reports (LSR). Tornadoes may be displayed in five subcategories based on the Enhanced Fujita scale (2007 onward) or the Fujita (before 2007) scale: E/F-0 (65-85 mph/<73 mph); E/F-1 (86-110 mph/73-112 mph); E/F-2 (111-135 mph/113-157 mph); E/F-3 (136-165 mph/158-206 mph); and E/F-4 (166-200 mph/207-260 mph)."
       break;
+    case "Hurricane ":
+      infoText = "Data for hurricanes and tropical storms are obtained from the National Hurricane Center (NHC) Best Track Data (HURDAT2). The location of hurricane and tropical storm tracks every six hours was used to ascertain the proximity to county centroids. If hurricanes or tropical storms were found to be within 75 miles of a county centroid, they were counted for that county."
+        + "<p style='font-size:12px; color:#f53737'><i>The hurricane data for the states other than NC/SC are still in progress and not available at this time. We'll upload the layers once it's finished. Thank you for your patience. </i></p>"
+      break;
   }
   layerInfoContent.innerHTML = infoText;
 };

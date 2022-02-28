@@ -150,45 +150,44 @@ let map = new ol.Map({
         }),
 
         new ol.layer.Tile({
-          title: "Winter Weather ",
+          title: "Winter Weather",
           visible: false,
           source: WMSsource_oasis('hera:ww_sql', "state:nc")
         }),
 
         new ol.layer.Tile({
-          // title: "NC Floods ",
-          title: "Flooding ",
+          title: "Flooding",
           visible: false,
           source: WMSsource_oasis('hera:floods_sql', "state:nc")
           // layers: createGroupedLyrs('hera:nc_floods_sql', "minYear:2010-01-01;maxYear:2018-12-31;sublist:'FA'\\,'CF'")
         }),
 
         new ol.layer.Tile({
-          title: "High Wind ",
+          title: "High Wind",
           visible: true,
           source: WMSsource_oasis('hera:hw_sql', "state:nc")
         }),
 
         new ol.layer.Tile({
-          title: "Heat ",
+          title: "Heat",
           visible: false,
           source: WMSsource_oasis('hera:heats_sql', "state:nc")
         }),
 
         new ol.layer.Tile({
-          title: "Hail ",
+          title: "Hail",
           visible: false,
           source: WMSsource_oasis('hera:hl_sql', "state:nc")
         }),
         
         new ol.layer.Tile({
-          title: "Tornado ",
+          title: "Tornado",
           visible: false,
           source: WMSsource_oasis('hera:tornado_sql', "state:nc")
         }),
 
         new ol.layer.Tile({
-          title: "Hurricane ",
+          title: "Hurricane",
           visible: false,
           source: WMSsource_oasis('hera:hu_sql', "state:nc")
         }),
@@ -1058,8 +1057,8 @@ function toggleLayerInfo() {
   }
 }
 
-$('.slider-time').html('1989'); // the years of time-slider when first loading, of high wind layer
-$('.slider-time2').html('2018');
+$('.slider-time').html('1998'); // the years of time-slider when first loading, of high wind layer
+$('.slider-time2').html('2019');
 
 var dt_from = $('.slider-time').text() + '/01/01';
 var dt_to = $('.slider-time2').text() + '/12/31';
@@ -1132,6 +1131,8 @@ function refreshSource(lyrname, params, l) {
 
 updateMapBtn.onclick = function () {
   overlay.setPosition(undefined);
+  showSelectedTypes(this);
+
   let selectedState = form.querySelector('#state-picker').value;
   let selectedLayer = form.querySelector('#target-layer').value;
   let minYear = form.querySelector('.slider-time').innerHTML.replace(/\//g, "-");
@@ -1200,7 +1201,6 @@ updateMapBtn.onclick = function () {
     });
 
   document.getElementById("tab-3").innerHTML = "Highlight Table: <i>" + selectedLayer + " ("+ selectedState.toUpperCase() +") " + minYear + "-" + maxYear + '</i>';
-  showSelectedTypes();
 }
 
 targetLayer.onchange = function () {
@@ -1258,7 +1258,7 @@ targetLayer.onchange = function () {
   check.innerHTML = '';
   // subCategory.options.length = 0;
   switch (this.value) {
-    case 'Flooding ':
+    case 'Flooding':
       sub = {
         'FA': 'Areal Flood',
         'FL': 'River Flood',
@@ -1267,7 +1267,7 @@ targetLayer.onchange = function () {
       };
 
       break;
-    case 'Winter Weather ':
+    case 'Winter Weather':
       sub = {
         'BZ': 'Blizzard',
         'WC': 'Wind Chill',
@@ -1280,12 +1280,12 @@ targetLayer.onchange = function () {
       };
 
       break;
-    case 'Heat ':
-    case 'Hail ':
+    case 'Heat':
+    case 'Hail':
       sub = {};
 
       break;
-    case 'High Wind ':
+    case 'High Wind':
       sub = {
         'Gale Force': 'Gale Force',
         'Storm Force': 'Storm Force',
@@ -1293,7 +1293,7 @@ targetLayer.onchange = function () {
       };
 
       break;
-    case 'Tornado ':
+    case 'Tornado':
       sub = {
         'F-0': 'F-0',
         'F-1': 'F-1',
@@ -1307,7 +1307,8 @@ targetLayer.onchange = function () {
         'EF-4': 'EF-4',
       };
 
-      case 'Hurricane ':
+      break;
+      case 'Hurricane':
         sub = {
           'HU': 'Hurricane',
           'TS': 'Tropical Storm',
@@ -1374,7 +1375,7 @@ targetLayer.onchange = function () {
 }
 
 function hideStates(currentLyr){
-  if (currentLyr == 'Hurricane '){
+  if (currentLyr == 'Hurricane'){
     let otherStates = form.querySelectorAll('#state-picker > option:not([value="nc"]):not([value="sc"])');
     otherStates.forEach(s => s.style.display = "none");
     // window.alert("The hurricane data for the states other than NC/SC are still in progress and not available at this time. We'll upload the layers once it's finished. Thank you for your patience. ");
@@ -1443,22 +1444,28 @@ function checkAll(e){
 }
 
 // Function: Change the subgroup drop down label innertext
-//        If all the subcategories selected, shows 'All Types';
+//        If only one type selected, display it as the label;
 //        if some of them selected, shows 'Multi Selected';
-//        else, shows the selected one
-function showSelectedTypes(){
+//        else, shows 'All Types'
+function showSelectedTypes(btnObj){
   let currentInnertext = document.getElementById('subcategory').selectedOptions[0];
   let currentOptions = form.querySelectorAll('input[type="checkbox"]:checked:not(#checkall)');
   let allOptions = form.querySelectorAll('input[type="checkbox"]:not(#checkall)');
-  if (currentOptions.length == allOptions.length){
-    console.log('All Types');
-    currentInnertext.innerText = 'All Types';
-  } else if (currentOptions.length > 1){
+
+  if (currentOptions.length == 1){
+    console.log(currentOptions[0].labels[0].innerText);
+    currentInnertext.innerText = currentOptions[0].labels[0].innerText;
+  } else if (currentOptions.length > 1 && currentOptions.length < allOptions.length){
     console.log('Multiple Types Selected');
     currentInnertext.innerText = 'Multiple Types Selected';
   } else{
-    console.log(currentOptions[0].labels[0].innerText);
-    currentInnertext.innerText = currentOptions[0].labels[0].innerText;
+    if (currentOptions.length == 0 && allOptions.length != 0){
+      // console.log(obj.innerText);
+      confirm("You're updating the map with no data type selected. It will return the results of all data.");
+      // btnObj.setAttribute('disabled', '');
+    }
+    console.log('All Types');
+    currentInnertext.innerText = 'All Types';
   }
 
 }
@@ -1636,8 +1643,8 @@ statepicker.onchange = function (e) {
 function hideHurricane(state){
   console.log(state, ':')
   if (state != 'sc' && state != 'nc'){
-    form.querySelector('#target-layer > option[value="Hurricane "]').style.display = "none";
+    form.querySelector('#target-layer > option[value="Hurricane"]').style.display = "none";
   }else{
-    form.querySelector('#target-layer > option[value="Hurricane "]').style.display = "block";
+    form.querySelector('#target-layer > option[value="Hurricane"]').style.display = "block";
   }
 }

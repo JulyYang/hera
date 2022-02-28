@@ -164,6 +164,18 @@ body {
   border-right: 1px solid #DDD;
 }
 
+.nav>li>a:focus, .nav>li>a:hover {
+  background-color: #123f5a7d;
+}
+
+.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
+  cursor: default;
+  background-color: transparent;
+  border: 2px solid #123f5a78;
+  border-bottom-color: #2d90cb00;
+  font-weight: bold;
+}
+
 #legend {
   display: none;
   /* position: absolute; */

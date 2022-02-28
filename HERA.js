@@ -1,4 +1,5 @@
-var interactionSelectPointerMove = new ol.interaction.Select({
+// Openlayers Cursor Moving Interaction of the Map
+let interactionSelectPointerMove = new ol.interaction.Select({
   condition: ol.events.condition.pointerMove,
   style: new ol.style.Style({
     // fill: new ol.style.Fill({
@@ -11,14 +12,15 @@ var interactionSelectPointerMove = new ol.interaction.Select({
   })
 });
 
-var interactionSelect = new ol.interaction.Select({});
+// Openlayers Select Interaction
+let interactionSelect = new ol.interaction.Select({});
 
-var container = document.getElementById('popup');
-var content = document.getElementById('popup-content');
-var closer = document.getElementById('popup-closer');
+let container = document.getElementById('popup');
+let content = document.getElementById('popup-content');
+let closer = document.getElementById('popup-closer');
 
-
-var overlay = new ol.Overlay({
+// Popup window of the selected polygon(s)
+let overlay = new ol.Overlay({
   element: container,
   autoPan: true,
   autoPanAnimation: {
@@ -33,7 +35,10 @@ closer.onclick = function () {
   return false;
 };
 
-
+// Function: Create WMS source
+// 1st param: layer of interest (neccessary)
+// 2nd param: conditions to the view (optional)
+// 3rd param: cql filter of the layer (optional)
 let WMSsource_oasis = function (lyr, params = null, cqlFilter = null) {
   let source = new ol.source.TileWMS({
     url: 'http://hera1.oasis.unc.edu:8080/geoserver/hera/wms',
@@ -48,7 +53,7 @@ let WMSsource_oasis = function (lyr, params = null, cqlFilter = null) {
       'CQL_FILTER': cqlFilter,
     },
     serverType: 'geoserver',
-    crossOrigin: 'anonymous', // Add to enable CQL filter on WMS
+    crossOrigin: 'anonymous', // Enable CQL filter on WMS
     // Countries have transparency, so do not fade tiles:
     transition: 0,
   });
@@ -56,11 +61,12 @@ let WMSsource_oasis = function (lyr, params = null, cqlFilter = null) {
   return source;
 };
 
-var basemap = new ol.layer.Tile({
+let basemap = new ol.layer.Tile({
   source: new ol.source.OSM()
 });
 
-var boundarySource = function (state) {
+// Function: create WFS source of the state boudary layer
+let boundarySource = function (state) {
   return new ol.source.Vector({
     renderMode: 'image', // Vector layers are rendered as images. Better performance. Default is 'vector'.
     format: new ol.format.GeoJSON(),
@@ -75,14 +81,14 @@ var boundarySource = function (state) {
   });
 };
 
-var view = new ol.View({
+let view = new ol.View({
   center: ol.proj.fromLonLat([-79.5, 35.1]), // projection: 'EPSG:3857',
   zoom: 8
 
 });
 
 
-var map = new ol.Map({
+let map = new ol.Map({
   target: 'map',
   loadTilesWhileAnimating: true,
   loadTilesWhileInteracting: true,
@@ -111,9 +117,6 @@ var map = new ol.Map({
             basemap,
 
             new ol.layer.Tile({
-              // title: "2017 population",
-              // visible: false,
-              // source: WMSsource('hera:ncsc_population_lyr', null, "stusps = 'NC'")
               source: WMSsource_oasis('hera:tl_2019_us_state')
             }),
 
@@ -143,15 +146,8 @@ var map = new ol.Map({
         new ol.layer.Tile({
           title: "2017 population",
           visible: false,
-          // source: WMSsource('hera:ncsc_population_lyr', null, "stusps = 'NC'")
           source: WMSsource_oasis('hera:tl_nc_population_lyr')
         }),
-
-        // new ol.layer.Tile({
-        //   title: "2015 Impervious Surface Area",
-        //   visible: false,
-        //   // source: WMSsource('hera:ncsc_isa_lyr', null, "stusps = 'NC'")
-        // }),
 
         new ol.layer.Tile({
           title: "Winter Weather ",
@@ -163,7 +159,6 @@ var map = new ol.Map({
           // title: "NC Floods ",
           title: "Flooding ",
           visible: false,
-          // source: WMSsource_oasis('hera:nc_floods_sql')
           source: WMSsource_oasis('hera:floods_sql', "state:nc")
           // layers: createGroupedLyrs('hera:nc_floods_sql', "minYear:2010-01-01;maxYear:2018-12-31;sublist:'FA'\\,'CF'")
         }),
@@ -204,13 +199,8 @@ var map = new ol.Map({
 
   ],
   overlays: [overlay],
-  // view: new ol.View({
-  //   // projection: 'EPSG:3857',
-  //   center: ol.proj.fromLonLat([-80,35.5]),
-  //   zoom: 7
   view: view
 
-  // })
 });
 
 // adjust the base map color
@@ -270,8 +260,6 @@ let createContent = function (lyr, selected) {
   let probability = 0;
   let startyear = parseInt($('.slider-time').html());
   let endyear = parseInt($('.slider-time2').html());
-  // let startyear = selected[Object.keys(selected)[0]]['minyear'];
-  // console.log(selected);
 
 
   Object.keys(selected).forEach(function (key) {
@@ -287,11 +275,7 @@ let createContent = function (lyr, selected) {
     }
 
     counties += selected[key]['county'] + ', ';
-    // console.log('counties: ', counties += selected[key]['county'] + ', ');
-    // console.log('total: ', total);
-    // console.log('average: ', total / flength);
 
-    // console.log(Object.keys(selected[key]));
     Object.keys(selected[key]).filter(i =>
       endyear >= parseInt(i.slice(1)) && parseInt(i.slice(1)) >= startyear && selected[key][i] != null
     ).forEach(i => {
@@ -310,11 +294,8 @@ let createContent = function (lyr, selected) {
   '</p><br><p class="popup-field">Frequency per year: </p><p class="popup-value">' + averageCount + '</p>';
 };
 
-// let createContentHtml = function(){
-//   contentHtml = 
-// };
 
-var shiftPressed = false;
+let shiftPressed = false;
 $(document).keydown(function (event) {
   shiftPressed = event.keyCode == 16;
 });
@@ -336,10 +317,9 @@ map.on('singleclick', function (evt) {
 
   let wmslayerSource = map.forEachLayerAtPixel(evt.pixel,
     function (layer) {
-      // return only layers with ol.source.TileWMS
+      // return only layers of ol.source.TileWMS
       var source = layer.getSource();
       if (source instanceof ol.source.TileWMS) {
-        // lyr = layer['values_']['source']['params_']['LAYERS']; console.log('lyr: ', lyr);
         lyr = source.params_.LAYERS;
         // console.log(source);
         return source;
@@ -351,9 +331,8 @@ map.on('singleclick', function (evt) {
         'INFO_FORMAT': 'application/json',
       }
     );
-    console.log("shiftpressed?: ", shiftPressed);
+    // console.log("shiftpressed?: ", shiftPressed);
 
-    // if (url) {
     fetch(url)
       .then(function (response) {
         return response.json();
@@ -364,14 +343,10 @@ map.on('singleclick', function (evt) {
         if (!shiftPressed) {
           selected = {};
           selected[featureid] = properties;
-          // console.log('if', selected);
         } else if (featureid in selected) {
           delete selected[featureid];
-          // console.log('else if', selected);
         } else {
           selected[featureid] = properties;
-          // console.log('else');
-          // console.log(selected)
         };
 
         // console.log(Object.keys(selected).length);
@@ -380,28 +355,18 @@ map.on('singleclick', function (evt) {
 
         // Load the data of the selected county to the datatable
         let countynameArray = Object.keys(selected).map(k => selected[k]['county']);
-        // console.log(countynameArray);
         // Show selected county names as the subtitle of the table2
         // document.getElementById('selectedCountyName').innerHTML = countynameArray.join(',');
 
         let countynames = '(%27' + countynameArray.join('%27,%27') + '%27)'
-        // let countyname = properties['county'];
         let lyrtable = 'tl_' + statepicker.value + '_' + lyr.replace('hera:', '').split('_')[0] + '_lyr';
         let datatb = $('#attributeTb2').DataTable();
-        // console.log(lyr.replace('hera:', '').split('_')[0]);
-        // datatb.ajax.url(attributeDataUrl + '&typeName=' + lyrtable + '&CQL_FILTER=county=%27' + countyname + '%27').load();
-        // datatb.ajax.url(attributeDataUrl + '&typeName=' + lyrtable + '&CQL_FILTER=county IN '+ '(%27' + countyname + '%27)').load();
-
-        // let highlighttb = $('#attributrTb3').DataTable();
 
         // Get the current params on the map
-        // let minYear = form.querySelector('.slider-time').innerHTML.replace(/\//g, "-"); 
-        // let maxYear = form.querySelector('.slider-time2').innerHTML.replace(/\//g, "-"); 
         let minYear = form.querySelector('.slider-time').innerHTML + '-01-01';
         let maxYear = form.querySelector('.slider-time2').innerHTML + '-12-31';
         let categories = [];
-        // let params = "state:" + selectedState + ";";
-        // let params = 'AND issued BETWEEN '+ minYear + ' AND ' + maxYear;
+
         let params = 'BETWEEN ' + minYear + ' AND ' + maxYear;
         // console.log(lyr.replace('hera:', '').split('_')[0], '_here');
 
@@ -434,15 +399,8 @@ map.on('singleclick', function (evt) {
             default:
               params += "AND phenom_subgroup IN (" + categories.join(",") + ")";
           }
-          // params += "AND phenom_subgroup IN ("+ categories.join(",") + ")";
-          // params += "AND phenom_subgroup IN ("+ categories.join("\\,") + ")";
-          // params += "AND phenom_subgroup IN ("+ categories.join("\\,") + ")" +"minYear:" + minYear + ";maxYear:" + maxYear + ";sublist:" + categories.join("\\,");
-          // } else {
-          //   params += "minYear:" + minYear + ";maxYear:" + maxYear;
         }
 
-        // datatb.ajax.url(attributeDataUrl + '&typeName=' + lyrtable + '&CQL_FILTER=county IN ' + countynames).load();
-        // console.log(attributeDataUrl + '&typeName=' + lyrtable + '&CQL_FILTER=county IN ' + countynames + params);
         datatb.ajax.url(attributeDataUrl + '&typeName=' + lyrtable + '&CQL_FILTER=county IN ' + countynames + params).load();
         
         let newlyrname = lyr.replace('hera:', '').split('_')[0];
@@ -450,13 +408,6 @@ map.on('singleclick', function (evt) {
         let newmaxYear = form.querySelector('.slider-time2').innerHTML;
         let newcountynames = countynames.replaceAll('(', '').replaceAll(')', '').replaceAll(",", "%5C,").replaceAll(' ', '%20');
         
-        // console.log('statepicker.value: ', statepicker.value);
-        // console.log('newlyrname: ', newlyrname);
-        // console.log(lyrSubgroup[newlyrname]);
-        // console.log('newcountynames: ', newcountynames);
-        // console.log('newminYear: ', newminYear);
-        // console.log('newmaxYear: ', newmaxYear);
-        // console.log('params: ', params);
         let categoriesString = categories.length == 0? lyrSubgroup[newlyrname]: categories.join("%5C,");
         // console.log(categoriesString);
 
@@ -725,28 +676,11 @@ let recreateDataTable = function (lyr) {
   createTabTable('#attributeTb2', lyrtable, null, null, dataColumns)
 
 };
-// interactionSelect.on('select', function (e) {
-// var coord = e.mapBrowserEvent.coordinate;
-// var features = e.target.getFeatures().getArray();
-// console.log(e.target.getFeatures());
-
-// if (features.length >= 1) {
-//   var layerid = features[0].getId().split('.')[0];
-//   // console.log(layerid);
-//   createContent(layerid, features);
-//   overlay.setPosition(coord);
-// } else {
-//   overlay.setPosition(undefined);
-// }
-// });
 
 
 document.getElementById("tab-1").innerHTML = "Counts by County: <i>High Wind 1998-2019</i>";
 document.getElementById("tab-2").innerHTML = "Data";
 document.getElementById("tab-3").innerHTML = "Highlight table: <i>High Wind (NC) 1998-2019</i>";
-
-// document.getElementById("about-tab-1").innerHTML = "HERA Data Source";
-// document.getElementById("about-tab-2").innerHTML = "Contact Us";
 
 
 // Create attribute table using Jquery library DataTable
@@ -768,8 +702,6 @@ function createTabTable(attributeTableID, layerID, countyname, params, propertie
     ],
     "scrollX": true,
     "ajax": {
-      // Delete the limitation: maxFeatures=50
-      // Solved from Stackoverflow questions no.48147970
       "url": attributeDataUrl +
         '&typeName=' + layerID +
         '&CQL_FILTER=county IN (%27' + countyname + '%27)' +
@@ -834,10 +766,6 @@ $('#attributeTb2').DataTable({
     }
   ],
   "scrollX": true,
-  // columnDefs: [{
-  //   targets: 3,
-  //   // render: $.fn.dataTable.render.moment( 'DD/MM/YYYY' )
-  // }],
   "ajax": {
     //   // Delete the limitation: maxFeatures=50
     //   // Solved from Stackoverflow questions no.48147970
@@ -896,7 +824,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 });
 
 
-var lyrSubgroup = {
+let lyrSubgroup = {
   'floods':'phenom_subgroup',
   'heats':'phenom_subgroup',
   'ww':'phenom_subgroup',
@@ -909,27 +837,6 @@ var lyrSubgroup = {
 
 var jsonSource = 'hera:highlightTable_sql';
 // Create mock-up highlight table as tableau
-// let layerjson = (function (jsonSource) {
-//   var json;
-//   $.ajax({
-//     async: false, // set acync to false is bad for browser performance
-//     url: `http://hera1.oasis.unc.edu:8080/geoserver/hera/ows?service=WFS&version=1.0.0
-//         &request=GetFeature&typeName=`+ 'hera:highlightTable_sql' +`&outputFormat=json
-//         &format_options=callback:getJson`,
-//     dataType: 'json',
-//     jsonpCallback: 'getJson',
-//     // success: parsejson
-//     success: function (data) {
-//       json = data
-//     }
-//   });
-//   return json;
-// })();
-
-// var layerjson;
-
-// function ajaxcall(state, layer, sublist) {
-// function ajaxcall(state, layer, subheader, sublist) {
 function ajaxcall(state, layer, subheader ,sublist, minyear='1952', maxyear='2021', county='county') {
   // var json;
   // var layerjson;
@@ -940,39 +847,17 @@ function ajaxcall(state, layer, subheader ,sublist, minyear='1952', maxyear='202
   '&format_options=callback:getJson' +
   '&viewparams=' + 'state:'+ state + ';lyr:'+ lyr+ ";subheader:" + subheader +";sublist:" + sublist
   + ";minYear:"+ minyear+ ";maxYear:"+ maxyear + ";county:"+ county;
-  // '&viewparams=' + 'state:'+ state + ';lyr:'+ layer+ ";subheader:" + subheader +";sublist:" + sublist;
+  
   // console.log(highlighttb_url);
   return $.ajax({
     // async: false, // set acync to false is BAD for browser performance!!
     url: highlighttb_url,
-    // url: 'http://hera1.oasis.unc.edu:8080/geoserver/hera/ows?service=WFS&version=1.0.0' +
-    // // url: 'http://hera1.oasis.unc.edu:8080/geoserver/hera/wfs?service=WFS&version=1.0.0' +
-    //   '&request=GetFeature' + '&outputFormat=application/json' + //seems like both json & application/json work
-    //   // url: attributeDataUrl + 
-    //   '&typeName=hera:highlightTable_sql' +
-    //   // '&typeName=hera:test_highlight' +
-    //   // '&viewparams=' + 'minYear:'+ '2017' +
-    //   '&format_options=callback:getJson' +
-    //   // '&viewparams=' + 'state:nc' + ';lyr:ww' + ';minYear:' + '2010' + ";sublist:%27WW%27%5C,%27BZ%27",
-    //   // '&viewparams=' + 'state:'+'nc' + ';lyr:'+ 'floods',
-    //   // '&viewparams=' + 'state:'+ state + ';lyr:'+ layer+ ";sublist:" + sublist,
-    //   '&viewparams=' + 'state:'+ state + ';lyr:'+ layer+ ";subheader:" + subheader +";sublist:" + sublist,
     dataType: 'json',
-    jsonpCallback: 'getJson',
-    // success: parsejson
-    // done: function (data) {
-    //   layerjson = data;
-    //   return layerjson;
-    // }
+    jsonpCallback: 'getJson',    
   });
 };
 
-// ajaxcall(jsonSource).then(function (response) {
-//   console.log(response)
-// });
 
-// ajaxcall('nc', 'ww', '%27WW%27%5C,%27BZ%27').then(function (layerjson) {
-// ajaxcall('nc', 'ww', 'phenom_subgroup' ,'%27WW%27%5C,%27BZ%27').then(function (layerjson) {
 ajaxcall('nc', 'hw', lyrSubgroup['hw'] , lyrSubgroup['hw']).then(function (layerjson) {
   var dummy = [];
 
@@ -1088,10 +973,9 @@ function createhighlight(dummy) {
 
 
 
+  let alpha = d3.scaleLinear().domain([0, 100]).range([0, 1]);
 
-  var alpha = d3.scaleLinear().domain([0, 100]).range([0, 1]);
-
-  var d3table = d3.select("#attributeTb3").append("table").attr("width", '100%');
+  let d3table = d3.select("#attributeTb3").append("table").attr("width", '100%');
 
   thead = d3table.append("thead");
   tbody = d3table.append("tbody")
@@ -1127,7 +1011,6 @@ function createhighlight(dummy) {
       } else {
         return 'rgba(' + colors[1].r + ',' + colors[1].g + ',' + colors[1].b + ',' + alpha(d) + ')';
       }
-      // return 'rgba(' + colors[i].r + ',' + colors[i].g + ',' + colors[i].b + ',' + alpha(d) + ')';
     })
     .text(function (d) {
       return d;
@@ -1173,14 +1056,6 @@ function toggleLayerInfo() {
   } else{
     filterDiv.remove(layerinfo);
   }
-  // let toggleon = document.getElementById('toggle').checked;
-  // if (!toggleon) {
-  //   $("#dialog").dialog("open");
-  //   // console.log("toggle on")
-  // } else {
-  //   $("#dialog").dialog("close");
-  //   // console.log("toggle off")
-  // }
 }
 
 $('.slider-time').html('1989'); // the years of time-slider when first loading, of high wind layer
@@ -1301,19 +1176,13 @@ updateMapBtn.onclick = function () {
   countTb.ajax.url(attributeDataUrl + '&typeName=' + countTbSrc + '&viewparams=' + params).load();
 
   document.getElementById("tab-1").innerHTML = "Counts by County: <i>" + selectedLayer + " " + minYear + "-" + maxYear + '</i>';
-  // countTb.ajax.url(attributeDataUrl + '&typeName=' + countTbSrc + '&viewparams=state:' + selectedState).load();
-  // countTb.ajax.url("http://hera1.oasis.unc.edu:8080/geoserver/hera/wfs?service=WFS&version=1.0.0&request=GetFeature&outputFormat=application/json&typeName=hera:floods_sql&viewparams=minYear:2010;maxYear:2018;sublist:%27CF%27%5C,%27FA%27").load();
-
+  
   // recreateDataTable(countTbSrc);
 
   let lyrid = countTbSrc.replace('hera:', '').split('_')[0];
   let categoriesString = categories.length == 0? lyrSubgroup[lyrid]: categories.join("%5C,");
   categoriesString = categoriesString.replaceAll('\\', '%5C').replaceAll(' ', '%20').replaceAll("'", '%27');
-  // console.log(lyrid);
-  // console.log(lyrSubgroup[lyrid]);
-  // console.log(categoriesString);
-  // console.log(minYear);
-  // console.log(maxYear);
+  
   ajaxcall(selectedState, lyrid, lyrSubgroup[lyrid], categoriesString, minYear, maxYear).then(function (layerjson) {
       $('#attributeTb3 table').remove();
       var dummy = [];
@@ -1390,7 +1259,6 @@ targetLayer.onchange = function () {
   // subCategory.options.length = 0;
   switch (this.value) {
     case 'Flooding ':
-      // sub = ['FA', 'FL', 'FF', 'CF'];
       sub = {
         'FA': 'Areal Flood',
         'FL': 'River Flood',
@@ -1400,7 +1268,6 @@ targetLayer.onchange = function () {
 
       break;
     case 'Winter Weather ':
-      // sub = ['BZ', 'WC', 'WW', 'HS', 'SN', 'ZR', 'IS', 'WS'];
       sub = {
         'BZ': 'Blizzard',
         'WC': 'Wind Chill',
@@ -1416,7 +1283,6 @@ targetLayer.onchange = function () {
     case 'Heat ':
     case 'Hail ':
       sub = {};
-      // check.style.visibility = 'hidden';
 
       break;
     case 'High Wind ':
@@ -1425,7 +1291,6 @@ targetLayer.onchange = function () {
         'Storm Force': 'Storm Force',
         'Hurricane Force': 'Hurricane Force'
       };
-      // check.style.visibility = 'hidden';
 
       break;
     case 'Tornado ':
@@ -1441,7 +1306,6 @@ targetLayer.onchange = function () {
         'EF-3': 'EF-3',
         'EF-4': 'EF-4',
       };
-      // check.style.visibility = 'hidden';
 
       case 'Hurricane ':
         sub = {
@@ -1454,7 +1318,7 @@ targetLayer.onchange = function () {
 
   createSelectAllbtn(Object.values(sub));
 
-  // for (s of sub) {
+  // Loop through the subgroup keys, create and append checkboxes + label to the subgroup drop down menu 
   for (s of Object.keys(sub)) {
     var l = document.createElement('label');
     var input = document.createElement('input');
@@ -1465,12 +1329,10 @@ targetLayer.onchange = function () {
     input.setAttribute('checked', true);
     l.setAttribute('for', s);
     l.appendChild(input);
-    // l.innerHTML = l.innerHTML + s;
     l.innerHTML = l.innerHTML + sub[s];
 
-    // check.appendChild(input);
     check.appendChild(l);
-    // check.appendChild(document.createElement('br'));
+    
   };
 
   // reload data in Count Table if layer switched
@@ -1488,12 +1350,8 @@ targetLayer.onchange = function () {
     list += '%27' + s + '%27%5C,' 
   };
   list = list.slice(0, -4);
-  // console.log(lyrSubgroup[lyrid]);
-  // console.log(list);
+  
   ajaxcall(selectedState, lyrid, lyrSubgroup[lyrid], lyrSubgroup[lyrid]).then(function (layerjson) {
-  // ajaxcall(selectedState, lyrid, lyrSubgroup[lyrid], list).then(function (layerjson) {
-  // ajaxcall(selectedState, lyrid, list).then(function (layerjson) {
-  // // ajaxcall('nc', 'floods').then(function (layerjson) {
     $('#attributeTb3 table').remove();
     var dummy = [];
     // console.log(layerjson)
@@ -1528,42 +1386,26 @@ function hideStates(currentLyr){
 }
 
 
-var expanded = false;
+let expanded = false;
 
+// Show subgroup dropdown when the length of subcategory > 0
 function showCheckboxes() {
   let checkboxes = document.getElementById("checkboxes");
-  // let checkall = document.getElementById("checkalldiv");
   if (!expanded) {
-    // checkboxes.style.display = "block";
-    // checkall.style.display = "block";
     expanded = true;
     let subcategories = form.querySelectorAll('input[type="checkbox"]:not(#checkall)');
-    // let selectallOptions = document.getElementById('selectAllOptions');
-    // console.log(subcategories);
-    // console.log(subcategories.length);
+
     if (subcategories.length > 0){
-      // checkall.style.display = "block";
       checkboxes.style.display = "block";
     }
-    // if (subcategories.length > 0 && selectallOptions == null){
-    //   let l = document.createElement('label');
-    //   let input = document.createElement('input');
-    //   input.id = "selectallOptions";
-    //   input.type = 'checkbox';
-    //   input.setAttribute('checked', true);
-    //   l.setAttribute('for', 'selectallOptions');
-    //   l.appendChild(input);
-    //   l.innerHTML += "Select All";
-    //   checkboxes.appendChild(l);
-    // }
   } else {
     checkboxes.style.display = "none";
-    // checkall.style.display = "none";
     expanded = false;
 
   }
 }
 
+// Create select all button and change the innertext of the drop down label
 function createSelectAllbtn(subArray){
   let checkboxes = document.getElementById("checkboxes");
   let checkall = document.getElementById('checkall');
@@ -1589,8 +1431,8 @@ function createSelectAllbtn(subArray){
   }
 }
 
+// Function: toggle all the check boxes when the 'Select All' is checked/unchecked
 function checkAll(e){
-  // console.log(e);
   let checkboxes = document.getElementById("checkboxes");
   if (e.checked == true){
     form.querySelectorAll('input[type="checkbox"]:not(#checkall)').forEach(i => i.checked = true);
@@ -1598,9 +1440,12 @@ function checkAll(e){
     form.querySelectorAll('input[type="checkbox"]:not(#checkall)').forEach(i => i.checked = false);
   }
   checkboxes.style.display = "block";
-  // console.log('select all');
 }
 
+// Function: Change the subgroup drop down label innertext
+//        If all the subcategories selected, shows 'All Types';
+//        if some of them selected, shows 'Multi Selected';
+//        else, shows the selected one
 function showSelectedTypes(){
   let currentInnertext = document.getElementById('subcategory').selectedOptions[0];
   let currentOptions = form.querySelectorAll('input[type="checkbox"]:checked:not(#checkall)');
@@ -1618,17 +1463,25 @@ function showSelectedTypes(){
 
 }
 
+// Function: Export the div of interest to image
 function exportToImage(divId, imgName){
+  // Get all the current params
   let minYear = form.querySelector('.slider-time').innerHTML.replace(/\//g, "-");
   let maxYear = form.querySelector('.slider-time2').innerHTML.replace(/\//g, "-");
   let currentOptions = form.querySelectorAll('input[type="checkbox"]:checked:not(#checkall)');
   let selectedLayer = form.querySelector('#target-layer').value;
   let selectedState = form.querySelector('#state-picker').value;
+  
+  // Get the div object to be exported
   const captureElement = document.querySelector(divId);
+  
+  // Create title for the exported image, and append to the div
   let imginfo = document.createElement('h4');
   imginfo.id = 'imginfo';
   imginfo.innerHTML = selectedState.toUpperCase() + ' ' + selectedLayer + ' ' + minYear + ' to ' + maxYear;
   captureElement.appendChild(imginfo);
+
+  // The function from the html2canvas library
   html2canvas(captureElement)
     .then(function(canvas) {
       canvas.style.display = "none";
@@ -1655,54 +1508,10 @@ function toggleInfo(divId){
   }
 }
 
-// (function loadingIndicator() {
-//   let allLyrs = map.getLayerGroup().getLayers().array_;
-//   let lyrsArray = allLyrs.filter(e => {
-//     return e.values_.title == 'Layers'
-//   })[0].getLayersArray();
-//   // let tilelyrs = lyrsGroup.getLayersArray().filter(e => {
-//   //   return e.type == 'TILE'
-//   // });
-//   var tilesLoading = 0;
-//   var tilesLoaded = 0;
-
-//   for (layer of lyrsArray) {
-//     if (layer instanceof ol.layer.Tile) {
-//       console.log('tileloaded: ', tilesLoaded);
-//       console.log('tileloading: ', tilesLoading);
-//       // if (layer instanceof ol.layer.Vector) {
-//       // layer.on("precompose", function () {
-//       layer.getSource().on('tileloadstart', function () {
-//         tilesLoading++;
-//         $("#ajaxSpinnerContainer").show();
-//         $("#ajaxSpinnerImage").show();
-//         console.log('show')
-//       });
-//       // layer.on("render", function () {
-//       layer.getSource().on('tileloadend', function () {
-//         tilesLoaded++;
-//         if (tilesLoading === tilesLoaded) {
-//           console.log(tilesLoaded + ' tiles finished loading');
-//           $("#ajaxSpinnerContainer").hide();
-//           $("#ajaxSpinnerImage").hide();
-//           console.log("hide")
-//           tilesLoading = 0;
-//           tilesLoaded = 0;
-//           //trigger another event, do something etc...
-//         }
-
-//       });
-//     }
-
-//   }
-
-
-
-// })()
-
+// Function: toggle the data table
+//        If the height of table navigation bar equals to 250 px (the table is opened), close the table; otherwise, open it.
 function toggleNav() {
   navSize = document.getElementById("tableSidenav").style.height;
-  // If the height of table navigation bar equals to 250 px (the table is opened), close the table; otherwise, open it.
   if (navSize == "40%") {
     // console.log("close");
     return closeNav();
@@ -1720,7 +1529,8 @@ function closeNav() {
   document.getElementById("map").style.marginBottom = "0";
 }
 
-// EPSG: 4326 for the map view
+// Coordinate center for the states
+//      EPSG: 4326 for the map view
 let viewObject = {
   'nc': [-79.5, 35.1],
   'sc': [-80.98, 33.5],
@@ -1733,8 +1543,9 @@ let viewObject = {
   'va': [-78.63208332413177, 37.39087233427526]
 }
 
-var statepicker = document.getElementById('state-picker');
+let statepicker = document.getElementById('state-picker');
 
+// State picker onchange function
 statepicker.onchange = function (e) {
   let selstate = e.srcElement.value;
   let baselyrs = map.getLayerGroup().getLayers().array_.filter(e => {
@@ -1750,6 +1561,7 @@ statepicker.onchange = function (e) {
   })[0];
 
   let lyrsArray = lyrs.getLayersArray();
+  // Update all the loaded (includeing unvisible) layers to the selected state
   lyrsArray.forEach(function (l) {
     l.getSource().updateParams({
       // LAYERS: newl
@@ -1757,24 +1569,26 @@ statepicker.onchange = function (e) {
     })
   });
 
+  // Create a new view based on the selected state
   let newView = new ol.View({
     center: ol.proj.fromLonLat(viewObject[selstate]),
     zoom: 8
   });
 
+  // Zoom to the view of the selected state
   map.setView(newView);
 
   let selectedLayer = form.querySelector('#target-layer').value;
   let selectedLyr = lyrsArray.filter(l => l.get('title') == selectedLayer);
-  // console.log(selectedLyr);
   let countTbSrc = selectedLyr[0].getLayersArray()[0].getSource().params_.LAYERS;
-  // console.log(countTbSrc);
-  // Update the count table
+  
+  // Update the Count Table
   $('#attributeTb').DataTable().ajax.url(attributeDataUrl + '&typeName=' + countTbSrc + '&viewparams=state:' + selstate).load();
 
   // Delete the current data table and reinitialize the table
   recreateDataTable(countTbSrc);
 
+  // Get the layer url
   let featureInfoUrl = selectedLyr[0].getLayersArray()[0].getSource().getGetFeatureInfoUrl(
     ol.proj.transform(viewObject[selstate], 'EPSG:4326', 'EPSG:3857'),
     map.getView().getResolution(),
@@ -1783,11 +1597,13 @@ statepicker.onchange = function (e) {
       'propertyName': 'minyear,maxyear',
     }
   );
+  // Fetch the url and get returned json
   fetch(featureInfoUrl)
   .then(function (response) {
     return response.json();
   })
   .then(function (json) {
+    // Get the max and min year of the layer
     let currentf = json.features[0];
     let currentp = currentf.properties;
     let miny = currentp.minyear;
@@ -1795,22 +1611,28 @@ statepicker.onchange = function (e) {
 
     $('.slider-time').html(miny);
     $('.slider-time2').html(maxy);
-
+    
+    // Update the max and min of the time slider
     $('#slider-range').slider({
       min: Date.parse(miny + '/01/01') / 1000,
       max: Date.parse(maxy + '/12/31') / 1000,
       values: [Date.parse(miny + '/01/01') / 1000, Date.parse(maxy + '/12/31') / 1000]
     })
+    // Update the title of the navigation tab for Count Table to notify users
     document.getElementById("tab-1").innerHTML = "Counts by County: <i>" + selectedLayer + " " + miny + "-" + maxy + '</i>';
 
   });
 
+  // Display the text 'All type' everytime when state picker changed
   currentInnertext = document.getElementById('subcategory').selectedOptions[0].innerText = 'All Types';
+  // Check all the checkboxes when switching state
   form.querySelectorAll('input[type="checkbox"]').forEach(i => i.checked = true);
   
+  // Decide to hide hurricane option or not based on the selected layer
   hideHurricane(selstate);
 }
 
+// Function: Hide hurricane option from being selected by users when they select states other than NC/SC
 function hideHurricane(state){
   console.log(state, ':')
   if (state != 'sc' && state != 'nc'){

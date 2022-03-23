@@ -184,10 +184,19 @@ body {
 
 #cisa-logo {
   width: 200px;
+  margin-right: 10px;
 }
 
 #sercc-logo {
   width: 120px;
+  margin-right: 10px;
+}
+
+#convergence-logo {
+  height: 120px;
+  /* width: 120px; */
+  background-color: #123f5a;
+  border-radius: 15px;
 }
 
 /* .layer-switcher.shown.layer-switcher-activation-mode-click {
@@ -492,7 +501,7 @@ body {
   display: inline-block;
 }
 
-#info, #btnTable, #print {
+#info, #btnTable, #print, #home {
   background-color: rgb(18 63 90 / 0%);
   color:whitesmoke;
   float: right;

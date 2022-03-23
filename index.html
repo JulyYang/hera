@@ -58,16 +58,23 @@
     <button id="info" onclick="toggleInfo('infoPage')" title="About map-header">
       <i class="fa fa-info-circle fa-lg" aria-hidden="true"></i>
     </button>
-
+    
     <!-- export the map to image button -->
     <button id="print" onclick="exportToImage('#map', 'map')" title="Save Map to File">
       <i class="fa fa-print fa-lg" aria-hidden="true"></i>
     </button>
-
+    
     <!-- the button to turn on/off the data table panel -->
     <button id="btnTable" onclick="toggleNav()" title="Data Table">
       <i class="fa fa-table fa-lg" aria-hidden="true"></i>
     </button>
+
+    <!-- the home button back to the Convergence page -->
+    <a href="https://convergence.unc.edu/" target="_blank">
+      <button id="home" title="Back to Convergence">
+        <i class="fa fa-home fa-lg" aria-hidden="true"></i>
+      </button>
+    </a>
   </div>
   <!-- END OF MAP HEADER DIV -->
 
@@ -166,7 +173,7 @@
       <div id="heraInfo">
       <a id="info-closer" class="ol-popup-closer" onclick="toggleInfo('infoPage')"></a>
         <h3 id="infoTitle">About HERA</h3>
-        <p><b>W</b>elcome to the experimental version of the Hazardous Extremes for Risk Assessments (HERA) tool. HERA is a
+        <p><b>W</b>elcome to the Hazardous Extremes for Risk Assessments (HERA) tool. HERA is a
           geospatial tool designed to assist local and regional decision-makers to assess and plan for meteorological and
           climatological hazards in their area. The tool provides decision support through:
           
@@ -194,6 +201,7 @@
                 
                 <a href="https://www.cisa.sc.edu/" target="_blank"><img id="cisa-logo" src="logos/CISAlogoTEXT.png"></a>
                 <a href="https://sercc.com/" target="_blank"><img id="sercc-logo" src="logos/SERCClogo.png"></a>
+                <a href="https://convergence.unc.edu/" target="_blank"><img id="convergence-logo" src="logos/ConvergenceLogo.png"></a>
                 <a onclick="changeContent('heraInfo','dataSource')">Data Source</a>
       </div>
       <!-- END OF HERA INFO DIV -->

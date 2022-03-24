@@ -199,6 +199,10 @@ body {
   border-radius: 15px;
 }
 
+#dataSrcBtn, #aboutBtn {
+  float: right;
+  font-weight: bold;
+}
 /* .layer-switcher.shown.layer-switcher-activation-mode-click {
   padding-right: 34px;
 }
